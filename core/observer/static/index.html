@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Studio Observer — Overview</title>
+  <link rel="stylesheet" href="_base.css" />
+  <link rel="icon" href="favicon.svg" />
+  <script src="_shell.js"></script>
+</head>
+<body>
+<main>
+  <div class="panel">
+    <h2>Active game</h2>
+    <div id="game-summary" class="empty">loading…</div>
+  </div>
+
+  <div class="grid cols-2">
+    <div class="panel">
+      <h2>Agent status</h2>
+      <div id="agent-status" class="empty">loading…</div>
+    </div>
+    <div class="panel">
+      <h2>Recent handoffs</h2>
+      <div id="recent-handoffs" class="empty">loading…</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Current phase</h2>
+    <pre id="phase-block" class="empty">loading…</pre>
+  </div>
+</main>
+
+<script>
+const AGENT_LIST = [
+  "orchestrator","researcher","game-designer","narrative-designer","ux-designer",
+  "tech-architect","art-director","asset-curator","blender-tech","level-designer",
+  "balance-engineer","gameplay-engineer","systems-engineer","ui-engineer","qa-engineer","build-engineer"
+];
+
+async function refresh() {
+  const game = STUDIO.activeGame;
+  // Summary.
+  const gSum = document.getElementById("game-summary");
+  if (!game) {
+    gSum.innerHTML = `<div class="empty">No active game. Run <code>./core/scripts/new-game.sh &lt;name&gt; --template &lt;t&gt;</code></div>`;
+  } else {
+    gSum.innerHTML = `<dl class="kv"><dt>slug</dt><dd>${game}</dd></dl>`;
+  }
+
+  // Agent status table.
+  const aStat = document.getElementById("agent-status");
+  if (!game) { aStat.innerHTML = `<div class="empty">select a game</div>`; }
+  else {
+    const r = await fetch(`/api/agents?game=${encodeURIComponent(game)}&tail=500`);
+    const j = await r.json();
+    const rows = AGENT_LIST.map(a => {
+      const last = j.by_agent[a];
+      const status = last ? last.status : "idle";
+      const ts = last ? STUDIO.fmtRelTs(last.ts) : "—";
+      const detail = last ? (last.detail || last.action || last.task || "") : "—";
+      return `<tr><td>${a}</td><td>${STUDIO.statusBadge(status)}</td><td>${ts}</td><td style="color:var(--muted);font-size:12px;">${(""+detail).slice(0,80)}</td></tr>`;
+    }).join("");
+    aStat.innerHTML = `<table><thead><tr><th>agent</th><th>status</th><th>last seen</th><th>detail</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  // Handoffs.
+  const hList = document.getElementById("recent-handoffs");
+  if (!game) { hList.innerHTML = `<div class="empty">select a game</div>`; }
+  else {
+    const r = await fetch(`/api/handoffs?game=${encodeURIComponent(game)}&limit=8`);
+    const j = await r.json();
+    if (!j.handoffs.length) hList.innerHTML = `<div class="empty">no handoffs yet</div>`;
+    else hList.innerHTML = `<table><thead><tr><th>agent</th><th>file</th><th>when</th></tr></thead><tbody>${
+      j.handoffs.map(h => `<tr><td>${h.agent}</td><td><a href="handoffs.html?game=${encodeURIComponent(game)}&path=${encodeURIComponent(h.rel_path)}">${h.filename}</a></td><td>${STUDIO.fmtRelTs(h.mtime)}</td></tr>`).join("")
+    }</tbody></table>`;
+  }
+
+  // Phase block.
+  const pBlock = document.getElementById("phase-block");
+  if (!game) { pBlock.textContent = "select a game"; }
+  else {
+    const r = await fetch(`/api/phase?game=${encodeURIComponent(game)}`);
+    const j = await r.json();
+    pBlock.textContent = j.current || "(no current-phase.md yet — orchestrator hasn't started)";
+    pBlock.classList.remove("empty");
+  }
+}
+
+(async () => {
+  await STUDIO.loadGames();
+  STUDIO.renderTopbar("index");
+  await refresh();
+  setInterval(refresh, 5000);
+})();
+</script>
+</body>
+</html>

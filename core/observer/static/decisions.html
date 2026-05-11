@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Studio Observer — Decisions</title>
+  <link rel="stylesheet" href="_base.css" />
+  <link rel="icon" href="favicon.svg" />
+  <script src="_shell.js"></script>
+</head>
+<body>
+<main>
+  <div class="grid cols-2">
+    <div class="panel">
+      <h2>ADR list</h2>
+      <div id="adr-list" class="empty">loading…</div>
+    </div>
+    <div class="panel">
+      <h2>Preview</h2>
+      <pre id="adr-body" class="empty">select an ADR</pre>
+    </div>
+  </div>
+</main>
+
+<script>
+async function showADR(game, rel) {
+  const r = await fetch(`/api/decision?game=${encodeURIComponent(game)}&path=${encodeURIComponent(rel)}`);
+  const j = await r.json();
+  document.getElementById("adr-body").textContent = j.content || "(empty)";
+  document.getElementById("adr-body").classList.remove("empty");
+}
+
+(async () => {
+  await STUDIO.loadGames();
+  STUDIO.renderTopbar("decisions");
+  const game = STUDIO.activeGame;
+  const list = document.getElementById("adr-list");
+  if (!game) { list.innerHTML = `<div class="empty">select a game</div>`; return; }
+  const r = await fetch(`/api/decisions?game=${encodeURIComponent(game)}`);
+  const j = await r.json();
+  if (!j.decisions.length) { list.innerHTML = `<div class="empty">no ADRs yet</div>`; return; }
+  list.innerHTML = `<table><thead><tr><th>file</th><th>title</th></tr></thead><tbody>${
+    j.decisions.map(d => `<tr><td><a href="#" data-rel="${d.rel_path}">${d.filename}</a></td><td style="color:var(--muted);">${d.title}</td></tr>`).join("")
+  }</tbody></table>`;
+  list.querySelectorAll("a").forEach(a => a.addEventListener("click", e => { e.preventDefault(); showADR(game, a.dataset.rel); }));
+})();
+</script>
+</body>
+</html>

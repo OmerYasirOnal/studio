@@ -1,0 +1,57 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+
+# Unity (per-game .gitignore inside games/<name>/unity/ handles project-specific items)
+**/Library/
+**/Temp/
+**/Obj/
+**/Build/
+**/Builds/
+**/Logs/
+**/UserSettings/
+**/MemoryCaptures/
+
+# Studio runtime artifacts
+logs/*.jsonl
+logs/*.log
+games/*/logs/**/*.log
+games/*/logs/**/*.jsonl
+.active-game.lock
+
+# Secrets — none should exist, this is a paranoia rail
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+
+# Assets we never commit raw
+games/*/assets-raw/**/*.psd
+games/*/assets-raw/**/*.blend1
+
+# OS artifacts
+Icon?

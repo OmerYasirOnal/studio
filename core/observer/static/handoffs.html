@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Studio Observer — Handoffs</title>
+  <link rel="stylesheet" href="_base.css" />
+  <link rel="icon" href="favicon.svg" />
+  <script src="_shell.js"></script>
+</head>
+<body>
+<main>
+  <div class="grid cols-2">
+    <div class="panel">
+      <h2>Recent handoffs</h2>
+      <div id="handoff-list" class="empty">loading…</div>
+    </div>
+    <div class="panel">
+      <h2>Preview</h2>
+      <pre id="handoff-body" class="empty">select a handoff</pre>
+    </div>
+  </div>
+</main>
+
+<script>
+async function showHandoff(game, rel) {
+  const r = await fetch(`/api/handoff?game=${encodeURIComponent(game)}&path=${encodeURIComponent(rel)}`);
+  const j = await r.json();
+  document.getElementById("handoff-body").textContent = j.content || "(empty)";
+  document.getElementById("handoff-body").classList.remove("empty");
+}
+
+(async () => {
+  await STUDIO.loadGames();
+  STUDIO.renderTopbar("handoffs");
+  const game = STUDIO.activeGame;
+  const list = document.getElementById("handoff-list");
+  if (!game) { list.innerHTML = `<div class="empty">select a game</div>`; return; }
+  const r = await fetch(`/api/handoffs?game=${encodeURIComponent(game)}&limit=50`);
+  const j = await r.json();
+  if (!j.handoffs.length) { list.innerHTML = `<div class="empty">no handoffs yet</div>`; return; }
+  list.innerHTML = `<table><thead><tr><th>agent</th><th>file</th><th>when</th></tr></thead><tbody>${
+    j.handoffs.map(h => `<tr><td>${h.agent}</td><td><a href="#" data-rel="${h.rel_path}">${h.filename}</a></td><td>${STUDIO.fmtRelTs(h.mtime)}</td></tr>`).join("")
+  }</tbody></table>`;
+  list.querySelectorAll("a").forEach(a => a.addEventListener("click", e => { e.preventDefault(); showHandoff(game, a.dataset.rel); }));
+
+  // Preselect from query param.
+  const params = new URLSearchParams(location.search);
+  const initial = params.get("path");
+  if (initial) showHandoff(game, initial);
+})();
+</script>
+</body>
+</html>

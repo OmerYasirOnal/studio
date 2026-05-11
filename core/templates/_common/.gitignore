@@ -1,0 +1,27 @@
+# Game-level .gitignore additions on top of the framework's root .gitignore.
+
+# Per-game runtime artifacts
+logs/**/*.log
+logs/**/*.jsonl
+.local/
+
+# Unity project ignores (in case Unity project lives at unity/)
+unity/Library/
+unity/Temp/
+unity/Obj/
+unity/Build/
+unity/Builds/
+unity/Logs/
+unity/UserSettings/
+unity/MemoryCaptures/
+unity/*.csproj
+unity/*.sln
+unity/.vs/
+
+# Blender backups
+**/*.blend1
+**/*.blend2
+
+# Asset working files we don't commit raw
+assets-raw/**/*.psd
+assets-raw/**/*.psb

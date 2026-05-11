@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Studio Observer — Logs</title>
+  <link rel="stylesheet" href="_base.css" />
+  <link rel="icon" href="favicon.svg" />
+  <script src="_shell.js"></script>
+</head>
+<body>
+<main>
+  <div class="panel">
+    <h2>Agent status events <small style="color:var(--muted); font-weight:normal;">(tail 200, live)</small></h2>
+    <div id="evt-list" class="empty">loading…</div>
+  </div>
+  <div class="panel">
+    <h2>Recent commits</h2>
+    <div id="commits" class="empty">loading…</div>
+  </div>
+</main>
+
+<script>
+async function refresh() {
+  const game = STUDIO.activeGame;
+  // Events.
+  const evtDiv = document.getElementById("evt-list");
+  const r1 = await fetch(`/api/agents?game=${encodeURIComponent(game)}&tail=200`);
+  const j1 = await r1.json();
+  const events = (j1.events || []).slice().reverse();
+  if (!events.length) evtDiv.innerHTML = `<div class="empty">no events yet</div>`;
+  else evtDiv.innerHTML = `<table><thead><tr><th>when</th><th>game</th><th>agent</th><th>status</th><th>action</th><th>detail</th></tr></thead><tbody>${
+    events.map(e => `<tr>
+      <td style="color:var(--muted);font-size:12px;">${STUDIO.fmtTs(e.ts)}</td>
+      <td>${e.game || "—"}</td>
+      <td>${e.agent || "—"}</td>
+      <td>${STUDIO.statusBadge(e.status)}</td>
+      <td style="font-family:var(--mono);font-size:12px;">${e.action || "—"}</td>
+      <td style="color:var(--muted);font-size:12px;">${(e.detail || e.task || "").toString().slice(0, 120)}</td>
+    </tr>`).join("")
+  }</tbody></table>`;
+
+  // Commits.
+  const cDiv = document.getElementById("commits");
+  const r2 = await fetch("/api/commits?tail=50");
+  const j2 = await r2.json();
+  const commits = (j2.commits || []).slice().reverse();
+  if (!commits.length) cDiv.innerHTML = `<div class="empty">no commits logged yet (post-commit-log.sh not installed?)</div>`;
+  else cDiv.innerHTML = `<table><thead><tr><th>when</th><th>short</th><th>game</th><th>message</th><th>files</th></tr></thead><tbody>${
+    commits.map(c => `<tr>
+      <td style="color:var(--muted);font-size:12px;">${STUDIO.fmtRelTs(c.ts)}</td>
+      <td style="font-family:var(--mono);">${c.short}</td>
+      <td>${c.game || "—"}</td>
+      <td>${(c.msg || "").slice(0, 100)}</td>
+      <td>${c.files}</td>
+    </tr>`).join("")
+  }</tbody></table>`;
+}
+
+(async () => {
+  await STUDIO.loadGames();
+  STUDIO.renderTopbar("logs");
+  await refresh();
+  setInterval(refresh, 4000);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Studio Observer — Phases</title>
+  <link rel="stylesheet" href="_base.css" />
+  <link rel="icon" href="favicon.svg" />
+  <script src="_shell.js"></script>
+</head>
+<body>
+<main>
+  <div class="panel">
+    <h2>Phase plan</h2>
+    <p style="color: var(--muted); margin-top: 0;">The canonical phase list (Game Phase 1..9). Status reflects files in <code>games/&lt;active&gt;/docs/11-roadmap/</code>.</p>
+    <table id="phase-table">
+      <thead><tr><th>#</th><th>Phase</th><th>Window</th><th>Output</th><th>Status</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div class="panel">
+    <h2>Current phase document</h2>
+    <pre id="cur-phase" class="empty">loading…</pre>
+  </div>
+</main>
+
+<script>
+const PHASES = [
+  [1, "Discovery", "Week 1", "5 competitor deconstructions, positioning, engine ADR"],
+  [2, "GDD", "Week 2", "13 GDD docs, 60+ user stories, 5 UX flows, 15 wireframes, art bible"],
+  [3, "Tech Architecture", "Week 3", "11 tech-spec docs, 8+ ADRs, data model"],
+  [4, "Asset Pipeline", "Weeks 3-4", "CC0 mirrors, asset budget, Blender pipeline"],
+  [5, "Prototype", "Weeks 4-5", "Unity scene, joystick, auto-attack, 200 enemies @ 60fps"],
+  [6, "Vertical Slice", "Weeks 6-7", "1 biome, 3 weapons, 5 enemies, 1 boss, save/load, TestFlight"],
+  [7, "Content", "Weeks 8-10", "8 chars, 5 biomes, 12 weapons, 50 achievements"],
+  [8, "Monetization", "Week 11", "Unity IAP, AdMob, battle pass"],
+  [9, "Polish + Launch", "Week 12+", "Juice, audio, VFX, TR/EN, soft launch"],
+];
+
+(async () => {
+  await STUDIO.loadGames();
+  STUDIO.renderTopbar("phases");
+
+  const game = STUDIO.activeGame;
+  const tbody = document.querySelector("#phase-table tbody");
+  tbody.innerHTML = PHASES.map(([n, name, win, out]) => {
+    return `<tr><td>${n}</td><td>${name}</td><td>${win}</td><td style="color:var(--muted);font-size:12px;">${out}</td><td><span class="badge gray">pending</span></td></tr>`;
+  }).join("");
+
+  const pre = document.getElementById("cur-phase");
+  if (!game) { pre.textContent = "select a game"; return; }
+  try {
+    const r = await fetch(`/api/phase?game=${encodeURIComponent(game)}`);
+    const j = await r.json();
+    pre.textContent = j.current || "(no current-phase.md yet)";
+    pre.classList.remove("empty");
+  } catch { pre.textContent = "fetch failed"; }
+})();
+</script>
+</body>
+</html>
