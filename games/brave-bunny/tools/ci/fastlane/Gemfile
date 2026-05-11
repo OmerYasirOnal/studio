@@ -1,0 +1,12 @@
+# Gemfile — fastlane + plugins. Used by `bundle install` in CI and locally.
+#
+# Owner: build-engineer. Cross-ref: tech-spec 10-build-and-ci.md.
+# Run `bundle install` from this directory before `bundle exec fastlane ...`.
+
+source "https://rubygems.org"
+
+gem "fastlane"
+
+# Load plugin gems declared in Pluginfile (fastlane convention).
+plugins_path = File.join(File.dirname(__FILE__), "Pluginfile")
+eval_gemfile(plugins_path) if File.exist?(plugins_path)

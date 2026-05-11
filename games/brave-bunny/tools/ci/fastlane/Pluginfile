@@ -1,0 +1,7 @@
+# fastlane Pluginfile — pinned plugins for headless Unity + version sync.
+#
+# Owner: build-engineer. Cross-ref: tech-spec 10-build-and-ci.md.
+# Plugins are gems; `bundle exec fastlane` resolves them via Gemfile.
+
+gem "fastlane-plugin-versioning"   # increment_version_number_in_xcodeproj etc.
+gem "fastlane-plugin-unity"        # helper invocations for Unity batchmode

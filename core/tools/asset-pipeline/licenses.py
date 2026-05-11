@@ -16,7 +16,10 @@ from pathlib import Path
 
 ALLOWED_LICENSES = {"CC0", "CC0 1.0", "CC-BY", "CC-BY 4.0", "MIT", "SIL OFL", "SIL OFL 1.1"}
 
-EXCLUDED_NAMES = {"LICENSES.md", "README.md", ".DS_Store", "INDEX.md"}
+EXCLUDED_NAMES = {"LICENSES.md", "README.md", ".DS_Store", "INDEX.md", "fetch-log.md"}
+# Source files / Blender working files are not assets — they live alongside assets in
+# the custom-blender subdir but they're our code (MIT) not third-party content.
+EXCLUDED_EXTENSIONS = {".py", ".blend", ".blend1", ".blend2"}
 
 
 def repo_root() -> Path:
@@ -71,6 +74,8 @@ def list_asset_files(assets_raw: Path) -> list[Path]:
         if not p.is_file():
             continue
         if p.name in EXCLUDED_NAMES:
+            continue
+        if p.suffix.lower() in EXCLUDED_EXTENSIONS:
             continue
         if any(part.startswith(".") for part in p.relative_to(assets_raw).parts):
             continue

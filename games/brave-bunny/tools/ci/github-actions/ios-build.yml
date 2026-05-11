@@ -1,0 +1,126 @@
+# ios-build.yml — Brave Bunny iOS build pipeline.
+#
+# Owner: build-engineer. Cross-ref: tech-spec 10-build-and-ci.md ("CI: GitHub Actions").
+#
+# COST AWARENESS — macOS GitHub-hosted runners cost 10x Linux minutes against the
+# GitHub Free tier (2,000 min/mo private repo budget → effectively 200 mac-min/mo).
+# So this workflow is:
+#   - manual (workflow_dispatch) by default
+#   - PR-triggered ONLY when the PR carries the `build:ios` label
+# No on-push or on-merge triggers in v0.1.
+#
+# DESTINATION: place this file at .github/workflows/ios-build.yml at the repo root.
+# It lives here under tools/ci/github-actions/ for ownership clarity; build-engineer
+# copies (or symlinks) into the workflows dir as part of repo setup.
+
+name: ios-build
+
+on:
+  # Manual trigger — primary entry point in v0.1.
+  workflow_dispatch:
+    inputs:
+      lane:
+        description: "fastlane lane to run (preview | beta)"
+        required: true
+        default: "preview"
+        type: choice
+        options:
+          - preview
+          - beta
+
+  # Label-gated PR trigger — opt-in per PR to control mac-minutes burn.
+  pull_request:
+    types: [labeled]
+    branches: [main]
+    paths:
+      - "games/brave-bunny/unity/**"
+      - "games/brave-bunny/tools/ci/**"
+
+jobs:
+  ios:
+    # Run only when explicitly requested (label or manual dispatch).
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' && github.event.label.name == 'build:ios')
+
+    runs-on: macos-14    # macOS 14 runner — required for Xcode 16 / iOS SDK 17+
+    timeout-minutes: 60  # hard cap to protect mac-minutes budget
+
+    env:
+      UNITY_VERSION: 6000.0.31f1
+      LANE: ${{ inputs.lane || 'preview' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          fetch-depth: 0
+
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: games/brave-bunny/unity/Library
+          key: Library-brave-bunny-iOS-${{ hashFiles('games/brave-bunny/unity/Packages/manifest.json') }}
+          restore-keys: |
+            Library-brave-bunny-iOS-
+            Library-brave-bunny-
+
+      - name: Build with Unity (headless via game-ci)
+        uses: game-ci/unity-builder@v4
+        with:
+          targetPlatform: iOS
+          unityVersion: ${{ env.UNITY_VERSION }}
+          projectPath: games/brave-bunny/unity
+          buildMethod: Brave.Boot.IOSBuilder.Build
+          buildName: BraveBunny
+          customParameters: -output ../unity/Build/iOS
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+          working-directory: games/brave-bunny/tools/ci/fastlane
+
+      - name: Install fastlane + plugins
+        working-directory: games/brave-bunny/tools/ci/fastlane
+        run: |
+          gem install bundler
+          bundle config set deployment 'true'
+          bundle install
+
+      - name: Run fastlane ${{ env.LANE }}
+        working-directory: games/brave-bunny/tools/ci/fastlane
+        run: bundle exec fastlane ios ${{ env.LANE }}
+        env:
+          CI: "true"
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_AUTHOR: ${{ secrets.MATCH_GIT_AUTHOR }}
+          FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+          FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
+          FASTLANE_APP_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APP_SPECIFIC_PASSWORD }}
+          FASTLANE_TEAM_ID: ${{ secrets.FASTLANE_TEAM_ID }}
+          FASTLANE_ITC_TEAM_ID: ${{ secrets.FASTLANE_ITC_TEAM_ID }}
+
+      - name: Upload IPA artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: BraveBunny-iOS-${{ github.run_number }}
+          path: games/brave-bunny/Builds/*.ipa
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Upload Unity build logs (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unity-build-logs-${{ github.run_number }}
+          path: games/brave-bunny/unity/Logs/
+          retention-days: 7
+          if-no-files-found: ignore

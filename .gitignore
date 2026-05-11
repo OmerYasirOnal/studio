@@ -53,5 +53,6 @@ games/*/logs/**/*.jsonl
 games/*/assets-raw/**/*.psd
 games/*/assets-raw/**/*.blend1
 
-# OS artifacts
-Icon?
+# OS artifacts (macOS Finder icon stub uses a literal carriage-return; '?' glob
+# would catch our 'icons/' directories)
+Icon[$'\r']

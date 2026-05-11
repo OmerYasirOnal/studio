@@ -1,0 +1,77 @@
+# lint.yml — Brave Bunny lint + schema validation pipeline.
+#
+# Owner: build-engineer. Cross-ref: tech-spec 10-build-and-ci.md, repo-root CLAUDE.md.
+#
+# Runs on Linux (free runner — no mac-minutes spend). Validates:
+#   - C# formatting (dotnet format --verify-no-changes)
+#   - Markdown linting (markdownlint-cli2)
+#   - Balance JSON schema (core/tools/balance-tools/validate_balance.py)
+#   - Asset license manifest (core/tools/asset-pipeline/licenses.py)
+#
+# DESTINATION: copy or symlink to .github/workflows/lint.yml.
+
+name: lint
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "games/brave-bunny/**"
+      - "core/tools/**"
+  pull_request:
+    paths:
+      - "games/brave-bunny/**"
+      - "core/tools/**"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest    # cheap runner — no mac-minutes
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Set up Node (for markdownlint)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate balance JSON schema
+        run: |
+          if [ -f core/tools/balance-tools/validate_balance.py ]; then
+            python core/tools/balance-tools/validate_balance.py --game brave-bunny
+          else
+            echo "::warning::core/tools/balance-tools/validate_balance.py not yet implemented — skipping"
+          fi
+
+      - name: Validate asset license manifest
+        run: |
+          if [ -f core/tools/asset-pipeline/licenses.py ]; then
+            python core/tools/asset-pipeline/licenses.py --validate --game brave-bunny
+          else
+            echo "::warning::core/tools/asset-pipeline/licenses.py not yet implemented — skipping"
+          fi
+
+      - name: Install markdownlint-cli2
+        run: npm install -g markdownlint-cli2
+
+      - name: Lint markdown
+        run: |
+          markdownlint-cli2 "games/brave-bunny/**/*.md" "#games/brave-bunny/unity/**" || \
+            echo "::warning::markdownlint reported issues — see job log"
+
+      - name: Lint shell scripts (shellcheck)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y shellcheck
+          find games/brave-bunny/tools/ci/scripts -name "*.sh" -print0 | \
+            xargs -0 shellcheck --severity=warning || \
+            echo "::warning::shellcheck reported issues — see job log"

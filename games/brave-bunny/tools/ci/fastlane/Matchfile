@@ -1,0 +1,23 @@
+# fastlane Match config — certificate + provisioning profile sync.
+#
+# Owner: build-engineer. Cross-ref: tech-spec 10-build-and-ci.md > "Signing".
+#
+# Match stores encrypted certs in a SEPARATE private git repo (studio-certs).
+# This is intentional — the studio monorepo stays open-source-able while
+# private signing material lives in its own audit-able repository.
+#
+# Decryption passphrase: MATCH_PASSWORD env var (GitHub Actions secret).
+# Read-only mode is forced on CI (lanes pass `readonly: true` explicitly).
+
+git_url "git@github.com:OmerYasirOnal/studio-certs.git"  # private — never make public
+storage_mode "git"
+type "appstore"                                          # default; lanes override per use
+app_identifier ["com.yasironal.brave-bunny"]
+username ENV["MATCH_GIT_AUTHOR"]                         # GitHub username with repo access
+
+# Optional: branch isolation if multiple games share the studio-certs repo.
+# git_branch "brave-bunny"
+
+# Force read-only on CI so a misfiring lane never overwrites cert material.
+# Local devs can still run `fastlane match appstore` to refresh certs interactively.
+readonly true if ENV["CI"]

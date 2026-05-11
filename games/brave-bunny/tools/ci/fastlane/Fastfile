@@ -1,0 +1,239 @@
+# Fastfile — Brave Bunny iOS build lanes.
+#
+# Owner: build-engineer. Cross-ref: tech-spec 10-build-and-ci.md ("Fastlane lanes").
+# Three lanes — preview (local archive), beta (TestFlight), release (App Store).
+#
+# Lane invocation:
+#   bundle exec fastlane ios preview   # local-only archive, no upload
+#   bundle exec fastlane ios beta      # CI TestFlight upload
+#   bundle exec fastlane ios release   # MANUAL gate — App Store submission
+#
+# Environment variables expected (see runbooks/first-build.md):
+#   MATCH_PASSWORD                — decrypt cert repo (studio-certs)
+#   MATCH_GIT_AUTHOR              — GitHub user for cert repo access
+#   FASTLANE_USER                 — Apple ID email
+#   FASTLANE_PASSWORD             — Apple ID password (avoid; prefer app-specific)
+#   FASTLANE_APP_SPECIFIC_PASSWORD — preferred over FASTLANE_PASSWORD
+#   FASTLANE_TEAM_ID              — Apple Developer team id
+#   FASTLANE_ITC_TEAM_ID          — App Store Connect team id
+#
+# Paths in this file are RELATIVE TO THIS FILE (fastlane sets CWD to its own dir).
+# games/brave-bunny/tools/ci/fastlane/Fastfile
+#   ../../../unity/Build/iOS = games/brave-bunny/unity/Build/iOS
+
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
+
+UNITY_PROJECT_PATH     = File.expand_path("../../../unity", __dir__)
+IOS_BUILD_DIR          = File.join(UNITY_PROJECT_PATH, "Build", "iOS")
+IOS_XCODEPROJ          = File.join(IOS_BUILD_DIR, "Unity-iPhone.xcodeproj")
+IOS_XCWORKSPACE        = File.join(IOS_BUILD_DIR, "Unity-iPhone.xcworkspace")
+BUILD_OUTPUT_ROOT      = File.expand_path("../../../Builds", __dir__)
+APP_IDENTIFIER         = "com.yasironal.brave-bunny"
+UNITY_BUILD_SCRIPT     = File.expand_path("../scripts/unity-build-ios.sh", __dir__)
+
+# ---------------------------------------------------------------------------
+# Global hooks
+# ---------------------------------------------------------------------------
+
+default_platform(:ios)
+
+before_all do |lane, options|
+  # Lock Xcode version — IL2CPP + Unity 6 LTS targets Xcode 16+ (see tech-spec 00).
+  # Comment out if running with a pinned non-default Xcode locally.
+  ensure_xcode_version(version: "16.0") if ENV["CI"]
+
+  # fastlane's CI helper: configures keychain, disables prompts, sets timeouts.
+  setup_ci if ENV["CI"]
+
+  UI.message("[fastlane] lane=#{lane} ci=#{ENV['CI'].to_s.empty? ? 'no' : 'yes'}")
+  UI.message("[fastlane] unity project: #{UNITY_PROJECT_PATH}")
+end
+
+after_all do |lane|
+  UI.success("[fastlane] lane=#{lane} completed")
+end
+
+error do |lane, exception|
+  UI.error("[fastlane] lane=#{lane} FAILED: #{exception.message}")
+  # No Slack / Discord webhook here — tech-spec 10 disallows paid services and
+  # we have not yet provisioned a free webhook. Re-add when observer dashboard
+  # has a notification surface.
+end
+
+# ---------------------------------------------------------------------------
+# Private helpers
+# ---------------------------------------------------------------------------
+
+# Invoke headless Unity build via the dedicated shell script.
+# Keeping this as a sh-out (not Ruby) means local devs can run the same script
+# without a fastlane install.
+private_lane :unity_build do |options|
+  target = options[:target] || "iOS"
+  UI.user_error!("unity_build: only iOS target wired in v0.1 (got #{target})") unless target == "iOS"
+  UI.message("[unity_build] invoking #{UNITY_BUILD_SCRIPT}")
+  sh("bash", UNITY_BUILD_SCRIPT)
+  UI.user_error!("unity_build: expected #{IOS_XCODEPROJ}") unless File.exist?(IOS_XCODEPROJ)
+end
+
+# Validate required env vars early — fails fast with a readable message.
+private_lane :require_env do |options|
+  missing = (options[:vars] || []).reject { |v| ENV[v] && !ENV[v].empty? }
+  unless missing.empty?
+    UI.user_error!("Missing required env vars: #{missing.join(', ')}. See runbooks/first-build.md.")
+  end
+end
+
+# ---------------------------------------------------------------------------
+# Platform: iOS
+# ---------------------------------------------------------------------------
+
+platform :ios do
+
+  # -------------------------------------------------------------------------
+  # Lane: preview
+  # Local archive without uploading. Useful for smoke-testing the pipeline
+  # before any TestFlight push. Safe to run locally.
+  # -------------------------------------------------------------------------
+  desc "Local archive without uploading (smoke test the pipeline)"
+  lane :preview do
+    require_env(vars: ["MATCH_PASSWORD"])
+
+    unity_build(target: "iOS")
+
+    match(
+      type: "appstore",
+      readonly: true,                 # never mutates the cert repo
+      app_identifier: APP_IDENTIFIER
+    )
+
+    # Bump CFBundleVersion monotonically — CI run number on CI, timestamp locally.
+    build_number = ENV["GITHUB_RUN_NUMBER"] || Time.now.strftime("%Y%m%d%H%M")
+    increment_build_number_in_xcodeproj(
+      xcodeproj: IOS_XCODEPROJ,
+      build_number: build_number
+    )
+
+    build_app(
+      project: IOS_XCODEPROJ,
+      scheme: "Unity-iPhone",
+      configuration: "Release",
+      export_method: "app-store",
+      include_bitcode: false,         # Apple deprecated bitcode in Xcode 14
+      output_directory: BUILD_OUTPUT_ROOT,
+      output_name: "BraveBunny-preview-#{build_number}.ipa",
+      clean: true
+    )
+
+    UI.success("[preview] archive: #{lane_context[SharedValues::IPA_OUTPUT_PATH]}")
+  end
+
+  # -------------------------------------------------------------------------
+  # Lane: beta
+  # TestFlight upload. Triggered by GitHub Actions (workflow_dispatch).
+  # Requires full Apple credentials in env.
+  # -------------------------------------------------------------------------
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    require_env(vars: [
+      "MATCH_PASSWORD",
+      "FASTLANE_USER",
+      "FASTLANE_TEAM_ID",
+      "FASTLANE_ITC_TEAM_ID"
+    ])
+
+    unity_build(target: "iOS")
+
+    match(
+      type: "appstore",
+      readonly: !ENV["CI"].nil?,      # CI: read-only; local: allow refresh
+      app_identifier: APP_IDENTIFIER
+    )
+
+    build_number = ENV["GITHUB_RUN_NUMBER"] || Time.now.strftime("%Y%m%d%H%M")
+    increment_build_number_in_xcodeproj(
+      xcodeproj: IOS_XCODEPROJ,
+      build_number: build_number
+    )
+
+    build_app(
+      project: IOS_XCODEPROJ,
+      scheme: "Unity-iPhone",
+      configuration: "Release",
+      export_method: "app-store",
+      include_bitcode: false,
+      output_directory: BUILD_OUTPUT_ROOT,
+      output_name: "BraveBunny-beta-#{build_number}.ipa",
+      clean: true
+    )
+
+    upload_to_testflight(
+      app_identifier: APP_IDENTIFIER,
+      skip_waiting_for_build_processing: true,
+      changelog: "See games/brave-bunny/CHANGELOG.md for this build's notes.",
+      distribute_external: false,     # internal testers only until v0.2
+      reject_build_waiting_for_review: false
+    )
+
+    UI.success("[beta] TestFlight upload submitted (build ##{build_number})")
+  end
+
+  # -------------------------------------------------------------------------
+  # Lane: release
+  # App Store submission. MANUAL gate — never auto-runs on CI.
+  # This lane uploads the binary but DOES NOT submit for review automatically;
+  # the developer reviews metadata in App Store Connect then clicks submit.
+  # -------------------------------------------------------------------------
+  desc "App Store submission (manual gate — binary upload only, no auto-submit)"
+  lane :release do
+    if ENV["CI"]
+      UI.user_error!("[release] this lane is a MANUAL gate; refusing to run on CI. " \
+                     "Trigger it locally after staging review per runbooks/first-build.md.")
+    end
+
+    require_env(vars: [
+      "MATCH_PASSWORD",
+      "FASTLANE_USER",
+      "FASTLANE_TEAM_ID",
+      "FASTLANE_ITC_TEAM_ID"
+    ])
+
+    unity_build(target: "iOS")
+
+    match(
+      type: "appstore",
+      readonly: true,
+      app_identifier: APP_IDENTIFIER
+    )
+
+    build_number = Time.now.strftime("%Y%m%d%H%M")
+    increment_build_number_in_xcodeproj(
+      xcodeproj: IOS_XCODEPROJ,
+      build_number: build_number
+    )
+
+    build_app(
+      project: IOS_XCODEPROJ,
+      scheme: "Unity-iPhone",
+      configuration: "Release",
+      export_method: "app-store",
+      include_bitcode: false,
+      output_directory: BUILD_OUTPUT_ROOT,
+      output_name: "BraveBunny-release-#{build_number}.ipa",
+      clean: true
+    )
+
+    upload_to_app_store(
+      app_identifier: APP_IDENTIFIER,
+      submit_for_review: false,       # manual approval per tech-spec 10
+      automatic_release: false,       # manual release after Apple approves
+      skip_metadata: true,            # metadata managed in ASC web UI, not git
+      skip_screenshots: true,
+      precheck_include_in_app_purchases: false
+    )
+
+    UI.success("[release] binary uploaded — open App Store Connect to submit for review")
+  end
+
+end
