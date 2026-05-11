@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "doc": "6 launch passives. Each has 5 levels with additive effects. Evolution-ingredient role marked per passive.",
+  "passives": [
+    {
+      "id": "magnet-charm",
+      "display_name": "Magnet Charm",
+      "effect_key": "magnet_pct",
+      "value_per_level": 0.20,
+      "max_level": 5,
+      "evolution_ingredient_for": ["harvest-cyclone", "pinwheel-storm"]
+    },
+    {
+      "id": "hp-charm",
+      "display_name": "Hearty Charm",
+      "effect_key": "max_hp_pct",
+      "value_per_level": 0.15,
+      "max_level": 5,
+      "evolution_ingredient_for": ["honey-hug"]
+    },
+    {
+      "id": "regen-charm",
+      "display_name": "Mossy Charm",
+      "effect_key": "hp_regen_per_sec",
+      "value_per_level": 0.5,
+      "max_level": 5,
+      "evolution_ingredient_for": []
+    },
+    {
+      "id": "damage-charm",
+      "display_name": "Damage Charm",
+      "effect_key": "global_dmg_pct",
+      "value_per_level": 0.10,
+      "max_level": 5,
+      "evolution_ingredient_for": ["meadow-bloom", "cornfield-volley"]
+    },
+    {
+      "id": "crit-charm",
+      "display_name": "Lucky Charm",
+      "effect_key": "crit_rate",
+      "value_per_level": 0.05,
+      "max_level": 5,
+      "evolution_ingredient_for": ["solar-halo", "oak-thunderclap"]
+    },
+    {
+      "id": "projectile-charm",
+      "display_name": "Splash Charm",
+      "effect_key": "projectile_count_at_l2_l4",
+      "value_per_level": 1,
+      "max_level": 5,
+      "note": "Grants +1 projectile only at levels 2 and 4 (not all levels); applies to projectile-archetype weapons only.",
+      "evolution_ingredient_for": ["stone-storm"]
+    }
+  ]
+}

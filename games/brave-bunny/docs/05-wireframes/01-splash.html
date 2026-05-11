@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Brave Bunny — Splash</title>
+<link rel="stylesheet" href="_style.css">
+</head>
+<body>
+<div class="device" data-spec="splash:cold-start frame, full-bleed art, 375x667" data-us="US-01,US-04,US-10">
+  <main style="background: linear-gradient(180deg, var(--sky-soft) 0%, var(--meadow-lime) 100%); align-items:center; justify-content:center; text-align:center; gap:24px;">
+    <div data-spec="logo-art:240x240 bunny mascot, art-director CC0 source" style="width:200px;height:200px;border-radius:50%;background:var(--bunny-cream); display:flex; align-items:center; justify-content:center; box-shadow:0 6px 20px rgba(0,0,0,0.15);">
+      <span class="num-lg" style="color:var(--coal-outline)">BB</span>
+    </div>
+    <h1 data-spec="logotype:Fredoka 24sp" style="color:var(--coal-outline)">Brave Bunny</h1>
+    <div data-spec="loader:indeterminate spinner, dwell 1.5s max" style="width:160px;">
+      <div class="bar" aria-label="loading"><span style="width:62%"></span></div>
+      <p class="micro" style="margin-top:8px; text-align:center; color:var(--olive-deep)">Warming the burrow…</p>
+    </div>
+    <p class="body-sm" data-spec="legal:CC0/OFL credits short" style="position:absolute;bottom:48px;color:var(--coal-outline);opacity:0.6;">v0.1.0 — © Studio CC0 assets</p>
+  </main>
+</div>
+<details class="spec">
+  <summary>Spec notes — 01-splash</summary>
+  Cold-start splash. Shown for ≤ 1.5 s while bootstrap data loads. Auto-advance to <code>02-title.html</code>.
+  KPI: Cold-start → first kill ≤ 30 s (<code>US-04</code>). No taps required.
+  Soft-language detection runs here pre-paint (<code>US-10</code>).
+  Related: US-01 first-launch FTUE, US-04 cold start, US-10 TR/EN detection.
+</details>
+</body>
+</html>

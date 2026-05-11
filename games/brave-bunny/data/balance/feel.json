@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "doc": "Hitstop and time-dilate timings per ADR-0003 (canonical lock). All durations in milliseconds. Read into FeelDefinition ScriptableObject by gameplay-engineer.",
+  "adr_reference": "0003-hitstop-timings",
+  "hitstop": {
+    "basic_enemy_hit_ms": 0,
+    "basic_enemy_kill_ms": 20,
+    "elite_hit_ms": 30,
+    "elite_kill_ms": 80,
+    "boss_damage_tick_ms": 40,
+    "boss_phase_change_ms": 150,
+    "boss_kill_ms": 250
+  },
+  "time_dilate": {
+    "boss_phase_change_factor": 0.5,
+    "boss_phase_change_duration_ms": 200,
+    "boss_entrance_factor": 0.4,
+    "boss_entrance_duration_ms": 800,
+    "boss_kill_factor": 0.3,
+    "boss_kill_duration_ms": 1200
+  },
+  "crit_prd_window": {
+    "expected_intervals_without_crit_before_force": 4,
+    "note": "After 4x expected-crit-interval without a crit, force-crit on next hit. Per 00-formulas.md § 2."
+  },
+  "screen_shake": {
+    "basic_kill_amp": 0.05,
+    "elite_kill_amp": 0.15,
+    "boss_phase_change_amp": 0.35,
+    "boss_kill_amp": 0.50,
+    "unit": "screen-fraction"
+  }
+}

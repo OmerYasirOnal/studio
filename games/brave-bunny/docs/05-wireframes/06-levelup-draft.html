@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Brave Bunny — Level Up Draft</title>
+<link rel="stylesheet" href="_style.css">
+</head>
+<body>
+<div class="device" data-spec="levelup-modal:vertical stack of 3 cards + banish + reroll, MUST fit 375x667 with no horizontal scroll" data-us="US-06,US-14,US-15,US-23,US-25,US-29">
+  <main style="background:var(--meadow-lime);padding:0;gap:0;">
+    <div class="backdrop" data-spec="dim-backdrop:60% opacity over 160ms" style="position:absolute;inset:0;padding:12px;">
+      <div class="modal" data-spec="modal-panel:16px radius, 327 max-w" style="max-width:343px;padding:16px;position:relative;max-height:640px;display:flex;flex-direction:column;gap:8px;">
+        <header style="text-align:center;">
+          <span class="chip chip-gold" data-spec="level-badge:Lv N, Baloo 2 32sp" data-us="US-14"><span class="num">Lv 5</span></span>
+          <h2 style="margin-top:4px;">{LEVEL_UP_FLAVOR_PLUCKY}</h2>
+        </header>
+
+        <!-- 3 vertical cards, each ≥ 88pt tap -->
+        <div class="card tappable card-row" data-spec="draft-card-A:88h min, current→next delta visible" data-us="US-14,US-23" style="border:2px solid var(--meadow-lime);">
+          <div style="width:56px;height:56px;border-radius:12px;background:var(--mint-wash);flex-shrink:0;display:flex;align-items:center;justify-content:center;"><span class="num">CC</span></div>
+          <div style="flex:1;min-width:0;">
+            <p class="num" style="margin:0;">Carrot Cannon Lv 2</p>
+            <p class="body-sm" style="margin:0;">Dmg <b>8 → 12</b> · Rate <b>1.2 → 1.5</b>/s</p>
+          </div>
+          <button class="btn" style="min-width:44px;padding:8px 14px;font-size:13px;" data-spec="take-cta">Take</button>
+        </div>
+
+        <div class="card tappable card-row" data-spec="draft-card-B:evolution-eligible, rare ring" data-us="US-25" style="border:2px solid var(--rare-cyan);">
+          <div style="width:56px;height:56px;border-radius:12px;background:var(--rare-cyan);flex-shrink:0;display:flex;align-items:center;justify-content:center;"><span class="num">★</span></div>
+          <div style="flex:1;min-width:0;">
+            <p class="num" style="margin:0;">Petal Orbit Lv 4</p>
+            <p class="body-sm" style="margin:0;">{LEVEL_UP_EVOLVE}</p>
+          </div>
+          <button class="btn" style="min-width:44px;padding:8px 14px;font-size:13px;">Take</button>
+        </div>
+
+        <div class="card tappable card-row" data-spec="draft-card-C:88h min" data-us="US-14,US-23">
+          <div style="width:56px;height:56px;border-radius:12px;background:var(--lavender-mist);flex-shrink:0;display:flex;align-items:center;justify-content:center;"><span class="num">+HP</span></div>
+          <div style="flex:1;min-width:0;">
+            <p class="num" style="margin:0;">Lucky Foot Lv 1</p>
+            <p class="body-sm" style="margin:0;">Max HP <b>80 → 92</b> (+15%)</p>
+          </div>
+          <button class="btn" style="min-width:44px;padding:8px 14px;font-size:13px;">Take</button>
+        </div>
+
+        <!-- footer: banish + reroll -->
+        <footer class="row spread" style="margin-top:8px;" data-spec="modal-footer:banish + reroll, single-tap, ad-gated on 2nd" data-us="US-15,US-29">
+          <button class="btn btn-ghost" style="flex:1;min-height:48px;font-size:14px;" data-spec="banish:one-per-run" data-us="US-15">Banish</button>
+          <button class="btn btn-gold" style="flex:1;min-height:48px;font-size:14px;" data-spec="reroll:1 free, 2nd ad-gated" data-us="US-29">{BTN_REROLL}</button>
+        </footer>
+      </div>
+    </div>
+  </main>
+</div>
+<details class="spec">
+  <summary>Spec notes — 06-levelup-draft (CRITICAL FIT)</summary>
+  Level-up draft modal. 3 cards stacked vertically, each ≥ 88 pt tap-row (card-row layout = horizontal icon + delta + Take button inside one card). On 375 × 667: header 84 pt + 3 cards × 88 pt + footer 56 pt + gaps = ~430 pt → fits without scroll inside the 640 pt modal max-height.
+  KPI: Draft pick &lt; 2 s (<code>US-14</code>). Delta text shows current → next bold (<code>US-23</code>).
+  Related: US-06 coach mark, US-14 &lt; 2s pick, US-15 banish, US-23 delta clarity, US-25 evolve callout, US-29 reroll.
+</details>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Brave Bunny — Settings</title>
+<link rel="stylesheet" href="_style.css">
+</head>
+<body>
+<div class="device" data-spec="settings-root:sub-nav grouped lists" data-us="US-03,US-11,US-44,US-46,US-54,US-56,US-61">
+  <header class="row spread" style="padding-top:8px;">
+    <button class="btn btn-ghost" style="min-width:44px;padding:8px;">‹</button>
+    <h1>{BTN_OPEN_SETTINGS}</h1>
+    <span style="width:44px;"></span>
+  </header>
+  <main>
+    <section data-spec="audio-group" data-us="US-11" class="card">
+      <h2>{SETTINGS_AUDIO}</h2>
+      <div class="row spread" style="margin-top:8px;"><span class="body-sm">{SETTINGS_MUSIC_VOLUME}</span><input type="range" data-spec="slider:0-100, 44pt thumb" min="0" max="100" value="70" style="flex:1;margin-left:12px;"></div>
+      <div class="row spread" style="margin-top:8px;"><span class="body-sm">{SETTINGS_SFX_VOLUME}</span><input type="range" min="0" max="100" value="80" style="flex:1;margin-left:12px;"></div>
+      <div class="row spread" style="margin-top:8px;"><span class="body-sm">{SETTINGS_HAPTICS}</span><label class="switch"><input type="checkbox" checked> On</label></div>
+    </section>
+
+    <section data-spec="accessibility-group:5 toggles + 2 selects" data-us="US-11" class="card">
+      <h2>Accessibility</h2>
+      <div class="row spread" style="margin-top:8px;"><span class="body-sm">{SETTINGS_REDUCED_MOTION}</span><label><input type="checkbox"> Off</label></div>
+      <div class="row spread"><span class="body-sm">{SETTINGS_LARGE_TEXT}</span><label><input type="checkbox"> Off</label></div>
+      <div class="row spread"><span class="body-sm">{SETTINGS_HIGH_CONTRAST}</span><label><input type="checkbox"> Off</label></div>
+      <div class="row spread"><span class="body-sm">{SETTINGS_LEFTY_LAYOUT}</span><label><input type="checkbox"> Off</label></div>
+      <div class="row spread"><span class="body-sm">{SETTINGS_COLORBLIND_MODE}</span><span class="body-sm">Default ›</span></div>
+      <div class="row spread"><span class="body-sm">{SETTINGS_AUTO_AIM}</span><label><input type="checkbox" checked> On</label></div>
+    </section>
+
+    <section data-spec="lang-group" class="card">
+      <h2>{SETTINGS_LANGUAGE}</h2>
+      <div class="row spread" style="margin-top:8px;"><span class="body-sm">Display language</span><span class="body-sm">Türkçe (auto) ›</span></div>
+    </section>
+
+    <section data-spec="privacy-group:ads + data + restore" data-us="US-44,US-46,US-54" class="card">
+      <h2>{SETTINGS_PRIVACY}</h2>
+      <div class="row spread" style="margin-top:8px;"><span class="body-sm">Personalized ads</span><label><input type="checkbox"> Off</label></div>
+      <div class="row spread"><span class="body-sm">Rewarded ad opt-in</span><label><input type="checkbox" checked> On</label></div>
+      <div class="row spread"><span class="body-sm">Analytics consent</span><span class="body-sm">Limited ›</span></div>
+      <button class="btn btn-ghost" data-spec="restore-purchases:always accessible" data-us="US-54" style="margin-top:8px;min-height:44px;">Restore purchases</button>
+    </section>
+
+    <section data-spec="social-group:leaderboard alias + block" data-us="US-56,US-61" class="card">
+      <h2>Social</h2>
+      <div class="row spread" style="margin-top:8px;"><span class="body-sm">Leaderboard display</span><span class="body-sm">Anonymous ›</span></div>
+      <div class="row spread"><span class="body-sm">Blocked users</span><span class="body-sm">0 ›</span></div>
+    </section>
+
+    <section data-spec="meta-group:tutorial + credits + version" class="card">
+      <button class="btn btn-ghost" data-spec="reset-tutorial" data-us="US-09" style="width:100%;min-height:44px;justify-content:flex-start;">{SETTINGS_RESET_TUTORIAL}</button>
+      <a href="15-credits.html" class="btn btn-ghost" data-spec="credits-link" style="width:100%;min-height:44px;justify-content:flex-start;text-decoration:none;">{SETTINGS_CREDITS}</a>
+      <p class="micro" style="text-align:center;margin-top:8px;opacity:0.6;">{SETTINGS_VERSION_LABEL}</p>
+    </section>
+  </main>
+</div>
+<details class="spec">
+  <summary>Spec notes — 14-settings</summary>
+  Settings root. Grouped sections — audio, accessibility, language, privacy, social, meta. Permission requests deferred until value is shown (<code>US-03</code>); audio prefs were captured early but non-blocking (<code>US-11</code>).
+  KPI: Every toggle ≥ 44 pt; restore-purchases is reachable in 1 tap from this screen (<code>US-54</code>).
+  Related: US-03 deferred permissions, US-09 reset tour, US-11 audio prefs, US-44 ad opt-in, US-46 no interstitials, US-54 restore, US-56 anonymous leaderboard, US-61 block/report.
+</details>
+</body>
+</html>

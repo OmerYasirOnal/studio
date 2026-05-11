@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Brave Bunny — Home Lobby</title>
+<link rel="stylesheet" href="_style.css">
+</head>
+<body>
+<div class="device" data-spec="home-lobby:meta hub w/ next-thing strap + nav" data-us="US-09,US-31,US-33,US-35,US-36,US-37,US-40,US-60">
+  <header style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;" data-spec="topbar:currency + mail">
+    <div class="row" data-spec="currency:gold+gem chips" data-us="US-18">
+      <span class="chip chip-gold" data-spec="gold-chip:Pickup Gold fill"><span class="num">1,240</span>&nbsp;carrots</span>
+      <span class="chip chip-rare" data-spec="gem-chip:Rare Cyan fill"><span class="num">28</span>&nbsp;gems</span>
+    </div>
+    <button class="btn btn-ghost" style="min-width:44px;padding:8px;" data-spec="mailbox-icon:48x48 tap target, dot=new" data-us="US-40">✉</button>
+  </header>
+  <main>
+    <section class="strip" data-spec="next-thing-strap:dominant CTA, dynamic copy" data-us="US-31,US-36" style="background:var(--pickup-gold);">
+      <div>
+        <p class="micro">{DAILY_STREAK_HOOK}</p>
+        <p class="num">Day 3 streak — tap to claim</p>
+      </div>
+      <button class="btn" data-spec="claim-cta:Hero Highlight, ≥44h" data-us="US-37">{BTN_CLAIM_DAILY}</button>
+    </section>
+
+    <section data-spec="hero-of-day:Bunny spotlight card" data-us="US-60" class="card card-row">
+      <div style="width:56px;height:56px;border-radius:50%;background:var(--berry-pink);"></div>
+      <div style="flex:1;"><p class="micro">Hero of the day</p><p class="num">Brave Bunny — +10% carrots today</p></div>
+    </section>
+
+    <section data-spec="daily-missions:3-row tray, US-33" data-us="US-33" class="card">
+      <h2>Today's missions</h2>
+      <div class="row spread"><span class="body-sm">Defeat 50 rascals</span><span class="num">12 / 50</span></div>
+      <div class="row spread"><span class="body-sm">Reach Level 10 in a run</span><span class="num">0 / 1</span></div>
+      <div class="row spread"><span class="body-sm">Survive 5:00</span><span class="num">2 / 5</span></div>
+    </section>
+
+    <section data-spec="battle-pass-strap:progress + tier" data-us="US-35" class="card">
+      <div class="row spread"><h2>Battle Pass — Spring Bloom</h2><span class="chip">Tier 4</span></div>
+      <div class="bar pass" aria-label="pass progress"><span style="width:64%"></span></div>
+      <p class="body-sm" style="margin-top:6px;">1,280 / 2,000 XP to next reward</p>
+    </section>
+
+    <button class="btn btn-primary-lg" data-spec="play-cta:dominant, always-live, US-36" data-us="US-36" style="margin-top:auto;width:100%;">{BTN_START_RUN}</button>
+  </main>
+  <nav class="tabbar" data-spec="bottom-nav:5 tabs, ≥44pt each">
+    <button aria-current="true" data-spec="tab-home" data-us="US-31">Home</button>
+    <button data-spec="tab-heroes" data-us="US-32">Heroes</button>
+    <button data-spec="tab-pass" data-us="US-35">Pass</button>
+    <button data-spec="tab-shop" data-us="US-43">Shop</button>
+    <button data-spec="tab-settings" data-us="US-11">Settings</button>
+  </nav>
+</div>
+<details class="spec">
+  <summary>Spec notes — 03-home-lobby</summary>
+  Meta hub. Surfaces "what to do next" (<code>US-31</code>): daily claim &gt; missions &gt; pass progress. Play button is always live (<code>US-36</code>) — no energy gate.
+  KPI: Returning user → Run start ≤ 2 taps. Home renders ≤ 200 ms after splash.
+  Related: US-09 home tour, US-31 next-thing, US-33 daily missions, US-35 pass, US-36 always-play, US-37 0-input streak, US-40 mailbox, US-60 hero-of-day.
+</details>
+</body>
+</html>

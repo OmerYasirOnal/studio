@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Brave Bunny — Title</title>
+<link rel="stylesheet" href="_style.css">
+</head>
+<body>
+<div class="device" data-spec="title:hero CTA Play, 375x667" data-us="US-01,US-02,US-08">
+  <main style="background: linear-gradient(180deg, var(--sky-soft) 0%, var(--mint-wash) 100%); align-items:center; gap:16px; text-align:center;">
+    <div data-spec="hero-art:bunny in meadow, 280x200 full-bleed-safe" style="width:100%;height:240px;background:var(--meadow-lime);border-radius:24px;display:flex;align-items:center;justify-content:center;color:var(--coal-outline);">
+      <span class="num-lg">Bunny art</span>
+    </div>
+    <h1 data-spec="title:H1 Fredoka 24sp">Brave Bunny</h1>
+    <p class="body-sm" data-spec="tagline:tone-bible warm, ≤8th-grade" style="max-width:280px;">A cozy little hop through sunny meadows and beyond.</p>
+    <button class="btn btn-primary-lg" data-spec="cta-play:primary CTA, 56h x 200w, idle Hero Highlight" data-us="US-01,US-02" style="margin-top:16px;width:240px;">{BTN_PLAY}</button>
+    <button class="btn btn-ghost" data-spec="cta-settings:secondary, 44h, opens 14-settings" data-us="US-11" style="width:240px;">{BTN_OPEN_SETTINGS}</button>
+    <p class="micro" data-spec="footer:no-login-wall reminder" data-us="US-08" style="position:absolute;bottom:32px;color:var(--olive-deep);">Local profile — no login required</p>
+  </main>
+</div>
+<details class="spec">
+  <summary>Spec notes — 02-title</summary>
+  Title screen. Hero CTA "{BTN_PLAY}" drops returning users directly into <code>03-home-lobby.html</code>; first-launch routes through onboarding (US-01).
+  No login wall (<code>US-08</code>). Settings is the only other top-level affordance.
+  KPI: ≤ 1 tap to Play; CTA hit-rect ≥ 88 pt.
+  Related: US-01, US-02 skip-onboarding-returning, US-08 local-profile, US-11 audio prefs deferred.
+</details>
+</body>
+</html>

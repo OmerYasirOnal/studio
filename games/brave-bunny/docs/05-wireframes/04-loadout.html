@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Brave Bunny — Loadout</title>
+<link rel="stylesheet" href="_style.css">
+</head>
+<body>
+<div class="device" data-spec="loadout:pick hero + starter weapon + biome" data-us="US-12,US-39,US-41">
+  <header class="row spread" style="padding-top:8px;">
+    <button class="btn btn-ghost" style="min-width:44px;padding:8px;" data-spec="back:returns to home">‹</button>
+    <h1 data-spec="title">Loadout</h1>
+    <span style="width:44px"></span>
+  </header>
+  <main>
+    <section data-spec="hero-preview:96x96 portrait + name + level badge" data-us="US-38,US-41" class="card card-row">
+      <div style="width:96px;height:96px;border-radius:16px;background:var(--bunny-cream);display:flex;align-items:center;justify-content:center;"><span class="num-lg">Bunny</span></div>
+      <div style="flex:1;">
+        <p class="micro">Active hero</p>
+        <p class="num">Brave Bunny — Lv 4</p>
+        <p class="body-sm">+8% movement, +5% carrot pickup radius</p>
+      </div>
+      <button class="btn btn-ghost" data-spec="swap-hero-cta:→ 09-character-select" data-us="US-32">Swap</button>
+    </section>
+
+    <section data-spec="cosmetic-slot:skin preview, no IAP friction" data-us="US-41" class="card">
+      <h2>Outfit</h2>
+      <div class="grid-3" style="margin-top:8px;">
+        <div class="card tappable" style="min-height:80px;background:var(--mint-wash);align-items:center;justify-content:center;"><span class="body-sm">Default</span></div>
+        <div class="card tappable" style="min-height:80px;background:var(--lavender-mist);align-items:center;justify-content:center;"><span class="body-sm">Ribbon</span><span class="chip chip-locked">Owned</span></div>
+        <div class="card tappable" style="min-height:80px;background:var(--peach-sand,#F6D6B5);align-items:center;justify-content:center;"><span class="body-sm">Sun hat</span><span class="chip chip-locked">Locked</span></div>
+      </div>
+    </section>
+
+    <section data-spec="starter-weapon:pick 1 of 3 cards, ≥88pt" data-us="US-19" class="card">
+      <h2>Starter weapon</h2>
+      <div class="grid-3" style="margin-top:8px;">
+        <div class="card tappable" data-spec="weapon-card:88h, rarity ring" style="min-height:88px;border:2px solid var(--meadow-lime);">
+          <p class="num">Carrot Cannon</p><p class="body-sm">Forward burst</p>
+        </div>
+        <div class="card tappable" style="min-height:88px;">
+          <p class="num">Petal Orbit</p><p class="body-sm">Auto orbit</p>
+        </div>
+        <div class="card tappable" style="min-height:88px;">
+          <p class="num">Acorn Bomb</p><p class="body-sm">Slow lob</p>
+        </div>
+      </div>
+    </section>
+
+    <section data-spec="biome-strip:Meadow only at launch, locked tiles show req" data-us="US-39" class="row" style="gap:8px;">
+      <div class="card tappable" style="flex:1;min-height:64px;background:var(--meadow-lime);"><span class="num">Meadow</span><span class="micro">Unlocked</span></div>
+      <div class="card tappable" style="flex:1;min-height:64px;background:#E6BE92;opacity:0.6;"><span class="num">Beach</span><span class="micro">Beat Boar boss</span></div>
+      <div class="card tappable" style="flex:1;min-height:64px;background:#7B9670;opacity:0.6;"><span class="num">Forest</span><span class="micro">Lv 10</span></div>
+    </section>
+
+    <button class="btn btn-primary-lg" data-spec="start-run:primary CTA, full-width" data-us="US-04" style="width:100%;">{BTN_START_RUN}</button>
+  </main>
+</div>
+<details class="spec">
+  <summary>Spec notes — 04-loadout</summary>
+  Pre-run loadout. Hero + cosmetic + starter weapon + biome in one screen. Locked tiles show requirement, never paywall (<code>US-39</code>).
+  KPI: From Home → Loadout → Run start in ≤ 2 taps if defaults accepted.
+  Related: US-12 winnable-first-run, US-19 auto-attack visibility, US-32 hero unlock cost, US-38 perma-stats, US-39 biome req-not-paywall, US-41 cosmetic preview.
+</details>
+</body>
+</html>

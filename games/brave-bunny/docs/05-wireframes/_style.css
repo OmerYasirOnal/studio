@@ -1,0 +1,118 @@
+/* Brave Bunny — shared wireframe stylesheet
+ * Mobile-first, iPhone SE 3 baseline (375 x 667 logical px).
+ * Tokens mirror docs/07-art-bible/01-color-palette.md.
+ * Plain CSS — no frameworks. ui-engineer will port to USS.
+ */
+:root {
+  /* primary */
+  --bunny-cream: #FFF4DC; --meadow-lime: #A8D86B; --sage-mid: #6FAE74;
+  --sky-soft: #BEE3F0; --berry-pink: #F39FB4; --bark-brown: #8B6A4A;
+  --stone-gray: #9FA5A8; --coal-outline: #2E2A28;
+  /* accents */
+  --pickup-gold: #FFC83D; --hero-highlight: #FF6B6B;
+  --rare-cyan: #3DE0E0; --danger-red: #E83C3C;
+  /* secondary */
+  --mint-wash: #CDEBD0; --lavender-mist: #D7C5E8; --olive-deep: #5E6B3E;
+  /* UI tokens */
+  --bg-light: #FFFEFA; --text-on-light: #1A1A2E;
+  --card-stroke: #E0DAD3; --card-shadow: rgba(46,42,40,0.12);
+  --btn-stroke: #C7423A;
+  /* type stacks */
+  --ff-head: "Fredoka", system-ui, sans-serif;
+  --ff-body: "Nunito", system-ui, sans-serif;
+  --ff-num:  "Baloo 2", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: #f3eee3; font-family: var(--ff-body); color: var(--text-on-light); }
+body { display: flex; justify-content: center; padding: 24px 0; min-height: 100vh; }
+
+/* iPhone SE 3 simulated frame: 375 x 667 logical */
+.device {
+  width: 375px; min-height: 667px; background: var(--bg-light);
+  border-radius: 36px; box-shadow: 0 8px 32px rgba(0,0,0,.18), 0 0 0 6px #111 inset;
+  padding: calc(20px + env(safe-area-inset-top)) 0 env(safe-area-inset-bottom) 0;
+  position: relative; overflow: hidden; display: flex; flex-direction: column;
+}
+.device > header, .device > main, .device > footer, .device > section {
+  padding-left: 16px; padding-right: 16px;
+}
+.device > main { flex: 1; display: flex; flex-direction: column; gap: 12px; padding-top: 8px; padding-bottom: 12px; }
+
+/* Typography */
+h1 { font-family: var(--ff-head); font-weight: 600; font-size: 24px; line-height: 32px; margin: 0; }
+h2 { font-family: var(--ff-head); font-weight: 500; font-size: 20px; line-height: 28px; margin: 0; }
+.num { font-family: var(--ff-num); font-weight: 700; font-size: 18px; line-height: 22px; }
+.num-lg { font-family: var(--ff-num); font-weight: 700; font-size: 32px; line-height: 36px; }
+.micro { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--coal-outline); }
+small, .body-sm { font-size: 12px; line-height: 16px; }
+
+/* Buttons */
+.btn {
+  font-family: var(--ff-head); font-weight: 500; font-size: 16px; line-height: 20px;
+  min-height: 44px; min-width: 44px; padding: 12px 24px; border-radius: 24px;
+  border: 1px solid var(--btn-stroke); background: var(--hero-highlight); color: #fff;
+  cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  transition: transform 100ms ease-out;
+}
+.btn:active { transform: scale(0.95); }
+.btn-primary-lg { min-height: 56px; min-width: 144px; font-size: 18px; }
+.btn-ghost { background: transparent; color: var(--text-on-light); border-color: var(--card-stroke); }
+.btn-gold { background: var(--pickup-gold); border-color: #C99A18; color: var(--coal-outline); }
+.btn-disabled { background: #C9C9C9; border-color: #9C9C9C; color: #6E6E6E; opacity: 0.7; pointer-events: none; }
+
+/* Cards */
+.card {
+  background: #fff; border: 1px solid var(--card-stroke); border-radius: 16px;
+  padding: 16px; box-shadow: 0 1px 2px var(--card-shadow);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.card.tappable { min-height: 88px; cursor: pointer; }
+.card.tappable:active { transform: scale(0.97); }
+.card-row { flex-direction: row; align-items: center; gap: 12px; }
+
+/* Generic chips / tags */
+.chip { display:inline-flex; align-items:center; padding: 4px 10px; border-radius: 12px;
+  background: var(--mint-wash); font-size: 11px; font-weight: 700; color: var(--olive-deep); }
+.chip-rare { background: var(--rare-cyan); color: var(--coal-outline); }
+.chip-gold { background: var(--pickup-gold); color: var(--coal-outline); }
+.chip-locked { background: #E0DAD3; color: #6E6E6E; }
+
+/* Modal / dialog */
+.backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding: 24px; z-index: 10; }
+.modal { background: var(--bg-light); border-radius: 16px; padding: 24px; width: 100%; max-width: 327px; box-shadow: 0 8px 24px var(--card-shadow); }
+.modal-close { position:absolute; top:12px; right:12px; width:32px; height:32px; border-radius:16px; background:transparent; border:none; cursor:pointer; }
+
+/* Toast */
+.toast { position: absolute; left: 16px; right: 16px; bottom: 24px; padding: 12px 16px;
+  background: rgba(46,42,40,0.92); color: #fff; border-radius: 16px; font-size: 14px; }
+
+/* HUD primitives */
+.bar { width:100%; height:10px; background: #ECE6DA; border-radius:6px; overflow:hidden; }
+.bar > span { display:block; height:100%; background: var(--hero-highlight); }
+.bar.xp > span { background: var(--rare-cyan); }
+.bar.hp > span { background: var(--hero-highlight); }
+.bar.pass > span { background: var(--pickup-gold); }
+
+/* Nav (bottom) */
+.tabbar { display:flex; justify-content:space-around; align-items:center; padding: 8px 0 16px;
+  border-top: 1px solid var(--card-stroke); background: var(--bg-light); }
+.tabbar button { background:none; border:none; min-width:56px; min-height:44px; font-family:var(--ff-body); font-size:11px; font-weight:700; color:var(--coal-outline); display:flex; flex-direction:column; align-items:center; gap:2px; }
+.tabbar button[aria-current="true"] { color: var(--hero-highlight); }
+
+/* Header strip */
+.strip { background: var(--meadow-lime); color: var(--coal-outline); border-radius: 12px;
+  padding: 10px 12px; display:flex; justify-content:space-between; align-items:center; }
+
+/* Grid helpers */
+.grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid-3 { display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.row { display:flex; align-items:center; gap:12px; }
+.row.spread { justify-content: space-between; }
+
+/* Spec notes block at bottom of each page */
+details.spec { margin: 16px; padding: 12px; border-radius: 12px; background: #fff; border: 1px dashed var(--card-stroke); font-size: 12px; line-height: 1.5; }
+details.spec summary { cursor: pointer; font-weight: 700; }
+details.spec code { background: var(--mint-wash); padding: 1px 4px; border-radius: 4px; }
+
+/* Annotation outline — visible only in dev */
+[data-spec] { outline: none; }

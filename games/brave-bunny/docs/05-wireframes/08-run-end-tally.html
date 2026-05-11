@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Brave Bunny — Run End Tally</title>
+<link rel="stylesheet" href="_style.css">
+</head>
+<body>
+<div class="device" data-spec="run-end-tally:bank currency BEFORE any ad/IAP surface" data-us="US-18,US-22,US-26,US-30,US-44,US-47,US-55,US-62">
+  <header style="padding-top:8px;text-align:center;">
+    <h1 data-spec="title:Win or Tucker-out, tone-bible-correct">{RUN_END_LOSE_GENERIC}</h1>
+  </header>
+  <main>
+    <section data-spec="hero-celebration:bunny pose + run summary" data-us="US-26" class="card" style="align-items:center;text-align:center;background:var(--mint-wash);">
+      <div style="width:96px;height:96px;border-radius:50%;background:var(--bunny-cream);"></div>
+      <p class="num-lg" data-spec="run-summary-stat" style="color:var(--olive-deep);">Lv 14 · 07:42</p>
+      <p class="body-sm">Meadow · 312 rascals sent packing</p>
+    </section>
+
+    <section data-spec="tally:carrots + xp + drops, banked first" data-us="US-18" class="card">
+      <h2>Banked</h2>
+      <div class="row spread"><span class="body-sm">Carrots earned</span><span class="num-lg" data-spec="num-carrots" data-us="US-18">+ 240</span></div>
+      <div class="row spread"><span class="body-sm">Pass XP</span><span class="num">+ 180</span></div>
+      <div class="row spread"><span class="body-sm">Hero XP</span><span class="num">+ 96</span></div>
+      <div class="row spread"><span class="body-sm">Daily mission</span><span class="chip chip-gold">2 of 3 ✓</span></div>
+    </section>
+
+    <section data-spec="ad-double-card:opt-in 2x rewarded ad, decline larger" data-us="US-44,US-47" class="card" style="border:2px dashed var(--pickup-gold);">
+      <h2>Bonus offer</h2>
+      <p class="body-sm">{AD_DOUBLE_REWARD_PROMPT}</p>
+      <p class="micro" data-spec="reward-preview:explicit reward">Preview: +240 carrots (total 480)</p>
+      <div class="row" style="gap:12px;margin-top:8px;">
+        <button class="btn btn-ghost" data-spec="decline:LARGER hit-rect per US-47" data-us="US-47" style="flex:2;min-height:52px;">{BTN_CANCEL}</button>
+        <button class="btn btn-gold" data-spec="watch-ad:smaller, opt-in" data-us="US-44" style="flex:1;min-height:44px;font-size:13px;">Watch ad</button>
+      </div>
+      <p class="micro" style="opacity:0.7;">{AD_OPT_OUT_HINT}</p>
+    </section>
+
+    <footer class="row" style="gap:8px;margin-top:auto;" data-spec="path-out:retry + share + home, ≤2 taps to replay" data-us="US-30,US-55,US-62">
+      <button class="btn btn-ghost" data-spec="share:opens share sheet" data-us="US-55,US-62" style="min-height:48px;">Share</button>
+      <button class="btn btn-ghost" data-spec="home:return to lobby" style="min-height:48px;">{BTN_QUIT_RUN}</button>
+      <button class="btn" data-spec="retry:dominant CTA, 1-tap replay" data-us="US-30" style="flex:1;min-height:48px;">{BTN_RETRY}</button>
+    </footer>
+  </main>
+</div>
+<details class="spec">
+  <summary>Spec notes — 08-run-end-tally</summary>
+  Run end. Currency banks FIRST (<code>US-18</code>) — the player sees what they earned before any ad/IAP surface. Decline on rewarded-ad card is visually larger than accept (<code>US-47</code>).
+  KPI: Run-end → Play again ≤ 2 taps (<code>US-30</code>). No interstitial ads here (<code>US-46</code>).
+  Related: US-18 tally first, US-22 revive prompt (separate modal), US-26 dignified death, US-30 2-tap replay, US-44 rewarded opt-in, US-47 larger decline, US-55 share, US-62 milestone share prompt.
+</details>
+</body>
+</html>

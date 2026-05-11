@@ -1,0 +1,164 @@
+{
+  "schema_version": "1.0",
+  "doc": "Source-of-truth character baselines for brave-bunny. See characters.schema.md for field reference. Per ADR-0001 no allowed_weapons array — only default_starter_weapon.",
+  "calibration_anchor": "bunny",
+  "base_move_units_per_sec": 4.5,
+  "base_magnet_units": 1.5,
+  "per_level_perks": {
+    "hp_per_level_pct": 0.01,
+    "dmg_per_level_pct": 0.007,
+    "move_per_level_pct": 0.002,
+    "crit_rate_per_level": 0.0005,
+    "max_level": 30
+  },
+  "characters": [
+    {
+      "id": "bunny",
+      "display_name": "Bunny",
+      "hp_base": 100,
+      "dmg_mult": 1.00,
+      "move_mult": 1.00,
+      "crit_rate": 0.05,
+      "crit_damage": 1.00,
+      "magnet_mult": 1.00,
+      "xp_gem_value_bonus": 0.00,
+      "default_starter_weapon": "carrot-boomerang",
+      "signature": {
+        "id": "hop-dodge",
+        "trigger": "every-5th-weapon-hit",
+        "iframe_ms": 400,
+        "cooldown_ms": 5000
+      }
+    },
+    {
+      "id": "tortoise",
+      "display_name": "Tortoise",
+      "hp_base": 160,
+      "dmg_mult": 1.00,
+      "move_mult": 0.70,
+      "crit_rate": 0.025,
+      "crit_damage": 1.00,
+      "magnet_mult": 1.00,
+      "xp_gem_value_bonus": 0.00,
+      "default_starter_weapon": "carrot-boomerang",
+      "signature": {
+        "id": "shell-brace",
+        "trigger": "hp-below-50pct",
+        "shield_absorb_hp": 100,
+        "cooldown_ms": 8000
+      }
+    },
+    {
+      "id": "hedgehog",
+      "display_name": "Hedgehog",
+      "hp_base": 110,
+      "dmg_mult": 0.90,
+      "move_mult": 0.95,
+      "crit_rate": 0.05,
+      "crit_damage": 1.00,
+      "magnet_mult": 1.00,
+      "xp_gem_value_bonus": 0.00,
+      "default_starter_weapon": "carrot-boomerang",
+      "signature": {
+        "id": "thorn-ring",
+        "trigger": "passive",
+        "tick_interval_ms": 3000,
+        "radius_units": 1.5,
+        "dmg_mult_per_tick": 0.5
+      }
+    },
+    {
+      "id": "fox",
+      "display_name": "Fox",
+      "hp_base": 80,
+      "dmg_mult": 1.30,
+      "move_mult": 1.15,
+      "crit_rate": 0.15,
+      "crit_damage": 1.25,
+      "magnet_mult": 1.00,
+      "xp_gem_value_bonus": 0.00,
+      "default_starter_weapon": "carrot-boomerang",
+      "signature": {
+        "id": "cunning-strike",
+        "trigger": "enemy-below-25pct-hp",
+        "exec_dmg_mult": 3.0,
+        "chain_max": 5,
+        "chain_window_ms": 1500
+      }
+    },
+    {
+      "id": "otter",
+      "display_name": "Otter",
+      "hp_base": 95,
+      "dmg_mult": 0.85,
+      "move_mult": 1.05,
+      "crit_rate": 0.05,
+      "crit_damage": 1.00,
+      "magnet_mult": 1.00,
+      "xp_gem_value_bonus": 0.00,
+      "default_starter_weapon": "carrot-boomerang",
+      "signature": {
+        "id": "splash-volley",
+        "trigger": "passive",
+        "projectile_archetype_only": true,
+        "extra_projectiles": 1,
+        "spread_degrees": 20
+      }
+    },
+    {
+      "id": "panda",
+      "display_name": "Panda",
+      "hp_base": 125,
+      "dmg_mult": 0.95,
+      "move_mult": 0.90,
+      "crit_rate": 0.04,
+      "crit_damage": 1.00,
+      "magnet_mult": 1.00,
+      "xp_gem_value_bonus": 0.00,
+      "default_starter_weapon": "honey-aura",
+      "signature": {
+        "id": "hearty-snack",
+        "trigger": "xp-gem-pickup",
+        "heal_hp": 1,
+        "cap_at_max_hp": true
+      }
+    },
+    {
+      "id": "badger",
+      "display_name": "Badger",
+      "hp_base": 100,
+      "dmg_mult": 0.85,
+      "move_mult": 0.95,
+      "crit_rate": 0.04,
+      "crit_damage": 1.00,
+      "magnet_mult": 1.00,
+      "xp_gem_value_bonus": 0.00,
+      "default_starter_weapon": "acorn-cannon",
+      "signature": {
+        "id": "baby-patrol",
+        "trigger": "interval",
+        "interval_ms": 30000,
+        "companion_dmg_mult": 0.6,
+        "companion_lifetime_ms": 60000,
+        "max_simultaneous": 3
+      }
+    },
+    {
+      "id": "owl",
+      "display_name": "Owl",
+      "hp_base": 90,
+      "dmg_mult": 0.95,
+      "move_mult": 1.00,
+      "crit_rate": 0.075,
+      "crit_damage": 1.00,
+      "magnet_mult": 3.00,
+      "xp_gem_value_bonus": 0.10,
+      "default_starter_weapon": "whirligig",
+      "signature": {
+        "id": "far-sight",
+        "trigger": "passive",
+        "note": "magnet_mult and xp_gem_value_bonus carry the signature; values reduced from GDD spec (4.0/0.15) to keep effective XP-throughput at +15.8% per 01-tuning-philosophy.md and 02-character-tuning.md"
+      }
+    }
+  ]
+}

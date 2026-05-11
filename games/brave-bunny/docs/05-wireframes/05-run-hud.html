@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Brave Bunny — Run HUD</title>
+<link rel="stylesheet" href="_style.css">
+</head>
+<body>
+<div class="device" data-spec="run-hud:in-run overlay, full-bleed gameplay underneath" data-us="US-13,US-16,US-19,US-21,US-24,US-28">
+  <main style="background:var(--meadow-lime);padding:0;gap:0;position:relative;">
+    <!-- top HUD strip — clamps to safe area, never enters top 47pt strip -->
+    <header style="position:absolute;top:env(safe-area-inset-top, 20px);left:16px;right:16px;display:flex;justify-content:space-between;align-items:center;gap:8px;" data-spec="top-hud:HP+XP bars+timer+pause" data-us="US-21">
+      <div style="flex:1;">
+        <div class="bar hp" data-spec="hp-bar:width 100%, anim 16ms" data-us="US-21" aria-label="HP"><span style="width:72%"></span></div>
+        <div class="bar xp" data-spec="xp-bar:rare cyan fill" data-us="US-21" style="margin-top:4px;"><span style="width:38%"></span></div>
+      </div>
+      <span class="num" data-spec="timer:Baloo 2 18sp bold" data-us="US-21" style="background:rgba(255,255,255,0.85);padding:6px 10px;border-radius:12px;">02:14</span>
+      <button class="btn" data-spec="pause:44x44, top-right" data-us="US-16" style="min-width:44px;padding:8px;background:rgba(255,255,255,0.9);color:var(--coal-outline);border-color:var(--card-stroke);">II</button>
+    </header>
+
+    <!-- mid: gameplay area with minimap pip + wave cue toast -->
+    <div style="position:absolute;top:80px;left:16px;right:16px;bottom:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--olive-deep);">
+      <p class="num-lg" data-spec="player-marker:bunny center-bottom" style="opacity:0.4;">Gameplay viewport</p>
+      <p class="micro" data-spec="auto-attack-fan:projectile arcs visible" data-us="US-19">auto-attack: forward burst, 1.2/s</p>
+    </div>
+
+    <div style="position:absolute;top:96px;right:16px;width:72px;height:72px;border-radius:12px;background:rgba(255,255,255,0.85);" data-spec="minimap-pip:72x72, boss arrow ping" data-us="US-20">
+      <p class="micro" style="text-align:center;padding-top:24px;">Map</p>
+    </div>
+
+    <!-- wave incoming cue -->
+    <div class="toast" data-spec="wave-toast:density cue, 2.5s dwell" data-us="US-28" style="bottom:140px;">{WAVE_INCOMING}</div>
+
+    <!-- bottom: joystick + pickup HUD -->
+    <footer style="position:absolute;bottom:env(safe-area-inset-bottom, 16px);left:16px;right:16px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;">
+      <div style="width:128px;height:128px;border-radius:50%;background:rgba(255,255,255,0.35);border:2px dashed rgba(255,255,255,0.8);display:flex;align-items:center;justify-content:center;" data-spec="joystick:128x128 floating, 1-frame response" data-us="US-13">
+        <div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.9);"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;" data-spec="pickup-feed:gold/heart counters, US-24" data-us="US-24">
+        <span class="chip chip-gold"><span class="num">+ 24</span>&nbsp;carrots</span>
+        <span class="chip" style="background:var(--berry-pink);color:#fff;"><span class="num">+ 1</span>&nbsp;heart</span>
+        <span class="chip" data-spec="lv-badge:Lv N indicator">Lv 4</span>
+      </div>
+    </footer>
+  </main>
+</div>
+<details class="spec">
+  <summary>Spec notes — 05-run-hud</summary>
+  In-run HUD overlay. All numerics avoid the top 47-pt strip; joystick + pickup feed clamp to bottom safe area.
+  KPI: Joystick → bunny within 1 frame (16 ms) — <code>US-13</code>. HUD remains readable on SE 3 thumb-occluded zones.
+  Related: US-13 joystick, US-16 pause, US-19 auto-attack, US-20 telegraphs, US-21 HUD readability, US-24 currency drops, US-28 wave pressure.
+</details>
+</body>
+</html>

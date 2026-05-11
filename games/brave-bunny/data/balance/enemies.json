@@ -1,0 +1,135 @@
+{
+  "schema_version": "1.0",
+  "doc": "Source-of-truth enemy stats. First-draft archetypes for the Meadow vertical slice: 3 swarmer archetypes (hop-slime, bee-buzz, daisy-bite), 1 tank (sleepy-boar), 1 ranged (archer-mole), 1 elite (big-onion), 1 boss (old-boar-king). HP curves recalibrated vs 05-enemies.md baselines — see 04-enemy-tuning.md and pending ADR-0006. Per-minute scaling lives in scaling.* fields per role.",
+  "scaling_method": "linear-per-minute",
+  "minute_zero_reference": 1,
+  "enemies": [
+    {
+      "id": "hop-slime",
+      "display_name": "Hop-Slime",
+      "role": "swarmer",
+      "biome": "meadow",
+      "scaling": {
+        "hp_base": 6,
+        "hp_per_min": 4,
+        "contact_dmg": 5,
+        "speed_mult_vs_player": 1.10,
+        "defense_mult": 0
+      },
+      "drops_ref": "swarmer-default"
+    },
+    {
+      "id": "bee-buzz",
+      "display_name": "Bee-Buzz",
+      "role": "swarmer",
+      "biome": "meadow",
+      "scaling": {
+        "hp_base": 6,
+        "hp_per_min": 4,
+        "contact_dmg": 5,
+        "speed_mult_vs_player": 1.20,
+        "defense_mult": 0
+      },
+      "behavior_note": "flank-pattern preferred; faster than hop-slime to enforce flank-feel",
+      "drops_ref": "swarmer-default"
+    },
+    {
+      "id": "daisy-bite",
+      "display_name": "Daisy-Bite",
+      "role": "swarmer",
+      "biome": "meadow",
+      "scaling": {
+        "hp_base": 6,
+        "hp_per_min": 4,
+        "contact_dmg": 5,
+        "speed_mult_vs_player": 1.05,
+        "defense_mult": 0
+      },
+      "behavior_note": "scatter-pattern; slightly slower for visual variety",
+      "drops_ref": "swarmer-default"
+    },
+    {
+      "id": "sleepy-boar",
+      "display_name": "Sleepy Boar",
+      "role": "tank",
+      "biome": "meadow",
+      "scaling": {
+        "hp_base": 80,
+        "hp_per_min": 40,
+        "contact_dmg": 18,
+        "speed_mult_vs_player": 0.60,
+        "defense_mult": 0
+      },
+      "charge": {
+        "interval_ms": 4000,
+        "burst_speed_mult": 1.50,
+        "burst_duration_ms": 1000,
+        "telegraph_ms": 400
+      },
+      "drops_ref": "tank-default"
+    },
+    {
+      "id": "archer-mole",
+      "display_name": "Archer Mole",
+      "role": "ranged",
+      "biome": "meadow",
+      "scaling": {
+        "hp_base": 16,
+        "hp_per_min": 8,
+        "contact_dmg": 4,
+        "ranged_dmg": 12,
+        "speed_mult_vs_player": 0.90,
+        "defense_mult": 0
+      },
+      "ranged": {
+        "kite_distance_units": 3.0,
+        "fire_window_units": [3.0, 6.0],
+        "telegraph_ms": 500,
+        "projectile_speed_units_per_sec": 4.0
+      },
+      "drops_ref": "ranged-default"
+    },
+    {
+      "id": "big-onion",
+      "display_name": "Big Onion",
+      "role": "elite",
+      "biome": "meadow",
+      "scaling": {
+        "hp_base": 300,
+        "hp_per_min": 80,
+        "contact_dmg": 25,
+        "speed_mult_vs_player": 0.70,
+        "defense_mult": 0
+      },
+      "telegraph_min_ms": 600,
+      "hitstop_on_kill_ms": 80,
+      "drops_ref": "elite-default"
+    },
+    {
+      "id": "old-boar-king",
+      "display_name": "Old Boar King",
+      "role": "boss",
+      "biome": "meadow",
+      "scaling": {
+        "hp_mid_boss": 2000,
+        "hp_end_boss": 3000,
+        "contact_dmg": 35,
+        "ranged_dmg": 25,
+        "aoe_dmg": 50,
+        "speed_mult_vs_player": 0.50,
+        "defense_mult": 0
+      },
+      "phases": [
+        {"phase": 1, "hp_pct_start": 1.00, "hp_pct_end": 0.66},
+        {"phase": 2, "hp_pct_start": 0.66, "hp_pct_end": 0.33},
+        {"phase": 3, "hp_pct_start": 0.33, "hp_pct_end": 0.00}
+      ],
+      "telegraph_min_ms": 800,
+      "hitstop_phase_change_ms": 150,
+      "time_dilate_after_phase_ms": 200,
+      "time_dilate_factor": 0.5,
+      "hitstop_on_kill_ms": 250,
+      "drops_ref": "boss-end-default"
+    }
+  ]
+}

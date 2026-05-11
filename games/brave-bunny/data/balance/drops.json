@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "doc": "Drop tables per enemy role. Referenced by enemies.json drops_ref field.",
+  "tables": [
+    {
+      "id": "swarmer-default",
+      "drops": [
+        {"item": "xp-gem-small",  "chance": 1.00, "xp_value": 1},
+        {"item": "gold-coin",     "chance": 0.12, "carrot_value": 1}
+      ]
+    },
+    {
+      "id": "tank-default",
+      "drops": [
+        {"item": "xp-gem-medium", "chance": 1.00, "xp_value": 5},
+        {"item": "gold-coin",     "chance": 0.60, "carrot_value": 4},
+        {"item": "heart",         "chance": 0.08, "heal_hp": 10}
+      ]
+    },
+    {
+      "id": "ranged-default",
+      "drops": [
+        {"item": "xp-gem-medium", "chance": 1.00, "xp_value": 5},
+        {"item": "gold-coin",     "chance": 0.35, "carrot_value": 2}
+      ]
+    },
+    {
+      "id": "elite-default",
+      "drops": [
+        {"item": "xp-gem-large",  "chance": 1.00, "xp_value": 25},
+        {"item": "gold-coin",     "chance": 1.00, "carrot_value": 20, "stack": 5},
+        {"item": "chest-small",   "chance": 1.00, "contains": "1-weapon-or-charm-draft-token"},
+        {"item": "soul-shard",    "chance": 1.00, "weighted_count": [{"n": 1, "w": 0.50}, {"n": 2, "w": 0.35}, {"n": 3, "w": 0.15}], "expected_value": 1.65}
+      ]
+    },
+    {
+      "id": "boss-mid-default",
+      "drops": [
+        {"item": "xp-gem-large",  "chance": 1.00, "xp_value": 100},
+        {"item": "gold-coin",     "chance": 1.00, "carrot_value": 50, "stack": 20},
+        {"item": "heart",         "chance": 1.00, "stack": 2, "heal_hp": 10},
+        {"item": "chest-medium",  "chance": 1.00, "contains": "2-weapon-or-charm-draft-tokens"},
+        {"item": "soul-shard",    "chance": 1.00, "weighted_count": [{"n": 10, "w": 0.60}, {"n": 12, "w": 0.30}, {"n": 14, "w": 0.10}], "expected_value": 10.8}
+      ]
+    },
+    {
+      "id": "boss-end-default",
+      "drops": [
+        {"item": "xp-gem-large",      "chance": 1.00, "xp_value": 250},
+        {"item": "gold-coin",         "chance": 1.00, "carrot_value": 100, "stack": 50},
+        {"item": "heart",             "chance": 1.00, "stack": 3, "heal_hp": 10},
+        {"item": "chest-large",       "chance": 1.00, "contains": "3-weapon-or-charm-draft-tokens"},
+        {"item": "character-shard",   "chance": 1.00, "stack": 1, "note": "Guaranteed character-shard pull"},
+        {"item": "soul-shard",        "chance": 1.00, "weighted_count": [{"n": 5, "w": 0.40}, {"n": 7, "w": 0.30}, {"n": 9, "w": 0.20}, {"n": 12, "w": 0.10}], "expected_value": 7.2}
+      ]
+    }
+  ],
+  "drop_buff_global": 0.0,
+  "drop_buff_note": "Set to non-zero only when run-bonus card, founder pass, or limited-time events are active. Stored here so gameplay-engineer reads a single value."
+}

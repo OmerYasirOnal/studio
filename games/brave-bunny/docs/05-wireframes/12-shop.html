@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Brave Bunny — Shop</title>
+<link rel="stylesheet" href="_style.css">
+</head>
+<body>
+<div class="device" data-spec="shop:cosmetic browse, no IAP popup until tap" data-us="US-41,US-43,US-49,US-50,US-51,US-52,US-53">
+  <header class="row spread" style="padding-top:8px;">
+    <button class="btn btn-ghost" style="min-width:44px;padding:8px;">‹</button>
+    <h1>{BTN_OPEN_SHOP}</h1>
+    <span class="chip chip-gold"><span class="num">1,240</span></span>
+  </header>
+  <main>
+    <section data-spec="sub-nav:cosmetics | bundles | currency" data-us="US-43" class="row" style="gap:8px;">
+      <button class="btn" style="flex:1;min-height:40px;font-size:13px;">Cosmetics</button>
+      <button class="btn btn-ghost" style="flex:1;min-height:40px;font-size:13px;">Bundles</button>
+      <button class="btn btn-ghost" style="flex:1;min-height:40px;font-size:13px;">Carrots</button>
+    </section>
+
+    <section data-spec="gift-banner:friendly sponsor framing, dismissible" data-us="US-50" class="card" style="background:var(--mint-wash);">
+      <p class="num">{IAP_GIFT_BANNER}</p>
+      <p class="body-sm">A free ribbon skin awaits in your mailbox.</p>
+      <button class="btn btn-gold" style="margin-top:8px;align-self:flex-start;min-height:44px;">Open mailbox</button>
+    </section>
+
+    <section data-spec="featured-grid:2x2 SKUs, rarity ring" data-us="US-43,US-41" class="grid-2">
+      <div class="card tappable" data-spec="sku-card:hat-cosmetic" style="min-height:140px;">
+        <div style="height:64px;background:var(--berry-pink);border-radius:12px;"></div>
+        <p class="num" style="margin-top:6px;">Sun hat</p>
+        <p class="body-sm">{IAP_COSMETIC_HAT_PROMPT}</p>
+        <button class="btn btn-gold" style="margin-top:6px;min-height:40px;font-size:13px;">$2.99</button>
+      </div>
+      <div class="card tappable" style="min-height:140px;">
+        <div style="height:64px;background:var(--rare-cyan);border-radius:12px;"></div>
+        <p class="num" style="margin-top:6px;">Cloud trail</p>
+        <p class="body-sm">Sparkly hop trail FX</p>
+        <button class="btn btn-gold" style="margin-top:6px;min-height:40px;font-size:13px;">$1.99</button>
+      </div>
+      <div class="card tappable" style="min-height:140px;">
+        <div style="height:64px;background:var(--pickup-gold);border-radius:12px;"></div>
+        <p class="num" style="margin-top:6px;">Coin bag</p>
+        <p class="body-sm">500 carrots</p>
+        <button class="btn btn-gold" style="margin-top:6px;min-height:40px;font-size:13px;">$0.99</button>
+      </div>
+      <div class="card tappable" style="min-height:140px;">
+        <div style="height:64px;background:var(--lavender-mist);border-radius:12px;"></div>
+        <p class="num" style="margin-top:6px;">Monthly card</p>
+        <p class="body-sm">Daily carrots · cancel anytime</p>
+        <button class="btn btn-gold" style="margin-top:6px;min-height:40px;font-size:13px;" data-spec="subscription:opt-in, restore path in settings" data-us="US-51,US-54">$3.99/mo</button>
+      </div>
+    </section>
+
+    <section data-spec="growth-fund-strip:milestone cumulative" data-us="US-52" class="card" style="background:var(--lavender-mist);">
+      <div class="row spread"><h2>Growth Fund</h2><span class="num">240 / 600</span></div>
+      <div class="bar pass"><span style="width:40%"></span></div>
+      <p class="body-sm" style="margin-top:6px;">Reach a milestone, earn carrots back — no pay-to-win.</p>
+    </section>
+
+    <p class="micro" data-spec="region-fairness-note:no exploit SKUs" data-us="US-53" style="opacity:0.7;text-align:center;">Prices localized fairly by store. Restore purchases in Settings.</p>
+  </main>
+</div>
+<details class="spec">
+  <summary>Spec notes — 12-shop</summary>
+  Cosmetic-first shop. Browse without any IAP popups firing — popups appear only on a deliberate SKU tap → routes to <code>13-iap-confirm.html</code>.
+  KPI: Browse → product detail → buy in ≤ 3 taps. Decline path always present.
+  Related: US-41 preview without purchase, US-43 no-friction browse, US-49 starter-pack (one-time slot), US-50 gift banner, US-51 monthly card, US-52 growth fund, US-53 fair regional pricing.
+</details>
+</body>
+</html>

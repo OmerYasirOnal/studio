@@ -1,0 +1,136 @@
+{
+  "schema_version": "1.0",
+  "doc": "Source-of-truth currency rates, IAP catalog skeleton, battle pass tier rewards. See 05-economy-tuning.md for derivation and ARPPU math.",
+  "currencies": {
+    "carrots":     {"id": "carrots",     "display_name": "Carrots",     "premium": false, "earn_in_run": true},
+    "stars":       {"id": "stars",       "display_name": "Stars",       "premium": true,  "earn_in_run": false},
+    "soul_shards": {"id": "soul_shards", "display_name": "Soul Shards", "premium": false, "earn_in_run": true}
+  },
+  "carrot_per_kill": {
+    "swarmer": 1,
+    "tank":    4,
+    "ranged":  2,
+    "elite":   20,
+    "boss_mid": 50,
+    "boss_end": 100
+  },
+  "soul_shard_drop_weights": {
+    "elite": [{"n": 1, "w": 0.50}, {"n": 2, "w": 0.35}, {"n": 3, "w": 0.15}],
+    "boss_mid": [{"n": 10, "w": 0.60}, {"n": 12, "w": 0.30}, {"n": 14, "w": 0.10}],
+    "boss_end": [{"n": 5, "w": 0.40}, {"n": 7, "w": 0.30}, {"n": 9, "w": 0.20}, {"n": 12, "w": 0.10}]
+  },
+  "soul_shard_to_carrot_exchange": {
+    "rate": 50,
+    "daily_cap_shards": 200
+  },
+  "character_upgrade_carrot_cost": [
+    {"level": 1,  "cost": 50,   "cumulative": 50},
+    {"level": 2,  "cost": 75,   "cumulative": 125},
+    {"level": 3,  "cost": 100,  "cumulative": 225},
+    {"level": 4,  "cost": 150,  "cumulative": 375},
+    {"level": 5,  "cost": 200,  "cumulative": 575},
+    {"level": 6,  "cost": 250,  "cumulative": 825},
+    {"level": 7,  "cost": 300,  "cumulative": 1125},
+    {"level": 8,  "cost": 350,  "cumulative": 1475},
+    {"level": 9,  "cost": 400,  "cumulative": 1875},
+    {"level": 10, "cost": 450,  "cumulative": 2325},
+    {"level": 11, "cost": 500,  "cumulative": 2825},
+    {"level": 12, "cost": 550,  "cumulative": 3375},
+    {"level": 13, "cost": 600,  "cumulative": 3975},
+    {"level": 14, "cost": 650,  "cumulative": 4625},
+    {"level": 15, "cost": 700,  "cumulative": 5325},
+    {"level": 16, "cost": 750,  "cumulative": 6075},
+    {"level": 17, "cost": 800,  "cumulative": 6875},
+    {"level": 18, "cost": 850,  "cumulative": 7725},
+    {"level": 19, "cost": 900,  "cumulative": 8625},
+    {"level": 20, "cost": 950,  "cumulative": 9575},
+    {"level": 21, "cost": 1000, "cumulative": 10575},
+    {"level": 22, "cost": 1050, "cumulative": 11625},
+    {"level": 23, "cost": 1100, "cumulative": 12725},
+    {"level": 24, "cost": 1150, "cumulative": 13875},
+    {"level": 25, "cost": 1225, "cumulative": 15100},
+    {"level": 26, "cost": 1275, "cumulative": 16375},
+    {"level": 27, "cost": 1325, "cumulative": 17700},
+    {"level": 28, "cost": 1375, "cumulative": 19075},
+    {"level": 29, "cost": 1450, "cumulative": 20525},
+    {"level": 30, "cost": 1500, "cumulative": 22025}
+  ],
+  "character_unlock_costs": [
+    {"character": "bunny",    "cost_stars": 0,    "alt": "free-starter"},
+    {"character": "tortoise", "cost_stars": 200,  "alt": "achievement:survive-100-elite-kills"},
+    {"character": "hedgehog", "cost_stars": 400,  "alt": "bp:s1-tier-15"},
+    {"character": "fox",      "cost_stars": 600,  "alt": "achievement:reach-wave-30"},
+    {"character": "otter",    "cost_stars": 800,  "alt": "event:splash-festival-week-6"},
+    {"character": "panda",    "cost_stars": 1000, "alt": "bp:s1-tier-30-free-capstone"},
+    {"character": "badger",   "cost_stars": 1200, "alt": "achievement:defeat-wolf-25-times"},
+    {"character": "owl",      "cost_stars": 1500, "alt": "achievement:reach-wave-50"}
+  ],
+  "iap_catalog": [
+    {"sku": "starter-sprout",      "price_usd": 0.99,  "stars": 50,   "extras": []},
+    {"sku": "carrot-basket",       "price_usd": 4.99,  "stars": 300,  "extras": ["cosmetic-common-1"]},
+    {"sku": "hearty-hamper",       "price_usd": 9.99,  "stars": 700,  "extras": ["cosmetic-uncommon-1", "soul-shards-5"]},
+    {"sku": "founder-pass",        "price_usd": 19.99, "stars": 1800, "extras": ["cosmetic-perma-founder", "perma-reward-bonus-5pct"], "one_time": true, "window": "launch-only"},
+    {"sku": "monthly-bunny-card",  "price_usd": 4.99,  "stars_per_day": 35, "duration_days": 30, "extras": [], "subscription": true},
+    {"sku": "run-bonus-card",      "price_usd": 2.99,  "extras": ["carrots-plus-20pct", "xp-plus-20pct"], "duration_days": 30}
+  ],
+  "cosmetic_prices": {
+    "common":    {"price": 50,  "currency": "carrots"},
+    "uncommon":  {"price": 200, "currency": "carrots"},
+    "rare":      {"price": 200, "currency": "stars"},
+    "legendary": {"price": 500, "currency": "stars"}
+  },
+  "battle_pass": {
+    "season_length_days": 60,
+    "tiers_total": 30,
+    "bp_xp_per_tier": 400,
+    "bp_xp_per_run_typical": 75,
+    "bp_xp_per_daily_mission_avg": 50,
+    "tiers": [
+      {"tier": 1,  "free": [{"item": "carrots", "value": 50}],                  "premium": [{"item": "carrots", "value": 100}]},
+      {"tier": 2,  "free": [{"item": "carrots", "value": 50}],                  "premium": [{"item": "stars",   "value": 5}]},
+      {"tier": 3,  "free": [{"item": "xp-gem-small", "value": 5}],              "premium": [{"item": "carrots", "value": 100}]},
+      {"tier": 4,  "free": [{"item": "carrots", "value": 75}],                  "premium": [{"item": "stars",   "value": 5}]},
+      {"tier": 5,  "free": [{"item": "cosmetic-common"}],                       "premium": [{"item": "cosmetic-rare"}]},
+      {"tier": 6,  "free": [{"item": "carrots", "value": 75}],                  "premium": [{"item": "stars",   "value": 5}]},
+      {"tier": 7,  "free": [{"item": "carrots", "value": 100}],                 "premium": [{"item": "soul-shards", "value": 3}]},
+      {"tier": 8,  "free": [{"item": "carrots", "value": 100}],                 "premium": [{"item": "stars",   "value": 10}]},
+      {"tier": 9,  "free": [{"item": "xp-gem-medium", "value": 10}],            "premium": [{"item": "carrots", "value": 150}]},
+      {"tier": 10, "free": [{"item": "cosmetic-common"}],                       "premium": [{"item": "weapon-unlock:pebble-sling"}]},
+      {"tier": 11, "free": [{"item": "carrots", "value": 100}],                 "premium": [{"item": "stars",   "value": 10}]},
+      {"tier": 12, "free": [{"item": "carrots", "value": 100}],                 "premium": [{"item": "weapon-unlock:thunder-cloud"}]},
+      {"tier": 13, "free": [{"item": "soul-shards", "value": 3}],               "premium": [{"item": "stars",   "value": 10}]},
+      {"tier": 14, "free": [{"item": "carrots", "value": 125}],                 "premium": [{"item": "stars",   "value": 10}]},
+      {"tier": 15, "free": [{"item": "carrots", "value": 125}],                 "premium": [{"item": "character-unlock:hedgehog"}]},
+      {"tier": 16, "free": [{"item": "carrots", "value": 125}],                 "premium": [{"item": "stars",   "value": 10}]},
+      {"tier": 17, "free": [{"item": "carrots", "value": 150}],                 "premium": [{"item": "soul-shards", "value": 5}]},
+      {"tier": 18, "free": [{"item": "xp-gem-large", "value": 25}],             "premium": [{"item": "stars",   "value": 15}]},
+      {"tier": 19, "free": [{"item": "carrots", "value": 150}],                 "premium": [{"item": "stars",   "value": 15}]},
+      {"tier": 20, "free": [{"item": "cosmetic-common"}],                       "premium": [{"item": "cosmetic-rare"}]},
+      {"tier": 21, "free": [{"item": "carrots", "value": 150}],                 "premium": [{"item": "stars",   "value": 15}]},
+      {"tier": 22, "free": [{"item": "soul-shards", "value": 5}],               "premium": [{"item": "character-shard-pull"}]},
+      {"tier": 23, "free": [{"item": "carrots", "value": 175}],                 "premium": [{"item": "stars",   "value": 15}]},
+      {"tier": 24, "free": [{"item": "carrots", "value": 175}],                 "premium": [{"item": "soul-shards", "value": 8}]},
+      {"tier": 25, "free": [{"item": "cosmetic-common"}],                       "premium": [{"item": "stars",   "value": 20}]},
+      {"tier": 26, "free": [{"item": "carrots", "value": 200}],                 "premium": [{"item": "stars",   "value": 20}]},
+      {"tier": 27, "free": [{"item": "carrots", "value": 200}],                 "premium": [{"item": "character-shard-pull"}]},
+      {"tier": 28, "free": [{"item": "xp-gem-large", "value": 50}],             "premium": [{"item": "stars",   "value": 20}]},
+      {"tier": 29, "free": [{"item": "carrots", "value": 200}],                 "premium": [{"item": "soul-shards", "value": 10}]},
+      {"tier": 30, "free": [{"item": "carrots", "value": 200}, {"item": "cosmetic-common"}], "premium": [{"item": "character-unlock:panda"}, {"item": "stars", "value": 300}, {"item": "cosmetic-legendary"}]}
+    ]
+  },
+  "daily_missions": [
+    {"id": "beat-the-boss",         "carrot_reward": 150, "bp_xp_reward": 50},
+    {"id": "survive-5-minutes",     "carrot_reward": 100, "bp_xp_reward": 40},
+    {"id": "reach-char-l15-in-run", "carrot_reward": 150, "bp_xp_reward": 50},
+    {"id": "kill-5-elites",         "carrot_reward": 200, "bp_xp_reward": 60},
+    {"id": "use-weapon-evolution",  "carrot_reward": 200, "bp_xp_reward": 60}
+  ],
+  "arppu_target_usd_per_month": 22,
+  "no_pay_to_win_audit": {
+    "stat_buff_iap": "forbidden",
+    "gear_gacha": "forbidden",
+    "energy_skip": "forbidden",
+    "region_priced_exploits": "forbidden",
+    "max_sku_price_usd": 19.99
+  }
+}

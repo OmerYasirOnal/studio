@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Brave Bunny — Boss Intro</title>
+<link rel="stylesheet" href="_style.css">
+</head>
+<body>
+<div class="device" data-spec="boss-intro:slow-mo dwell card + skip" data-us="US-17,US-20">
+  <main style="background:linear-gradient(180deg, var(--olive-deep) 0%, var(--bark-brown) 100%);padding:0;gap:0;color:#fff;align-items:center;justify-content:center;text-align:center;position:relative;">
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,0.35);" aria-hidden="true"></div>
+
+    <section data-spec="boss-card:full-bleed art behind, dwell 2.5s default" data-us="US-17" style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:16px;padding:0 24px;">
+      <span class="chip" data-spec="boss-tag:danger red fill" style="background:var(--danger-red);color:#fff;">BOSS — Meadow</span>
+      <div data-spec="boss-portrait:200x200 ring, rim light" style="width:200px;height:200px;border-radius:50%;background:var(--bark-brown);border:4px solid var(--danger-red);display:flex;align-items:center;justify-content:center;color:#fff;">
+        <span class="num-lg">Old Boar</span>
+      </div>
+      <h1 data-spec="boss-name:Fredoka 24sp white" style="color:#fff;">Old Boar</h1>
+      <p class="body-sm" data-spec="taunt-copy:from 04-boss-intros.md" data-us="US-17" style="max-width:280px;color:#fff;">{BOSS_INTRO_BOAR}</p>
+      <div class="row" style="gap:12px;margin-top:8px;" data-spec="affordances:HP preview + skip">
+        <span class="chip chip-locked" style="background:rgba(255,255,255,0.85);color:var(--coal-outline);">HP × 3 phases</span>
+        <span class="chip chip-locked" style="background:rgba(255,255,255,0.85);color:var(--coal-outline);">Telegraph: ground stomp</span>
+      </div>
+    </section>
+
+    <button class="btn btn-ghost" data-spec="skip-cta:always present, tap-rect ≥44pt, top-right" data-us="US-17" style="position:absolute;top:env(safe-area-inset-top, 20px);right:16px;background:rgba(255,255,255,0.92);color:var(--coal-outline);border-color:transparent;z-index:3;">Skip ›</button>
+
+    <p class="micro" data-spec="dwell-hint" style="position:absolute;bottom:48px;color:#fff;opacity:0.8;z-index:2;">Dwell 2.5 s · slow-mo 50%</p>
+  </main>
+</div>
+<details class="spec">
+  <summary>Spec notes — 07-boss-intro</summary>
+  Boss intro card. Slow-mo background, foreground card with name, portrait, taunt copy. Skip button always present, top-right, hit-rect ≥ 44 pt (<code>US-17</code>).
+  KPI: Default dwell 2.5 s; can be skipped to 0 in single tap. Telegraph hint readable in &lt; 1 s.
+  Related: US-17 boss intro dwell+skip, US-20 telegraph readability.
+</details>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Brave Bunny — Character Upgrade</title>
+<link rel="stylesheet" href="_style.css">
+</head>
+<body>
+<div class="device" data-spec="character-upgrade:perma stats per hero" data-us="US-23,US-32,US-38,US-41,US-42">
+  <header class="row spread" style="padding-top:8px;">
+    <button class="btn btn-ghost" style="min-width:44px;padding:8px;">‹</button>
+    <h1>Upgrades</h1>
+    <span class="chip chip-gold"><span class="num">1,240</span></span>
+  </header>
+  <main>
+    <section data-spec="hero-banner:96 portrait + lifetime stats" data-us="US-42" class="card card-row">
+      <div style="width:96px;height:96px;border-radius:16px;background:var(--bunny-cream);"></div>
+      <div style="flex:1;">
+        <p class="num">Brave Bunny · Lv 4</p>
+        <div class="bar pass" style="margin-top:6px;"><span style="width:48%"></span></div>
+        <p class="micro" style="margin-top:4px;">XP 240 / 500 to Lv 5</p>
+        <p class="body-sm" style="margin-top:4px;">Lifetime: 312 runs · 28 bosses · 04:12 best</p>
+      </div>
+    </section>
+
+    <section data-spec="perk-tree:4 perk rows w/ current → next delta" data-us="US-23,US-38" class="card">
+      <h2>Perks</h2>
+      <div class="card-row card" data-spec="perk-row:HP" style="border:none;box-shadow:none;padding:8px 0;">
+        <span style="width:40px;height:40px;border-radius:8px;background:var(--berry-pink);"></span>
+        <div style="flex:1;">
+          <p class="num">Sturdy heart</p>
+          <p class="body-sm">Max HP <b>80 → 92</b> (+15%)</p>
+        </div>
+        <button class="btn btn-gold" style="min-height:44px;font-size:13px;"><span class="num">+200</span></button>
+      </div>
+      <div class="card-row card" style="border:none;box-shadow:none;padding:8px 0;">
+        <span style="width:40px;height:40px;border-radius:8px;background:var(--meadow-lime);"></span>
+        <div style="flex:1;">
+          <p class="num">Quick paw</p>
+          <p class="body-sm">Move <b>5.0 → 5.4</b> m/s (+8%)</p>
+        </div>
+        <button class="btn btn-gold" style="min-height:44px;font-size:13px;"><span class="num">+200</span></button>
+      </div>
+      <div class="card-row card" style="border:none;box-shadow:none;padding:8px 0;">
+        <span style="width:40px;height:40px;border-radius:8px;background:var(--pickup-gold);"></span>
+        <div style="flex:1;">
+          <p class="num">Bigger ears</p>
+          <p class="body-sm">Pickup radius <b>2.0 → 2.3</b> m</p>
+        </div>
+        <button class="btn btn-disabled" style="min-height:44px;font-size:13px;" data-spec="locked-insufficient" data-us="US-32"><span class="num">+400</span></button>
+      </div>
+      <div class="card-row card" style="border:none;box-shadow:none;padding:8px 0;">
+        <span style="width:40px;height:40px;border-radius:8px;background:var(--rare-cyan);"></span>
+        <div style="flex:1;">
+          <p class="num">Lucky carrot</p>
+          <p class="body-sm">Drop chance <b>+3% → +5%</b></p>
+        </div>
+        <button class="btn btn-disabled" style="min-height:44px;font-size:13px;" data-spec="locked-by-level"><span class="num">Lv 5</span></button>
+      </div>
+    </section>
+
+    <section data-spec="cosmetics-strip:preview without purchase" data-us="US-41" class="row" style="gap:8px;">
+      <div class="card tappable" style="flex:1;min-height:72px;background:var(--mint-wash);"><span class="micro">Default</span></div>
+      <div class="card tappable" style="flex:1;min-height:72px;background:var(--berry-pink);"><span class="micro">Ribbon (owned)</span></div>
+      <div class="card tappable" style="flex:1;min-height:72px;background:var(--lavender-mist);opacity:0.7;"><span class="micro">Star hat (locked)</span></div>
+    </section>
+  </main>
+</div>
+<details class="spec">
+  <summary>Spec notes — 10-character-upgrade</summary>
+  Perma stat upgrades for the active hero. Every row shows current → next delta in bold (<code>US-23</code>). Cost is in carrots, never RNG (<code>US-32</code>).
+  KPI: One screen, no tabs, all 4 perks visible without scroll on 375 × 667.
+  Related: US-23 delta clarity, US-32 fixed costs, US-38 perma stats, US-41 cosmetic preview, US-42 lifetime stats.
+</details>
+</body>
+</html>

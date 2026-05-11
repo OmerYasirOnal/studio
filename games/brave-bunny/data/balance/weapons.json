@@ -1,0 +1,303 @@
+{
+  "schema_version": "1.0",
+  "doc": "Source-of-truth weapon roster for brave-bunny — 12 weapons + 6 evolutions. Per ADR-0001 no allowed_characters array — universal pool.",
+  "weapons": [
+    {
+      "id": "carrot-boomerang",
+      "display_name": "Carrot Boomerang",
+      "archetype": "projectile",
+      "targeting": "nearest",
+      "dmg_base": 1.2,
+      "rate_ms": 1000,
+      "range_units": 5.0,
+      "projectiles_base": 1,
+      "level_mult": [1.00, 1.15, 1.35, 1.55, 1.85],
+      "level_perks": [
+        {"level": 2, "perk": "projectiles", "value": 1},
+        {"level": 3, "perk": "dmg_pct", "value": 0.20},
+        {"level": 4, "perk": "rate_ms", "value": 800},
+        {"level": 5, "perk": "range_pct_and_pierce", "value": {"range_pct": 0.25, "pierce": 4}}
+      ],
+      "evolution": {
+        "evolved_id": "harvest-cyclone",
+        "required_charm_id": "magnet-charm",
+        "required_charm_level": 5,
+        "required_weapon_level": 5
+      },
+      "synergy_tags": ["kinetic", "nature"],
+      "unlock": "starter"
+    },
+    {
+      "id": "sunbeam",
+      "display_name": "Sunbeam",
+      "archetype": "utility-beam",
+      "targeting": "nearest-sweep-lock",
+      "dmg_base": 0.6,
+      "rate_ms": 200,
+      "range_units": 6.0,
+      "projectiles_base": 1,
+      "level_mult": [1.00, 1.25, 1.25, 1.25, 1.25],
+      "level_perks": [
+        {"level": 2, "perk": "dmg_pct", "value": 0.25},
+        {"level": 3, "perk": "beam_width_mult", "value": 1.5},
+        {"level": 4, "perk": "rate_ms", "value": 150},
+        {"level": 5, "perk": "reflect_off_edge", "value": 1}
+      ],
+      "evolution": {
+        "evolved_id": "solar-halo",
+        "required_charm_id": "crit-charm",
+        "required_charm_level": 5,
+        "required_weapon_level": 5
+      },
+      "synergy_tags": ["solar", "beam"],
+      "unlock": "starter"
+    },
+    {
+      "id": "daisy-mine",
+      "display_name": "Daisy Mine",
+      "archetype": "area",
+      "targeting": "random-in-range",
+      "dmg_base": 2.5,
+      "rate_ms": 2000,
+      "range_units": 4.0,
+      "projectiles_base": 1,
+      "arm_time_ms": 1000,
+      "level_mult": [1.00, 1.00, 1.00, 1.30, 1.30],
+      "level_perks": [
+        {"level": 2, "perk": "projectiles", "value": 1},
+        {"level": 3, "perk": "arm_time_ms", "value": 500},
+        {"level": 4, "perk": "dmg_pct", "value": 0.30},
+        {"level": 5, "perk": "chain", "value": {"targets": 3, "dmg_mult": 0.5}}
+      ],
+      "evolution": {
+        "evolved_id": "meadow-bloom",
+        "required_charm_id": "damage-charm",
+        "required_charm_level": 5,
+        "required_weapon_level": 5
+      },
+      "synergy_tags": ["nature", "explosive"],
+      "unlock": "starter"
+    },
+    {
+      "id": "pebble-sling",
+      "display_name": "Pebble Sling",
+      "archetype": "projectile",
+      "targeting": "nearest",
+      "dmg_base": 0.8,
+      "rate_ms": 800,
+      "range_units": 6.0,
+      "projectiles_base": 1,
+      "level_mult": [1.00, 1.00, 1.00, 1.00, 1.00],
+      "level_perks": [
+        {"level": 2, "perk": "projectiles", "value": 1},
+        {"level": 3, "perk": "rate_ms", "value": 600},
+        {"level": 4, "perk": "projectiles", "value": 1},
+        {"level": 5, "perk": "bounce", "value": 1}
+      ],
+      "evolution": {
+        "evolved_id": "stone-storm",
+        "required_charm_id": "projectile-charm",
+        "required_charm_level": 5,
+        "required_weapon_level": 5
+      },
+      "synergy_tags": ["kinetic", "bounce"],
+      "unlock": "achievement:complete-run-one-weapon"
+    },
+    {
+      "id": "honey-aura",
+      "display_name": "Honey Aura",
+      "archetype": "aura",
+      "targeting": "self-radial",
+      "dmg_base": 0.3,
+      "rate_ms": 400,
+      "range_units": 2.5,
+      "projectiles_base": 0,
+      "level_mult": [1.00, 1.00, 1.50, 1.50, 1.50],
+      "level_perks": [
+        {"level": 2, "perk": "range_units_delta", "value": 0.5},
+        {"level": 3, "perk": "dmg_pct", "value": 0.50},
+        {"level": 4, "perk": "slow_pct", "value": 0.15},
+        {"level": 5, "perk": "range_units_delta", "value": 1.0}
+      ],
+      "evolution": {
+        "evolved_id": "honey-hug",
+        "required_charm_id": "hp-charm",
+        "required_charm_level": 5,
+        "required_weapon_level": 5
+      },
+      "synergy_tags": ["nature", "aura"],
+      "unlock": "character-bound:panda-default"
+    },
+    {
+      "id": "acorn-cannon",
+      "display_name": "Acorn Cannon",
+      "archetype": "projectile",
+      "targeting": "furthest",
+      "dmg_base": 3.0,
+      "rate_ms": 1800,
+      "range_units": 7.0,
+      "projectiles_base": 1,
+      "level_mult": [1.00, 1.30, 1.30, 1.30, 1.95],
+      "level_perks": [
+        {"level": 2, "perk": "dmg_pct", "value": 0.30},
+        {"level": 3, "perk": "rate_ms", "value": 1400},
+        {"level": 4, "perk": "pierce", "value": 1},
+        {"level": 5, "perk": "dmg_and_splash", "value": {"dmg_pct": 0.50, "splash_units": 1.0}}
+      ],
+      "evolution": {
+        "evolved_id": "oak-thunderclap",
+        "required_charm_id": "crit-charm",
+        "required_charm_level": 5,
+        "required_weapon_level": 5
+      },
+      "synergy_tags": ["kinetic", "heavy"],
+      "unlock": "character-bound:badger-default"
+    },
+    {
+      "id": "thunder-cloud",
+      "display_name": "Thunder Cloud",
+      "archetype": "area",
+      "targeting": "random-in-range",
+      "dmg_base": 1.5,
+      "rate_ms": 3000,
+      "range_units": 5.0,
+      "projectiles_base": 1,
+      "zaps_per_cloud": 3,
+      "cloud_lifetime_ms": 4000,
+      "level_mult": [1.00, 1.00, 1.25, 1.25, 1.25],
+      "level_perks": [
+        {"level": 2, "perk": "zaps_per_cloud", "value": 4},
+        {"level": 3, "perk": "dmg_pct", "value": 0.25},
+        {"level": 4, "perk": "cloud_lifetime_ms", "value": 6000},
+        {"level": 5, "perk": "projectiles", "value": 1}
+      ],
+      "evolution": null,
+      "synergy_tags": ["solar"],
+      "unlock": "battle-pass:s1-tier-12"
+    },
+    {
+      "id": "frost-whisper",
+      "display_name": "Frost Whisper",
+      "archetype": "aura",
+      "targeting": "self-radial",
+      "dmg_base": 0.1,
+      "rate_ms": 500,
+      "range_units": 3.0,
+      "projectiles_base": 0,
+      "slow_pct_base": 0.10,
+      "level_mult": [1.00, 1.00, 1.00, 1.00, 1.00],
+      "level_perks": [
+        {"level": 2, "perk": "slow_pct", "value": 0.25},
+        {"level": 3, "perk": "range_units_delta", "value": 0.5},
+        {"level": 4, "perk": "frostbite_debuff_pct", "value": 0.15},
+        {"level": 5, "perk": "range_units_delta", "value": 0.5}
+      ],
+      "evolution": null,
+      "synergy_tags": ["frost", "aura"],
+      "unlock": "biome:frost-burrow-first-run"
+    },
+    {
+      "id": "cob-mortar",
+      "display_name": "Cob Mortar",
+      "archetype": "area",
+      "targeting": "random-screen-position",
+      "dmg_base": 4.0,
+      "rate_ms": 2500,
+      "range_units": 8.0,
+      "projectiles_base": 1,
+      "travel_ms": 1200,
+      "splash_units_base": 1.5,
+      "level_mult": [1.00, 1.00, 1.30, 1.30, 1.30],
+      "level_perks": [
+        {"level": 2, "perk": "splash_units", "value": 2.0},
+        {"level": 3, "perk": "dmg_pct", "value": 0.30},
+        {"level": 4, "perk": "rate_ms", "value": 1800},
+        {"level": 5, "perk": "projectiles", "value": 1}
+      ],
+      "evolution": {
+        "evolved_id": "cornfield-volley",
+        "required_charm_id": "damage-charm",
+        "required_charm_level": 5,
+        "required_weapon_level": 5
+      },
+      "synergy_tags": ["nature", "explosive"],
+      "unlock": "character-bound:bunny-l10-achievement"
+    },
+    {
+      "id": "beehive",
+      "display_name": "Beehive",
+      "archetype": "summon",
+      "targeting": "orbit-then-dive",
+      "dmg_base": 0.5,
+      "rate_ms": 600,
+      "range_units": 4.0,
+      "projectiles_base": 3,
+      "level_mult": [1.00, 1.00, 1.25, 1.25, 1.25],
+      "level_perks": [
+        {"level": 2, "perk": "projectiles", "value": 1},
+        {"level": 3, "perk": "dmg_pct", "value": 0.25},
+        {"level": 4, "perk": "dot_ms", "value": 500},
+        {"level": 5, "perk": "projectiles", "value": 1}
+      ],
+      "evolution": null,
+      "synergy_tags": ["nature", "summon"],
+      "unlock": "character-bound:badger-l5-or-achievement"
+    },
+    {
+      "id": "tumbleweed",
+      "display_name": "Tumbleweed",
+      "archetype": "summon",
+      "targeting": "random-direction-roll",
+      "dmg_base": 1.0,
+      "rate_ms": 2000,
+      "range_units": 0,
+      "projectiles_base": 1,
+      "lifetime_ms": 4000,
+      "level_mult": [1.00, 1.00, 1.00, 1.00, 1.00],
+      "level_perks": [
+        {"level": 2, "perk": "lifetime_ms", "value": 6000},
+        {"level": 3, "perk": "projectiles", "value": 1},
+        {"level": 4, "perk": "contact_tick_mult", "value": 2.0},
+        {"level": 5, "perk": "projectiles", "value": 1}
+      ],
+      "evolution": null,
+      "synergy_tags": ["nature", "kinetic"],
+      "unlock": "event:tumbleweed-rodeo-or-bp-s2-tier-20"
+    },
+    {
+      "id": "whirligig",
+      "display_name": "Whirligig",
+      "archetype": "projectile",
+      "targeting": "orbit-self",
+      "dmg_base": 0.7,
+      "rate_ms": 300,
+      "range_units": 2.0,
+      "projectiles_base": 2,
+      "level_mult": [1.00, 1.00, 1.25, 1.25, 1.25],
+      "level_perks": [
+        {"level": 2, "perk": "projectiles", "value": 1},
+        {"level": 3, "perk": "dmg_pct", "value": 0.25},
+        {"level": 4, "perk": "range_units", "value": 3.0},
+        {"level": 5, "perk": "projectiles", "value": 1}
+      ],
+      "evolution": {
+        "evolved_id": "pinwheel-storm",
+        "required_charm_id": "magnet-charm",
+        "required_charm_level": 5,
+        "required_weapon_level": 5
+      },
+      "synergy_tags": ["mech", "kinetic"],
+      "unlock": "character-bound:owl-default"
+    }
+  ],
+  "evolutions": [
+    {"id": "harvest-cyclone",   "display_name": "Harvest Cyclone",   "dmg_base": 2.5, "rate_ms": 800, "range_units": 8.0, "archetype": "area",       "tag_headline": "massive area boomerang pulls + damages"},
+    {"id": "solar-halo",        "display_name": "Solar Halo",        "dmg_base": 1.0, "rate_ms": 150, "range_units": 7.0, "archetype": "utility-beam","tag_headline": "orbiting twin beams 360 degree coverage"},
+    {"id": "meadow-bloom",      "display_name": "Meadow Bloom",      "dmg_base": 3.5, "rate_ms": 1800,"range_units": 4.5, "archetype": "area",       "tag_headline": "detonations grow DOT flower fields 4s"},
+    {"id": "stone-storm",       "display_name": "Stone Storm",       "dmg_base": 1.0, "rate_ms": 500, "range_units": 6.5, "archetype": "projectile", "tag_headline": "6 bouncing pebbles per fire"},
+    {"id": "oak-thunderclap",   "display_name": "Oak Thunderclap",   "dmg_base": 7.0, "rate_ms": 1400,"range_units": 8.0, "archetype": "projectile", "tag_headline": "huge AOE 4x DMG on crit"},
+    {"id": "cornfield-volley",  "display_name": "Cornfield Volley",  "dmg_base": 6.5, "rate_ms": 1500,"range_units": 9.0, "archetype": "area",       "tag_headline": "3 cobs each spawning DOT fields"},
+    {"id": "honey-hug",         "display_name": "Honey Hug",         "dmg_base": 0.6, "rate_ms": 400, "range_units": 4.5, "archetype": "aura",       "tag_headline": "aura also heals 1HP per 3 enemies per second"},
+    {"id": "pinwheel-storm",    "display_name": "Pinwheel Storm",    "dmg_base": 1.0, "rate_ms": 300, "range_units": 3.5, "archetype": "projectile", "tag_headline": "8 whirligigs at varying radii"}
+  ]
+}

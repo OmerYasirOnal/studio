@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Brave Bunny — Battle Pass</title>
+<link rel="stylesheet" href="_style.css">
+</head>
+<body>
+<div class="device" data-spec="battle-pass:free + premium tracks, one screen" data-us="US-35,US-48">
+  <header class="row spread" style="padding-top:8px;">
+    <button class="btn btn-ghost" style="min-width:44px;padding:8px;">‹</button>
+    <h1>Battle Pass</h1>
+    <span class="chip chip-locked">Season ends in 14d</span>
+  </header>
+  <main>
+    <section data-spec="pass-header:season banner + progress" data-us="US-35" class="card" style="background:var(--lavender-mist);">
+      <div class="row spread">
+        <div>
+          <p class="micro">Spring Bloom · Season 1</p>
+          <p class="num-lg">Tier 4 / 40</p>
+        </div>
+        <span class="chip chip-gold">Free track</span>
+      </div>
+      <div class="bar pass" style="margin-top:8px;"><span style="width:64%"></span></div>
+      <p class="body-sm" style="margin-top:6px;">1,280 / 2,000 XP to Tier 5</p>
+    </section>
+
+    <section data-spec="track-grid:rows = tiers, cols = free|premium" data-us="US-48" class="card" style="padding:8px;">
+      <div class="row" style="font-weight:700;padding:4px 8px;">
+        <span style="width:32px;"></span>
+        <span style="flex:1;text-align:center;">Free</span>
+        <span style="flex:1;text-align:center;color:var(--hero-highlight);">Premium</span>
+      </div>
+      <div class="row" data-spec="tier-row:T3-claimed" style="padding:6px 4px;border-top:1px solid var(--card-stroke);">
+        <span class="num" style="width:32px;">T3</span>
+        <span style="flex:1;text-align:center;"><span class="chip chip-locked">Claimed</span></span>
+        <span style="flex:1;text-align:center;"><span class="chip chip-gold">+100 carrots</span></span>
+      </div>
+      <div class="row" data-spec="tier-row:T4-current" style="padding:6px 4px;border-top:1px solid var(--card-stroke);background:var(--mint-wash);">
+        <span class="num" style="width:32px;">T4</span>
+        <span style="flex:1;text-align:center;"><button class="btn btn-gold" style="min-height:36px;font-size:12px;padding:6px 12px;">Claim 50</button></span>
+        <span style="flex:1;text-align:center;"><span class="chip chip-locked">Premium</span></span>
+      </div>
+      <div class="row" style="padding:6px 4px;border-top:1px solid var(--card-stroke);">
+        <span class="num" style="width:32px;">T5</span>
+        <span style="flex:1;text-align:center;"><span class="chip">+150 carrots</span></span>
+        <span style="flex:1;text-align:center;"><span class="chip chip-rare">Ribbon skin</span></span>
+      </div>
+      <div class="row" style="padding:6px 4px;border-top:1px solid var(--card-stroke);">
+        <span class="num" style="width:32px;">T6</span>
+        <span style="flex:1;text-align:center;"><span class="chip">+200 carrots</span></span>
+        <span style="flex:1;text-align:center;"><span class="chip chip-gold">Emote · hop</span></span>
+      </div>
+      <div class="row" style="padding:6px 4px;border-top:1px solid var(--card-stroke);">
+        <span class="num" style="width:32px;">T7</span>
+        <span style="flex:1;text-align:center;"><span class="chip">+250 carrots</span></span>
+        <span style="flex:1;text-align:center;"><span class="chip chip-rare">Trail FX</span></span>
+      </div>
+    </section>
+
+    <section data-spec="upgrade-pass:premium upsell, no-pay-to-win framing" data-us="US-48" class="card" style="border:2px dashed var(--hero-highlight);">
+      <p class="num">{IAP_BATTLE_PASS_PROMPT}</p>
+      <p class="body-sm">{IAP_BATTLE_PASS_BENEFIT}</p>
+      <div class="row" style="gap:8px;margin-top:8px;">
+        <button class="btn btn-ghost" style="flex:1;min-height:44px;">{BTN_CANCEL}</button>
+        <button class="btn" style="flex:1;min-height:44px;" data-spec="iap-cta:opens 13-iap-confirm">Add the Pass</button>
+      </div>
+    </section>
+  </main>
+</div>
+<details class="spec">
+  <summary>Spec notes — 11-battle-pass</summary>
+  Battle pass single-screen view. Free vs premium tracks are visually split (left/right columns) so the player always sees what's currently free (<code>US-48</code>).
+  KPI: Claim a tier reward in 1 tap; premium upsell is single-screen, never modal-on-modal.
+  Related: US-35 pass progression, US-48 free vs premium split.
+</details>
+</body>
+</html>

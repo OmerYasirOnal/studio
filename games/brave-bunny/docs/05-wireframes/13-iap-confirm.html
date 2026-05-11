@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Brave Bunny — IAP Confirm</title>
+<link rel="stylesheet" href="_style.css">
+</head>
+<body>
+<div class="device" data-spec="iap-confirm:modal w/ price + value + no-auto-renew" data-us="US-45,US-48,US-51,US-53,US-54">
+  <main style="background:var(--meadow-lime);padding:0;">
+    <div class="backdrop" data-spec="dim-backdrop:60% opacity">
+      <div class="modal" data-spec="modal-panel:16px radius, 327 max-w" style="position:relative;">
+        <button class="modal-close" data-spec="close:32x32, top-right" aria-label="Close">×</button>
+        <header style="text-align:center;margin-bottom:12px;">
+          <div style="width:80px;height:80px;border-radius:16px;background:var(--berry-pink);margin:0 auto;display:flex;align-items:center;justify-content:center;color:#fff;">
+            <span class="num">Hat</span>
+          </div>
+          <h2 style="margin-top:8px;">Sun hat</h2>
+          <p class="body-sm">A little hat for Bunny — cosmetic only.</p>
+        </header>
+
+        <section data-spec="value-rundown:what you get, plain language" data-us="US-45" class="card" style="border:none;background:var(--mint-wash);">
+          <h2>What's inside</h2>
+          <p class="body-sm">· 1 cosmetic hat (Sun)</p>
+          <p class="body-sm">· No stat changes — cosmetic only</p>
+          <p class="body-sm">· Yours forever — no auto-renew</p>
+        </section>
+
+        <section data-spec="price-line:store-localized price" data-us="US-45,US-53" class="row spread" style="margin-top:12px;">
+          <span class="body-sm">Price</span>
+          <span class="num-lg" style="font-size:24px;">$2.99</span>
+        </section>
+
+        <section data-spec="auto-renew-status:explicit" data-us="US-45,US-51" class="row spread" style="margin-top:4px;">
+          <span class="body-sm">Auto-renews?</span>
+          <span class="chip" style="background:var(--mint-wash);color:var(--olive-deep);">No · one-time</span>
+        </section>
+
+        <footer style="margin-top:16px;display:flex;flex-direction:column;gap:8px;" data-spec="cta-stack:confirm + cancel + restore" data-us="US-54">
+          <button class="btn btn-primary-lg" data-spec="confirm:routes to store" style="width:100%;">{BTN_CONFIRM} — $2.99</button>
+          <button class="btn btn-ghost" data-spec="cancel:dominant decline path" style="width:100%;">{BTN_CANCEL}</button>
+          <button class="btn btn-ghost" data-spec="restore:always accessible per US-54" data-us="US-54" style="width:100%;font-size:13px;min-height:44px;">Restore purchases</button>
+        </footer>
+
+        <p class="micro" data-spec="legal-line" style="margin-top:12px;text-align:center;opacity:0.7;">Purchases charged via your store account. Cancel anytime — see Settings &gt; Privacy.</p>
+      </div>
+    </div>
+  </main>
+</div>
+<details class="spec">
+  <summary>Spec notes — 13-iap-confirm</summary>
+  IAP confirmation modal. Shows price (localized), value rundown, and explicit "no auto-renew" status per <code>US-45</code>. Restore-purchases is on every IAP modal — never buried in settings only (<code>US-54</code>).
+  KPI: Confirm or cancel both reachable in 1 tap; decline path is visually equal in weight, not minimized.
+  Related: US-45 IAP confirm fields, US-48 pass split, US-51 monthly card, US-53 fair pricing, US-54 restore + refund path.
+</details>
+</body>
+</html>
