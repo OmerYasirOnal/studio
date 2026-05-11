@@ -32,9 +32,18 @@
 
         <!-- All registered concrete SignatureMechanic implementations.
              Reflection finds these via [BraveRegister]; without explicit
-             preservation, IL2CPP may strip them from the iOS build. -->
-        <type fullname="Brave.Gameplay.Combat.BunnyHopDodge" preserve="all"/>
-        <type fullname="Brave.Gameplay.Combat.TortoiseShellShield" preserve="all"/>
+             preservation, IL2CPP may strip them from the iOS build.
+             Keep this list in sync with [BraveRegister] declarations in
+             Brave.Gameplay.Characters.*; check via the link.xml drift script
+             under core/tools/code-tools/check_link_xml.py -->
+        <type fullname="Brave.Gameplay.Characters.BunnyHopDodge" preserve="all"/>
+        <type fullname="Brave.Gameplay.Characters.TortoiseShellShield" preserve="all"/>
+        <type fullname="Brave.Gameplay.Characters.FoxExec" preserve="all"/>
+        <type fullname="Brave.Gameplay.Characters.HedgehogThornRing" preserve="all"/>
+        <type fullname="Brave.Gameplay.Characters.OtterMultiShot" preserve="all"/>
+        <type fullname="Brave.Gameplay.Characters.PandaHealOnPickup" preserve="all"/>
+        <type fullname="Brave.Gameplay.Characters.BadgerSummonBaby" preserve="all"/>
+        <type fullname="Brave.Gameplay.Characters.OwlMagnet" preserve="all"/>
 
         <!-- Concrete BossAttackPattern implementations registered via attribute. -->
         <type fullname="Brave.Gameplay.Combat.BoarCharge" preserve="all"/>
