@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    IL2CPP managed-code stripping preservation list for Brave Bunny.
+
+    Why this file exists:
+    Per ADR-0009 (polymorphic mechanics registry), SignatureMechanic +
+    BossAttackPattern + AchievementCondition + WeaponSignatureMod are
+    resolved at boot by a reflection scan over [Brave.Register]-tagged
+    types. IL2CPP's static analysis cannot see reflection-only references,
+    so without this link.xml the iOS build may silently strip registered
+    classes, causing MechanicRegistry.Resolve(typeName) to throw at runtime
+    on first character spawn / first boss attack / first achievement check.
+
+    Maintenance rule:
+    When a new [BraveRegister] class is added in any of the polymorphic
+    base types above, add a corresponding <type> entry below. A pre-commit
+    hook (TODO — build-engineer to author at games/brave-bunny/tools/ci/)
+    should warn about drift between [BraveRegister] attribute declarations
+    in source and <type> entries here. Keep this list in sync with the
+    [BraveRegister(...)] declarations.
+
+    Doc reference: docs/decisions/0009-polymorphic-mechanics-registry.md
+-->
+<linker>
+    <!-- Core registry + attribute infrastructure. Must never be stripped. -->
+    <assembly fullname="Brave.Gameplay">
+        <type fullname="Brave.Gameplay.Combat.SignatureMechanic" preserve="all"/>
+        <type fullname="Brave.Gameplay.Combat.BraveRegisterAttribute" preserve="all"/>
+        <type fullname="Brave.Gameplay.Combat.MechanicRegistry" preserve="all"/>
+        <type fullname="Brave.Gameplay.Combat.BossAttackPattern" preserve="all"/>
+        <type fullname="Brave.Gameplay.Combat.WeaponSignatureMod" preserve="all"/>
+
+        <!-- All registered concrete SignatureMechanic implementations.
+             Reflection finds these via [BraveRegister]; without explicit
+             preservation, IL2CPP may strip them from the iOS build. -->
+        <type fullname="Brave.Gameplay.Combat.BunnyHopDodge" preserve="all"/>
+        <type fullname="Brave.Gameplay.Combat.TortoiseShellShield" preserve="all"/>
+
+        <!-- Concrete BossAttackPattern implementations registered via attribute. -->
+        <type fullname="Brave.Gameplay.Combat.BoarCharge" preserve="all"/>
+        <type fullname="Brave.Gameplay.Combat.BoarSweep" preserve="all"/>
+        <type fullname="Brave.Gameplay.Combat.BoarHopStomp" preserve="all"/>
+
+        <!-- Additional mechanics + boss patterns added in Phase 5 will need
+             entries here. Keep this in sync with the [BraveRegister(...)]
+             declarations. See ADR-0009 for the registry contract. -->
+    </assembly>
+
+    <!-- AchievementCondition implementations live in the systems assembly. -->
+    <assembly fullname="Brave.Systems">
+        <type fullname="Brave.Systems.Achievements.AchievementCondition" preserve="all"/>
+        <type fullname="Brave.Systems.Achievements.KillCountCondition" preserve="all"/>
+        <type fullname="Brave.Systems.Achievements.RunTimeCondition" preserve="all"/>
+    </assembly>
+
+    <!-- Newtonsoft.Json is used for save serialization (ADR-0008) + balance JSON
+         loading. Reflection-heavy by nature; preserve the whole assembly so
+         IL2CPP doesn't strip converters or attributed POCO fields. -->
+    <assembly fullname="Newtonsoft.Json" preserve="all"/>
+</linker>

@@ -28,6 +28,8 @@ Every asset under `assets-raw/` must appear in this table. asset-curator maintai
 | textures/ambientcg/Rock029_2K-JPG.zip | ambientCG | CC0 1.0 | https://ambientcg.com/view?id=Rock029 | Lennart Demes (ambientCG) | 2026-05-12 |
 | textures/ambientcg/Snow006_2K-JPG.zip | ambientCG | CC0 1.0 | https://ambientcg.com/view?id=Snow006 | Lennart Demes (ambientCG) | 2026-05-12 |
 | textures/ambientcg/Ground054_2K-JPG.zip | ambientCG | CC0 1.0 | https://ambientcg.com/view?id=Ground054 | Lennart Demes (ambientCG) | 2026-05-12 |
+| hdri/small_cave_2k.hdr | Polyhaven | CC0 1.0 | https://polyhaven.com/a/small_cave | Andreas Mischok | 2026-05-12 |
+| textures/ambientcg/Ground037_2K-JPG.zip | ambientCG | CC0 1.0 | https://ambientcg.com/view?id=Ground037 | Lennart Demes (ambientCG) | 2026-05-12 |
 
 ## Best-effort fetches attempted (2026-05-12)
 
@@ -37,18 +39,18 @@ This section documents the asset-curator's first real pass at fetching the plann
 - MANUAL = URL identified and CC0-confirmed, but the source requires interactive download (click-through, captcha, or login). To be fetched by a human and re-recorded here.
 - UNAVAILABLE = source 404'd or moved at the time of the fetch pass; alternative noted.
 
-### Fetched OK (22 files)
+### Fetched OK (24 files — after second pass 2026-05-12)
 
 - 10 Kenney CC0 packs (Nature Kit, Platformer Kit, Mini Dungeon, Game Icons, UI Pack, UI Audio, Interface Sounds, Casino Audio, Impact Sounds, Particle Pack)
 - 3 Google Fonts (Fredoka, Nunito, Baloo 2 regular weights)
-- 4 Polyhaven HDRIs (Meadow / Beach / Forest / Snow sky candidates — Cavern still TODO)
-- 5 ambientCG PBR textures (Grass, Bark, Rock, Snow, Ground)
+- 5 Polyhaven HDRIs (Meadow / Beach / Forest / Snow + **Cavern `small_cave_2k.hdr`** added in second pass)
+- 6 ambientCG PBR textures (Grass, Bark, Rock, Snow, Ground054 beach + **Ground037 mud-like wet earth** added in second pass)
 
 ### Manual download required (URL + license confirmed, fetch script not applicable)
 
 | Planned asset | Source page | License | Reason |
 |---|---|---|---|
-| Quaternius Ultimate Animated Animals (8 characters) | https://quaternius.com/packs/ultimateanimatedanimals.html | CC0 (page-confirmed) | Page exposes a download button but no static .zip URL discoverable from server-rendered HTML — likely client-side JS or external host (itch.io / gumroad). asset-curator could not extract a direct URL via WebFetch. ACTION: human or future Quaternius API fetch. |
+| Quaternius Ultimate Animated Animals (8 characters) | https://quaternius.com/packs/ultimateanimatedanimals.html | CC0 (page-confirmed) | **SECOND-PASS FINDING (2026-05-12):** the on-page "Download" button opens a **Google Drive folder** (`https://drive.google.com/drive/folders/1uJ3N5HfB7jKTseJUNQr3N4YaN0UuEtHk?usp=sharing`). Drive folders are not in the approved allow-list and cannot be fetched without OAuth. **Human action required: visit the Drive link, download the ZIP, drop into `assets-raw/3d/characters/quaternius/`, then `python core/tools/asset-pipeline/quaternius-fetch.py` will not work** (host guard rejects Drive). asset-curator will manually append a LICENSES.md row once the file lands. Also available via Quaternius's itch.io page (`https://quaternius.itch.io/`) where the same CC0 license is metadata-tagged, but itch.io is currently on the FORBIDDEN list in `asset-policy.md` for paid-content reasons — an ADR would need to add a "Quaternius-on-itch.io CC0" exception. |
 | Quaternius Ultimate Stylized Nature | https://quaternius.com/packs/ — index page only | CC0 (likely, per Quaternius blanket license) | Index page 404'd at /packs.html — need to crawl /packs/ root or use Quaternius homepage cards. |
 | Quaternius Monsters Pack (enemies — swarmer/elite/boss base meshes) | https://quaternius.com/packs/ | CC0 (likely) | Same as above. |
 | Kenney Cave Kit | https://kenney.nl/assets/cave-kit | unknown | Page 404'd. ALTERNATIVE: Mini Dungeon (already fetched) covers cavern biome. Cave Kit may be deprecated or renamed; recheck Kenney library for current cave-themed pack. |

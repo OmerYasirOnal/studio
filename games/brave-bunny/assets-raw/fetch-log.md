@@ -123,3 +123,65 @@ Total files downloaded: **22 archive/asset files** representing **~310 individua
 ## Time spent
 
 Roughly 30-40 minutes wall-clock from receiving the task to writing this log. Most time spent on parallel WebFetch verifications; downloads themselves took ~10 minutes for 22 files (largest single file: Grass001 at 37 MB).
+
+---
+
+## Second pass — 2026-05-12 (asset-curator follow-up)
+
+> Goal: push further on the gaps left by the first pass — Quaternius packs, Pixabay BGM, Freesound SFX, plus the leftover Cavern HDRI / Mud PBR. Result: 2 new files fetched (Polyhaven cavern HDRI + ambientCG mud texture), Quaternius distribution channel **definitively identified as Google Drive** (out of allow-list), Pixabay & Freesound both **confirmed unfetchable from this environment** (Pixabay 403 / Freesound 504), ADR-0014 written for the Otter-Beaver fallback.
+
+### What worked
+
+1. **Polyhaven `small_cave_2k.hdr` (6.9 MB)** — direct CDN fetch via `dl.polyhaven.org`. Author Andreas Mischok. CC0. Filed under `hdri/`. Closes the Cavern biome HDRI gap.
+2. **ambientCG `Ground037_2K-JPG.zip` (36 MB)** — direct CDN fetch via `ambientcg.com/get`. Tags: Damp / Earth / Moss / Overgrown — suitable for both Forest wet-patches and Cavern damp-floor use cases. CC0.
+
+### What I learned about Quaternius
+
+- The page `https://quaternius.com/packs/ultimateanimatedanimals.html` reveals (after grep'ing the full HTML, not just WebFetch-rendered content) that the **"Just give me the Download" button calls `window.open()` on a Google Drive folder URL**: `https://drive.google.com/drive/folders/1uJ3N5HfB7jKTseJUNQr3N4YaN0UuEtHk?usp=sharing`.
+- Google Drive folder downloads require Drive API OAuth (or the human clicks each file). The Drive hostname is NOT in our asset-pipeline allow-list (`quaternius-fetch.py` only accepts `quaternius.com`/`cdn.quaternius.com`).
+- Quaternius's itch.io page (`https://quaternius.itch.io/`) hosts the same packs CC0-tagged in itch.io metadata. The itch.io "Download Now" button generates per-session signed URLs (via `download_url` endpoint behind a CSRF token). itch.io is also currently on the FORBIDDEN list in `core/docs/asset-policy.md` (line 44, "Gumroad / itch.io paid") even though Quaternius's specific listings are free + CC0.
+- Quaternius GitHub org (`https://github.com/Quaternius`) has 5 repos, none of which host current asset packs (`TestGltfAssets` is Terasology-only test data).
+- Conclusion: **Quaternius distribution is human-click-only from this environment**. There is no scriptable path that respects both `asset-policy.md` and the per-script `ALLOWED_HOSTS` guard.
+
+### What I learned about Pixabay
+
+- `https://pixabay.com/music/` and `https://pixabay.com/music/search/cozy/` both return HTTP 403 to non-browser User-Agents (Cloudflare bot challenge).
+- `https://cdn.pixabay.com/audio/...` URLs return 403 to direct `curl` without a session cookie.
+- Even WebFetch (which uses a normal-ish UA) was blocked with 403. **Conclusion: Pixabay is not fetchable from this CLI environment without a real browser session.** Per-track human pick remains the only path.
+
+### What I learned about Freesound
+
+- `https://freesound.org/browse/tags/cartoon/` and `https://freesound.org/search/?...` both **timed out** (HTTP 504 / >30s) from this environment. Could be temporary infra problem on Freesound's side, or persistent rate-limit/anti-bot.
+- The official Freesound CC0 preview-URL pattern (`cdn.freesound.org/previews/<id_dir>/<id>_<hash>-lq.mp3`) requires knowing the sound ID first, which requires browsing the site — and that's exactly what's failing.
+- **Conclusion: Freesound also requires human-driven shortlisting.** Once a human pastes specific sound page URLs, `freesound-fetch.py` can fetch the preview MP3s — but discovery is human-driven.
+
+### Validator state after second pass
+
+- `python3 core/tools/asset-pipeline/licenses.py --validate --game brave-bunny` returns **OK** with 24 files / 24 rows (was 22/22 before this pass).
+- No license-allow-list extension was needed because Pixabay-RF / itch.io exceptions were never reached (no files actually downloaded from those sources). The `Pixabay-RF` exception remains a **pending ADR** for whenever the human first hand-fetches a Pixabay track.
+
+### Second-pass next-action recommendations (priority order, updated)
+
+1. **Quaternius** (priority 1, blocked): human visits each Drive folder linked from the pack pages on quaternius.com, downloads the ZIPs, drops them under `assets-raw/3d/characters/quaternius/` (Animated Animals), `3d/environment/quaternius/` (Stylized Nature, Ultimate Modular Ruins), `3d/enemies/quaternius/` (Ultimate Monsters). After each pack, manually append a row to `LICENSES.md`. **5 packs needed × ~30 seconds each = ~5 minutes of clicking.** Drive folder URLs (extracted from page HTML):
+   - Animated Animals → `https://drive.google.com/drive/folders/1uJ3N5HfB7jKTseJUNQr3N4YaN0UuEtHk?usp=sharing`
+   - Other packs' Drive URLs are on each pack's `quaternius.com/packs/<slug>.html` page — same HTML pattern (`onclick="window.open('https://drive.google.com/drive/folders/...?usp=sharing','_blank');"`).
+2. **Otter audit** (immediately after Quaternius lands): open the Animated Animals pack and confirm whether `otter.fbx` (or `.glb`) exists. ADR-0014 is now in place to govern the Otter-vs-Beaver fallback — execute the ADR's decision branch based on the audit.
+3. **Pixabay BGM** (priority 2, blocked from CLI): human opens Pixabay in a browser, picks ~7 tracks per the BGM spec, downloads MP3s, drops into `audio/bgm/pixabay/`. Then: a) write ADR-0015 adding `Pixabay-RF` to the allowed-license list in `core/tools/asset-pipeline/licenses.py`, b) extend the `ALLOWED_LICENSES` set, c) manually append LICENSES.md rows. Without (a)+(b), the validator will FAIL on Pixabay files.
+4. **Freesound SFX** (priority 3): human shortlists ~30 CC0 sounds via the browse UI, then for each: copy the preview MP3 URL and the sound page URL, run `freesound-fetch.py` per sound. Validator already accepts CC0.
+5. **Incompetech CC-BY BGM** (priority 4): human picks 3-4 tracks, downloads, manually appends rows with `CC-BY 4.0` license and full attribution.
+
+### Risks for next fetch pass
+
+1. **Quaternius Drive folder may rate-limit batch downloads** if the human downloads all 5 packs in one session. Workaround: download one at a time.
+2. **itch.io exception ADR** may surface a policy debate: do we trust per-listing CC0 tags on a generally-EULA-restricted aggregator? If the answer is "no" we lose Quaternius's itch.io as a backup distribution path forever.
+3. **Pixabay Content License** is technically more restrictive than CC0 (no redistribution as standalone audio, no AI-training). For a shipped game's bundled assets this is fine, but if any QA / build artifact accidentally exposes the raw MP3 the legal posture is murkier than CC0. ADR-0015 should weigh this explicitly.
+
+### Phase 5 unblock assessment
+
+**Can Phase 5 (Unity prototyping) start without Quaternius?** **Yes — with a placeholder.** Specifically:
+- 4/5 biomes have full art coverage (Kenney Nature, Platformer, Mini Dungeon + Polyhaven HDRIs + ambientCG textures). Cavern HDRI is now fetched. Only the Quaternius Stylized Nature **hero props** (lone tree, oak, palm) are missing, and Kenney Nature Kit covers ~80% of those needs.
+- 0/8 characters have meshes. **Prototype can use Kenney's "Toon Characters" base if available, or a Unity built-in capsule with a colored material**, then swap to Quaternius once the human downloads. gameplay-engineer can build all combat/movement/AI against the placeholder rig and re-skin in <1 day once Quaternius arrives.
+- 0/12 weapons need new fetches — 6 are custom-Blender (blender-tech) and 6 use props from already-fetched Kenney packs.
+- BGM/SFX can be placeholder-silenced during Phase 5; audio integration is its own pass after gameplay loop is stable.
+
+**Recommended Phase 5 kickoff posture:** start with capsule-placeholder characters + Kenney environment + silence audio. Track "Quaternius landing" as a parallel human task. ETA to character-swap: 1 day after human delivers the Drive ZIP.
