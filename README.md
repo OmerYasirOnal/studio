@@ -96,7 +96,7 @@ Every agent runs in its own clean Claude Code conversation. They never read each
 
 | Game | Genre | Status | Folder |
 |---|---|---|---|
-| **Brave Bunny** | Action roguelite (Survivor.io-like) | Phase 1 — Discovery | [`games/brave-bunny/`](games/brave-bunny/) |
+| **Brave Bunny** | Action roguelite (Survivor.io-like) | Phase 3 complete (Tech Architecture) — Phase 5 (Prototype) gated on tmux + Unity install | [`games/brave-bunny/`](games/brave-bunny/) |
 
 ## Roadmap
 
