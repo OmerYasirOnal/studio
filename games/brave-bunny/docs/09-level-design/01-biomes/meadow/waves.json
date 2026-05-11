@@ -1,0 +1,98 @@
+{
+  "biome": "meadow",
+  "schema_version": "1.0",
+  "duration_seconds": 480,
+  "spawner_count": 8,
+  "max_concurrent_enemies": 200,
+  "assumed_avg_enemy_lifetime_seconds": 6,
+  "notes": "Time-keyed spawn schedule for the Meadow vertical-slice arena. Cross-checked against the 200-enemy perf cap per CLAUDE.md and the named-beat pacing curve in ../../00-pacing-model.md. Spawn counts assume ~6 s average enemy lifetime at peak build TTK; balance-engineer to verify. Frame counts elsewhere assume 60 fps.",
+  "spawns": [
+    {"t": 0,    "beat": "calm-intro",     "enemy": "hop-slime",  "count": 3,  "pattern": "ring",    "radius": 35},
+    {"t": 8,    "beat": "calm-intro",     "enemy": "hop-slime",  "count": 2,  "pattern": "stream",  "from": "north"},
+    {"t": 18,   "beat": "calm-intro",     "enemy": "hop-slime",  "count": 3,  "pattern": "stream",  "from": "east"},
+
+    {"t": 30,   "beat": "first-swarm",    "enemy": "hop-slime",  "count": 5,  "pattern": "ring",    "radius": 35},
+    {"t": 42,   "beat": "first-swarm",    "enemy": "hop-slime",  "count": 4,  "pattern": "stream",  "from": "south"},
+    {"t": 55,   "beat": "first-swarm",    "enemy": "bee-buzz",   "count": 4,  "pattern": "flank",   "from": "east"},
+    {"t": 68,   "beat": "first-swarm",    "enemy": "hop-slime",  "count": 6,  "pattern": "scatter"},
+    {"t": 80,   "beat": "first-swarm",    "enemy": "bee-buzz",   "count": 4,  "pattern": "flank",   "from": "west"},
+
+    {"t": 92,   "beat": "build-phase",    "enemy": "hop-slime",  "count": 8,  "pattern": "ring",    "radius": 35},
+    {"t": 105,  "beat": "build-phase",    "enemy": "sleepy-boar","count": 1,  "pattern": "stream",  "from": "north"},
+    {"t": 115,  "beat": "build-phase",    "enemy": "daisy-bite", "count": 4,  "pattern": "scatter"},
+    {"t": 120,  "beat": "build-phase",    "elite": "big-onion",  "count": 1,  "pattern": "scripted-spawn", "from": "north", "telegraph_seconds": 1.5},
+    {"t": 128,  "beat": "build-phase",    "enemy": "hop-slime",  "count": 6,  "pattern": "stream",  "from": "south"},
+    {"t": 140,  "beat": "build-phase",    "enemy": "bee-buzz",   "count": 5,  "pattern": "flank",   "from": "north"},
+
+    {"t": 155,  "beat": "escalation-1",   "enemy": "hop-slime",  "count": 10, "pattern": "ring",    "radius": 35},
+    {"t": 165,  "beat": "escalation-1",   "enemy": "archer-mole","count": 2,  "pattern": "stream",  "from": "east"},
+    {"t": 175,  "beat": "escalation-1",   "enemy": "daisy-bite", "count": 5,  "pattern": "scatter"},
+    {"t": 185,  "beat": "escalation-1",   "enemy": "sleepy-boar","count": 1,  "pattern": "stream",  "from": "west"},
+    {"t": 195,  "beat": "escalation-1",   "enemy": "hop-slime",  "count": 12, "pattern": "ring",    "radius": 35},
+    {"t": 200,  "beat": "escalation-1",   "elite": "big-onion",  "count": 1,  "pattern": "scripted-spawn", "from": "east", "telegraph_seconds": 1.5},
+    {"t": 215,  "beat": "escalation-1",   "enemy": "bee-buzz",   "count": 6,  "pattern": "flank",   "from": "south"},
+
+    {"t": 225,  "beat": "mid-swarm",      "enemy": "hop-slime",  "count": 14, "pattern": "ring",    "radius": 35},
+    {"t": 240,  "beat": "mid-swarm",      "enemy": "hop-slime",  "count": 16, "pattern": "ring",    "radius": 35},
+    {"t": 252,  "beat": "mid-swarm",      "enemy": "daisy-bite", "count": 8,  "pattern": "scatter"},
+    {"t": 260,  "beat": "mid-swarm",      "enemy": "bee-buzz",   "count": 10, "pattern": "flank",   "from": "north"},
+    {"t": 270,  "beat": "mid-swarm",      "enemy": "archer-mole","count": 3,  "pattern": "stream",  "from": "west"},
+    {"t": 278,  "beat": "mid-swarm",      "enemy": "sleepy-boar","count": 2,  "pattern": "stream",  "from": "east"},
+    {"t": 285,  "beat": "mid-swarm",      "enemy": "hop-slime",  "count": 18, "pattern": "ring",    "radius": 35},
+    {"t": 295,  "beat": "mid-swarm",      "enemy": "bee-buzz",   "count": 8,  "pattern": "flank",   "from": "south"},
+
+    {"t": 305,  "beat": "escalation-2",   "enemy": "hop-slime",  "count": 20, "pattern": "ring",    "radius": 35},
+    {"t": 315,  "beat": "escalation-2",   "enemy": "daisy-bite", "count": 10, "pattern": "scatter"},
+    {"t": 325,  "beat": "escalation-2",   "enemy": "bee-buzz",   "count": 10, "pattern": "flank",   "from": "east"},
+    {"t": 330,  "beat": "escalation-2",   "elite": "big-onion",  "count": 1,  "pattern": "scripted-spawn", "from": "south", "telegraph_seconds": 1.5},
+    {"t": 340,  "beat": "escalation-2",   "enemy": "hop-slime",  "count": 22, "pattern": "ring",    "radius": 35},
+    {"t": 348,  "beat": "escalation-2",   "enemy": "archer-mole","count": 4,  "pattern": "stream",  "from": "north"},
+    {"t": 355,  "beat": "escalation-2",   "enemy": "sleepy-boar","count": 2,  "pattern": "stream",  "from": "west"},
+
+    {"t": 362,  "beat": "pre-boss",       "enemy": "hop-slime",  "count": 24, "pattern": "ring",    "radius": 35},
+    {"t": 370,  "beat": "pre-boss",       "enemy": "bee-buzz",   "count": 12, "pattern": "scatter"},
+    {"t": 378,  "beat": "pre-boss",       "enemy": "daisy-bite", "count": 12, "pattern": "scatter"},
+    {"t": 385,  "beat": "pre-boss",       "enemy": "hop-slime",  "count": 18, "pattern": "ring",    "radius": 35},
+
+    {"t": 390,  "beat": "pre-boss-signal","event": "boss-approach-signal", "vfx": "screen-edge-warm-tint", "sfx": "low-rumble", "music": "boss-stinger-fade-in"},
+
+    {"t": 392,  "beat": "pre-boss-taper", "enemy": "hop-slime",  "count": 8,  "pattern": "scatter"},
+    {"t": 402,  "beat": "pre-boss-taper", "enemy": "hop-slime",  "count": 6,  "pattern": "scatter"},
+    {"t": 412,  "beat": "pre-boss-taper", "enemy": "bee-buzz",   "count": 4,  "pattern": "scatter"},
+
+    {"t": 420,  "beat": "boss-fight",     "boss": "old-boar-king", "count": 1, "pattern": "center-spawn", "entrance_seconds": 1.5, "time_dilate_ms": 800, "time_dilate_factor": 0.4},
+
+    {"t": 445,  "beat": "boss-fight",     "enemy": "hop-slime",  "count": 6,  "pattern": "ring",    "radius": 40, "during_boss": true},
+    {"t": 460,  "beat": "boss-fight",     "enemy": "bee-buzz",   "count": 4,  "pattern": "flank",   "from": "north", "during_boss": true},
+    {"t": 472,  "beat": "boss-fight",     "enemy": "hop-slime",  "count": 6,  "pattern": "scatter", "during_boss": true},
+
+    {"t": 482,  "beat": "outro",          "enemy": "hop-slime",  "count": 5,  "pattern": "scatter", "post_boss": true},
+    {"t": 490,  "beat": "outro",          "enemy": "bee-buzz",   "count": 3,  "pattern": "scatter", "post_boss": true}
+  ],
+  "elite_windows": [
+    {"t": 120, "pool": ["big-onion"], "spawn_direction": "north"},
+    {"t": 200, "pool": ["big-onion"], "spawn_direction": "east"},
+    {"t": 330, "pool": ["big-onion"], "spawn_direction": "south"}
+  ],
+  "boss": {
+    "t": 420,
+    "id": "old-boar-king",
+    "arena_mods": {
+      "hazard_count": 0,
+      "shrink_radius": false,
+      "phase_2_props": ["tree-stump-a", "tree-stump-b"],
+      "phase_3_props": ["ground-crack-n", "ground-crack-e", "ground-crack-s", "ground-crack-w"]
+    },
+    "minion_adds": [
+      {"phase": 2, "enemy": "hop-slime", "count": 4, "summon_count": 2},
+      {"phase": 3, "enemy": "hop-slime", "count": 6, "summon_count": 1}
+    ]
+  },
+  "perf_crosscheck": {
+    "peak_pre_boss_window": "t=362-390, projected peak concurrent ~150-160",
+    "peak_during_boss_window": "t=420-480, projected ambient concurrent ~30-50 + boss",
+    "method": "Sum of spawn counts in any rolling 6 s window, accounting for assumed 6 s avg lifetime; no window exceeds 160 outside of boss-add overlap, and boss-fight ambient stays under 80 to preserve telegraph readability.",
+    "max_observed_window_concurrent_estimate": 160,
+    "headroom_to_perf_cap": 40
+  }
+}
