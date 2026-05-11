@@ -1,0 +1,22 @@
+{
+    "name": "Brave.UI",
+    "rootNamespace": "Brave.UI",
+    "references": [
+        "Brave.Systems",
+        "Brave.Gameplay",
+        "Unity.InputSystem",
+        "Unity.Localization",
+        "Unity.TextMeshPro",
+        "Unity.UI",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

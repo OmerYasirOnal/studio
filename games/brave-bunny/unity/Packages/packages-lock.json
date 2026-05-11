@@ -1,0 +1,4 @@
+{
+  "_comment": "Stub packages-lock.json. Unity regenerates this file with full package hashes + resolved transitive deps when the project is opened in the Editor for the first time. Do NOT hand-edit. Once Unity populates this, commit it so future clones are deterministic.",
+  "dependencies": {}
+}

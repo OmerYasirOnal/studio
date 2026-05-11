@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Brave Bunny — Run HUD overlay.
+  Wireframe source: docs/05-wireframes/05-run-hud.html
+  User stories: US-13, US-16, US-19, US-20, US-21, US-24, US-28.
+  Controller: Code/UI/Controllers/RunHudController.cs subscribes to gameplay
+  channels (HP, XP, run-timer, pickup) and updates labels + bar fills.
+  Safe-area: top inset applied at runtime by SafeAreaUtility.cs (USS cannot
+  read env(safe-area-inset-*)).
+-->
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="project://database/Assets/_Brave/UI/Themes/theme.uss" />
+    <Style src="project://database/Assets/_Brave/UI/Styles/screens.uss" />
+
+    <ui:VisualElement name="hud-root" class="brave-root hud-root">
+
+        <!-- Top HUD: HP bar + XP bar + timer + pause -->
+        <ui:VisualElement name="hud-top" class="hud-top">
+            <ui:VisualElement name="hud-bars" class="hud-bars">
+                <ui:VisualElement name="hp-bar" class="bar bar-hp">
+                    <ui:VisualElement name="hp-bar-fill" class="bar-fill" style="width: 72%;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="xp-bar" class="bar bar-xp" style="margin-top: 4px;">
+                    <ui:VisualElement name="xp-bar-fill" class="bar-fill" style="width: 38%;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Label name="lbl-timer" text="02:14" class="num hud-timer" />
+            <ui:Button name="btn-pause" text="II" class="btn hud-pause" loc-key="BTN_PAUSE" />
+        </ui:VisualElement>
+
+        <!-- Mid: gameplay viewport label (placeholder; 3D camera draws underneath) -->
+        <ui:VisualElement name="hud-viewport-label" class="hud-viewport-label" picking-mode="Ignore">
+            <ui:Label name="lbl-viewport-stub" text="Gameplay viewport" class="num-lg"
+                      style="opacity: 0.4;" />
+            <ui:Label name="lbl-attack-info" text="auto-attack: forward burst, 1.2/s" class="micro" />
+        </ui:VisualElement>
+
+        <!-- Minimap pip (top-right under HUD bars) -->
+        <ui:VisualElement name="hud-minimap" class="hud-minimap">
+            <ui:Label text="Map" class="micro" />
+        </ui:VisualElement>
+
+        <!-- Wave incoming cue -->
+        <ui:Label name="lbl-wave-toast" text="Heads up — more rascals on the way." class="toast"
+                  loc-key="WAVE_INCOMING" style="bottom: 140px; display: none;" />
+
+        <!-- Bottom: joystick (anchor for runtime InputSystem joystick) + pickup feed -->
+        <ui:VisualElement name="hud-footer" class="hud-footer">
+            <ui:VisualElement name="joystick-anchor" class="hud-joystick">
+                <ui:VisualElement name="joystick-knob" class="hud-joystick-knob" />
+            </ui:VisualElement>
+            <ui:VisualElement name="pickup-feed" class="hud-pickup-feed">
+                <ui:VisualElement name="pickup-gold" class="chip chip-gold">
+                    <ui:Label name="lbl-pickup-gold-amount" text="+ 24" class="num" />
+                    <ui:Label text=" carrots" />
+                </ui:VisualElement>
+                <ui:VisualElement name="pickup-heart" class="chip chip-heart" style="margin-top: 8px;">
+                    <ui:Label name="lbl-pickup-heart-amount" text="+ 1" class="num" />
+                    <ui:Label text=" heart" />
+                </ui:VisualElement>
+                <ui:Label name="lbl-level-badge" text="Lv 4" class="chip" style="margin-top: 8px;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>

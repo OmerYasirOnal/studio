@@ -1,0 +1,47 @@
+root = true
+
+[*.cs]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# C# code style
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_prefer_method_group_conversion = true:suggestion
+csharp_new_line_before_open_brace = methods, types, accessors
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+
+# StyleCop-ish
+dotnet_diagnostic.IDE0008.severity = suggestion
+dotnet_diagnostic.IDE0011.severity = suggestion
+
+[*.{json,asmdef,asmref}]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.{uxml,uss,xml}]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.{yaml,yml,unity,prefab,asset,mat,meta,controller,anim}]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = false
+insert_final_newline = true

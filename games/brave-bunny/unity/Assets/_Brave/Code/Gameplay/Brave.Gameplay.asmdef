@@ -1,0 +1,19 @@
+{
+    "name": "Brave.Gameplay",
+    "rootNamespace": "Brave.Gameplay",
+    "references": [
+        "Unity.InputSystem",
+        "Unity.Mathematics",
+        "Unity.Collections",
+        "Unity.Burst"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

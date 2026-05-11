@@ -1,0 +1,82 @@
+# ============================================================================
+# Brave Bunny — Unity-specific .gitignore
+# ============================================================================
+# Extends the repo-root .gitignore. Anything Unity regenerates locally on
+# open / build / play stays OUT of git.
+#
+# Cross-references:
+#   - tech-spec 01-project-layout.md  (Library/, Temp/, obj/, csproj artifacts
+#                                      are explicitly gitignored)
+#   - tech-spec 10-build-and-ci.md    (Builds/ holds Xcode + .apk output)
+# ============================================================================
+
+# Unity-generated folders (regenerated on every project open)
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+MemoryCaptures/
+Recordings/
+
+# Asset meta files MUST be tracked
+!*.meta
+
+# Generated VS / Rider files (Unity regenerates from .asmdef on open)
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# IDE configuration directories
+.vs/
+.idea/
+.vscode/
+.gradle/
+*.sln.DotSettings.user
+
+# OS junk
+.DS_Store
+Thumbs.db
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# Crashlytics generated file
+crashlytics-build.properties
+sysinfo.txt
+
+# Packed Addressables
+[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+
+# Belt-and-braces cache exclusion
+**/Library/**
+**/Temp/**
+
+# Build artifacts (build-engineer owns; never committed)
+*.apk
+*.aab
+*.ipa
+*.app/
+*.unitypackage
+
+# Visual scripting / Bolt cache
+[Aa]ssets/AssetStoreTools*
+
+# ---------------------------------------------------------------------------
+# Committed deliberately (do NOT add to this gitignore):
+#   - ProjectSettings/*  (engine pins live here)
+#   - Packages/manifest.json + packages-lock.json
+# ---------------------------------------------------------------------------

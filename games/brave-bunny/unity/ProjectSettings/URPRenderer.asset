@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+# ----------------------------------------------------------------------------
+# URP Renderer (ScriptableRendererData) — STUB
+#
+# This is a placeholder. The actual URP Renderer asset MUST be authored in
+# the Unity Editor via Assets > Create > Rendering > URP > Universal Renderer.
+# Once authored, the asset is moved to Assets/Settings/ and referenced by
+# URPGlobal.asset (the asset pipeline asset).
+#
+# Author in-editor with the following configuration (per tech-spec
+# 06-rendering.md):
+#   - Rendering Path: Forward+
+#   - Depth Priming Mode: Disabled (mobile cost > benefit on tile GPUs)
+#   - Depth Texture: On
+#   - Opaque Texture: Off
+#   - HDR: Off (60 fps mobile budget cannot afford it)
+#   - MSAA: 2x
+#   - Render Scale: 1.0 (drop to 0.85 if Phase-5 profiling demands it)
+#   - Shadow Cascades: 1 (mobile)
+#   - Soft Shadows: Off
+#   - Post-Processing: enabled, minimal stack (color grading + vignette only)
+#   - Renderer Features: SSAO disabled at launch
+#
+# Cross-reference: tech-spec 06-rendering.md.
+# ----------------------------------------------------------------------------
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: URPRenderer
+  m_EditorClassIdentifier:
+  # NOTE: real fields are populated by Unity when the ScriptableRenderer
+  # asset is created via the in-editor menu. This stub exists only to mark
+  # the intended path; delete + recreate this file from the Editor on first
+  # project open.

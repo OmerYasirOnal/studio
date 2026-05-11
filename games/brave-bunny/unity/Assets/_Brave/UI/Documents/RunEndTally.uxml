@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Brave Bunny — Run-end Tally.
+  Wireframe source: docs/05-wireframes/08-run-end-tally.html
+  User stories: US-18, US-22, US-26, US-30, US-44, US-47, US-55, US-62.
+
+  Per US-18: currency banks FIRST — the player sees what they earned before
+  any ad / IAP surface.
+  Per US-47: rewarded-ad DECLINE button is visually larger than ACCEPT and is
+  pre-focused so the default action is the player-friendly one.
+-->
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="project://database/Assets/_Brave/UI/Themes/theme.uss" />
+    <Style src="project://database/Assets/_Brave/UI/Styles/screens.uss" />
+
+    <ui:VisualElement name="tally-root" class="brave-root">
+
+        <!-- Title -->
+        <ui:VisualElement name="tally-header" class="tally-header">
+            <ui:Label name="lbl-title" text="Tuckered out — but you banked 240 carrots." class="h1"
+                      loc-key="RUN_END_LOSE_GENERIC" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="tally-main" class="home-main">
+
+            <!-- Hero celebration + run summary -->
+            <ui:VisualElement name="card-celebration" class="card tally-celebration">
+                <ui:VisualElement name="hero-avatar" class="tally-avatar" />
+                <ui:Label name="lbl-run-summary" text="Lv 14 · 07:42" class="num-lg"
+                          style="color: rgb(94, 107, 62); margin-top: 8px;" />
+                <ui:Label name="lbl-run-detail" text="Meadow · 312 rascals sent packing" class="body-sm"
+                          style="margin-top: 4px;" />
+            </ui:VisualElement>
+
+            <!-- Banked totals (FIRST, per US-18) -->
+            <ui:VisualElement name="card-banked" class="card" style="margin-top: 12px;">
+                <ui:Label text="Banked" class="h2" />
+                <ui:VisualElement class="row-spread" style="margin-top: 8px;">
+                    <ui:Label text="Carrots earned" class="body-sm" />
+                    <ui:Label name="lbl-banked-carrots" text="+ 240" class="num-lg" />
+                </ui:VisualElement>
+                <ui:VisualElement class="row-spread" style="margin-top: 4px;">
+                    <ui:Label text="Pass XP" class="body-sm" />
+                    <ui:Label name="lbl-banked-pass-xp" text="+ 180" class="num" />
+                </ui:VisualElement>
+                <ui:VisualElement class="row-spread" style="margin-top: 4px;">
+                    <ui:Label text="Hero XP" class="body-sm" />
+                    <ui:Label name="lbl-banked-hero-xp" text="+ 96" class="num" />
+                </ui:VisualElement>
+                <ui:VisualElement class="row-spread" style="margin-top: 4px;">
+                    <ui:Label text="Daily mission" class="body-sm" />
+                    <ui:Label name="lbl-mission-progress" text="2 of 3 ✓" class="chip chip-gold" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Rewarded ad opt-in: decline larger + pre-focused per US-47 -->
+            <ui:VisualElement name="card-ad-offer" class="card tally-ad-card" style="margin-top: 12px;">
+                <ui:Label text="Bonus offer" class="h2" />
+                <ui:Label name="lbl-ad-prompt" text="Watch a quick ad to double your carrots?" class="body-sm"
+                          loc-key="AD_DOUBLE_REWARD_PROMPT" />
+                <ui:Label name="lbl-ad-preview" text="Preview: +240 carrots (total 480)" class="micro" />
+                <ui:VisualElement class="row" style="margin-top: 8px;">
+                    <ui:Button name="btn-decline-ad" text="Not yet." class="btn btn-ghost tally-decline-btn"
+                               loc-key="BTN_CANCEL" focusable="true" />
+                    <ui:Button name="btn-watch-ad" text="Watch ad" class="btn btn-gold tally-accept-btn"
+                               style="margin-left: 12px;" />
+                </ui:VisualElement>
+                <ui:Label name="lbl-ad-opt-out-hint" text="You can turn ads off in Settings." class="micro"
+                          loc-key="AD_OPT_OUT_HINT" style="opacity: 0.7; margin-top: 4px;" />
+            </ui:VisualElement>
+
+            <!-- Path out: share + home + retry -->
+            <ui:VisualElement name="tally-footer" class="tally-footer">
+                <ui:Button name="btn-share" text="Show a friend." class="btn btn-ghost tally-footer-btn"
+                           loc-key="BTN_SHARE_RUN" />
+                <ui:Button name="btn-home" text="Head home for now." class="btn btn-ghost tally-footer-btn"
+                           loc-key="BTN_QUIT_RUN" />
+                <ui:Button name="btn-retry" text="One more hop." class="btn tally-retry-btn"
+                           loc-key="BTN_RETRY" />
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

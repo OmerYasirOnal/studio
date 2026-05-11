@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Brave Bunny — Level-up Draft modal.
+  Wireframe source: docs/05-wireframes/06-levelup-draft.html
+  User stories: US-06, US-14, US-15, US-23, US-25, US-29.
+
+  CRITICAL FIT: 3 cards stack vertically (NOT horizontal). Each card ≥ 88 pt
+  tap row to clear iPhone SE 3 thumb-zone tests. Header 84 + 3*88 + footer 56
+  = ~430 pt → fits inside modal max-height 640 pt without scrolling.
+
+  Controller: Code/UI/Controllers/LevelUpDraftController.cs receives the 3
+  offers from UpgradePicker, populates icon/title/delta-body/take button, and
+  raises the "applied" callback so RunService can resume.
+-->
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="project://database/Assets/_Brave/UI/Themes/theme.uss" />
+    <Style src="project://database/Assets/_Brave/UI/Styles/screens.uss" />
+
+    <ui:VisualElement name="levelup-root" class="brave-root">
+        <ui:VisualElement name="backdrop" class="backdrop">
+            <ui:VisualElement name="modal" class="modal levelup-modal">
+
+                <!-- Header: level badge + flavor copy -->
+                <ui:VisualElement name="levelup-header" class="levelup-header">
+                    <ui:VisualElement name="level-badge" class="chip chip-gold">
+                        <ui:Label name="lbl-level-badge" text="Lv 5" class="num" />
+                    </ui:VisualElement>
+                    <ui:Label name="lbl-flavor" text="You feel pluckier. Choose your gift." class="h2"
+                              loc-key="LEVEL_UP_FLAVOR_PLUCKY" style="margin-top: 4px;" />
+                </ui:VisualElement>
+
+                <!-- Card A: weapon upgrade with delta -->
+                <ui:VisualElement name="card-a" class="card card-tappable levelup-card card-meadow">
+                    <ui:VisualElement name="card-a-icon" class="levelup-card-icon">
+                        <ui:Label name="lbl-card-a-icon" text="CC" class="num" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="levelup-card-body">
+                        <ui:Label name="lbl-card-a-title" text="Carrot Cannon Lv 2" class="num" />
+                        <ui:Label name="lbl-card-a-delta" text="Dmg 8 → 12 · Rate 1.2 → 1.5/s" class="body-sm" />
+                    </ui:VisualElement>
+                    <ui:Button name="btn-take-a" text="Take it." class="btn levelup-take-btn"
+                               loc-key="BTN_UPGRADE_TAKE" />
+                </ui:VisualElement>
+
+                <!-- Card B: evolution-eligible (rare ring) -->
+                <ui:VisualElement name="card-b" class="card card-tappable levelup-card card-rare">
+                    <ui:VisualElement name="card-b-icon" class="levelup-card-icon levelup-card-icon-rare">
+                        <ui:Label name="lbl-card-b-icon" text="★" class="num" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="levelup-card-body">
+                        <ui:Label name="lbl-card-b-title" text="Petal Orbit Lv 4" class="num" />
+                        <ui:Label name="lbl-card-b-delta" text="Two gifts want to become one. Pick the pair."
+                                  class="body-sm" loc-key="LEVEL_UP_EVOLVE" />
+                    </ui:VisualElement>
+                    <ui:Button name="btn-take-b" text="Take it." class="btn levelup-take-btn"
+                               loc-key="BTN_UPGRADE_TAKE" />
+                </ui:VisualElement>
+
+                <!-- Card C: passive HP upgrade -->
+                <ui:VisualElement name="card-c" class="card card-tappable levelup-card">
+                    <ui:VisualElement name="card-c-icon" class="levelup-card-icon levelup-card-icon-hp">
+                        <ui:Label name="lbl-card-c-icon" text="+HP" class="num" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="levelup-card-body">
+                        <ui:Label name="lbl-card-c-title" text="Lucky Foot Lv 1" class="num" />
+                        <ui:Label name="lbl-card-c-delta" text="Max HP 80 → 92 (+15%)" class="body-sm" />
+                    </ui:VisualElement>
+                    <ui:Button name="btn-take-c" text="Take it." class="btn levelup-take-btn"
+                               loc-key="BTN_UPGRADE_TAKE" />
+                </ui:VisualElement>
+
+                <!-- Footer: banish + reroll, single-tap, reroll ad-gated on 2nd -->
+                <ui:VisualElement name="levelup-footer" class="levelup-footer">
+                    <ui:Button name="btn-banish" text="Skip this gift." class="btn btn-ghost levelup-footer-btn"
+                               loc-key="BTN_UPGRADE_SKIP" />
+                    <ui:Button name="btn-reroll" text="Try again." class="btn btn-gold levelup-footer-btn"
+                               loc-key="BTN_REROLL" style="margin-left: 8px;" />
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
