@@ -6,6 +6,23 @@ Every asset under `assets-raw/` must appear in this table. asset-curator maintai
 |---|---|---|---|---|---|
 | _none yet_ | | | | | |
 
+## Planned acquisitions (not yet fetched)
+
+These rows will be populated as assets are downloaded. The current state is "no assets fetched". Use the fetch scripts in `core/tools/asset-pipeline/` to download CC0 packs; each fetch appends a row here automatically.
+
+Per `INDEX.md` in this directory, the planned roster covers:
+- 8 characters from Quaternius Animated Animals
+- 16 chunks × 5 biomes = 80 environment chunks (Kenney Nature/Platformer/Cave/Mini Dungeon)
+- 12 weapons (some from Quaternius/Kenney, some custom Blender)
+- 50 SFX (Freesound CC0 + Kenney UI Audio)
+- 12 BGM tracks (Pixabay + Incompetech CC-BY)
+- 3 fonts (Google Fonts SIL OFL)
+- ~52% UI icons from Kenney Game Icons (CC0)
+
+| File | Source | License | URL | Author | Fetched |
+|---|---|---|---|---|---|
+| _none yet — see INDEX.md for the plan_ | | | | | |
+
 ## Allowed licenses
 
 - CC0 1.0 Universal
