@@ -1,0 +1,104 @@
+{
+  "biome": "snow",
+  "schema_version": "1.0",
+  "duration_seconds": 480,
+  "spawner_count": 8,
+  "max_concurrent_enemies": 200,
+  "assumed_avg_enemy_lifetime_seconds": 6,
+  "notes": "Time-keyed spawn schedule for the Snow vertical-slice arena. Snow is biome 5 — launch endgame, density rebalanced +10% per 06-biomes.md because the long sight lines make density feel lower at same raw count. Highest concurrent enemy projection of any biome (target ~170 peak, all hazards stack during the boss fight). 4 elites (extra elite at t=278 like Cavern). Boss is Big Snow-yeti (3 phases, cold-aura always-on) at t=420. Frame counts elsewhere assume 60 fps.",
+  "spawns": [
+    {"t": 0,    "beat": "calm-intro",     "enemy": "ice-puff",      "count": 4,  "pattern": "ring",    "radius": 42},
+    {"t": 9,    "beat": "calm-intro",     "enemy": "ice-puff",      "count": 2,  "pattern": "stream",  "from": "north"},
+    {"t": 20,   "beat": "calm-intro",     "enemy": "snow-rat",      "count": 3,  "pattern": "stream",  "from": "east"},
+
+    {"t": 32,   "beat": "first-swarm",    "enemy": "ice-puff",      "count": 7,  "pattern": "ring",    "radius": 42},
+    {"t": 44,   "beat": "first-swarm",    "enemy": "snow-rat",      "count": 5,  "pattern": "stream",  "from": "south"},
+    {"t": 56,   "beat": "first-swarm",    "enemy": "frost-bee",     "count": 5,  "pattern": "flank",   "from": "west"},
+    {"t": 68,   "beat": "first-swarm",    "enemy": "ice-puff",      "count": 8,  "pattern": "scatter"},
+    {"t": 82,   "beat": "first-swarm",    "enemy": "frost-bee",     "count": 5,  "pattern": "flank",   "from": "east"},
+
+    {"t": 94,   "beat": "build-phase",    "enemy": "ice-puff",      "count": 11, "pattern": "ring",    "radius": 42},
+    {"t": 107,  "beat": "build-phase",    "enemy": "yak",           "count": 1,  "pattern": "stream",  "from": "north"},
+    {"t": 116,  "beat": "build-phase",    "enemy": "snow-rat",      "count": 7,  "pattern": "scatter"},
+    {"t": 122,  "beat": "build-phase",    "elite": "snow-yeti-cub", "count": 1,  "pattern": "scripted-spawn", "from": "north", "telegraph_seconds": 1.5},
+    {"t": 132,  "beat": "build-phase",    "enemy": "ice-puff",      "count": 8,  "pattern": "stream",  "from": "south"},
+    {"t": 144,  "beat": "build-phase",    "enemy": "frost-bee",     "count": 7,  "pattern": "flank",   "from": "north"},
+    {"t": 152,  "beat": "build-phase",    "enemy": "penguin-chick", "count": 5,  "pattern": "scatter"},
+
+    {"t": 158,  "beat": "escalation-1",   "enemy": "ice-puff",      "count": 14, "pattern": "ring",    "radius": 42},
+    {"t": 168,  "beat": "escalation-1",   "enemy": "snowball-mole", "count": 3,  "pattern": "stream",  "from": "east"},
+    {"t": 178,  "beat": "escalation-1",   "enemy": "snow-rat",      "count": 7,  "pattern": "scatter"},
+    {"t": 188,  "beat": "escalation-1",   "enemy": "walrus",        "count": 1,  "pattern": "stream",  "from": "west"},
+    {"t": 198,  "beat": "escalation-1",   "enemy": "ice-puff",      "count": 15, "pattern": "ring",    "radius": 42},
+    {"t": 204,  "beat": "escalation-1",   "elite": "snow-yeti-cub", "count": 1,  "pattern": "scripted-spawn", "from": "east", "telegraph_seconds": 1.5},
+    {"t": 216,  "beat": "escalation-1",   "enemy": "frost-bee",     "count": 9,  "pattern": "flank",   "from": "south"},
+
+    {"t": 228,  "beat": "mid-swarm",      "enemy": "ice-puff",      "count": 18, "pattern": "ring",    "radius": 42},
+    {"t": 242,  "beat": "mid-swarm",      "enemy": "ice-puff",      "count": 21, "pattern": "ring",    "radius": 42},
+    {"t": 254,  "beat": "mid-swarm",      "enemy": "snow-rat",      "count": 11, "pattern": "scatter"},
+    {"t": 262,  "beat": "mid-swarm",      "enemy": "frost-bee",     "count": 13, "pattern": "flank",   "from": "north"},
+    {"t": 272,  "beat": "mid-swarm",      "enemy": "snowball-mole", "count": 4,  "pattern": "stream",  "from": "west"},
+    {"t": 278,  "beat": "mid-swarm",      "elite": "snow-yeti-cub", "count": 1,  "pattern": "scripted-spawn", "from": "south", "telegraph_seconds": 1.5, "note": "extra elite — Snow runs 4 elites total like Cavern"},
+    {"t": 286,  "beat": "mid-swarm",      "enemy": "yak",           "count": 2,  "pattern": "stream",  "from": "east"},
+    {"t": 294,  "beat": "mid-swarm",      "enemy": "ice-puff",      "count": 22, "pattern": "ring",    "radius": 42},
+    {"t": 302,  "beat": "mid-swarm",      "enemy": "penguin-chick", "count": 9,  "pattern": "scatter"},
+
+    {"t": 310,  "beat": "escalation-2",   "enemy": "ice-puff",      "count": 24, "pattern": "ring",    "radius": 42},
+    {"t": 320,  "beat": "escalation-2",   "enemy": "snow-rat",      "count": 12, "pattern": "scatter"},
+    {"t": 328,  "beat": "escalation-2",   "enemy": "frost-bee",     "count": 12, "pattern": "flank",   "from": "east"},
+    {"t": 334,  "beat": "escalation-2",   "elite": "snow-yeti-cub", "count": 1,  "pattern": "scripted-spawn", "from": "west", "telegraph_seconds": 1.5},
+    {"t": 344,  "beat": "escalation-2",   "enemy": "ice-puff",      "count": 26, "pattern": "ring",    "radius": 42},
+    {"t": 352,  "beat": "escalation-2",   "enemy": "snowball-mole", "count": 5,  "pattern": "stream",  "from": "north"},
+    {"t": 360,  "beat": "escalation-2",   "enemy": "walrus",        "count": 2,  "pattern": "stream",  "from": "south"},
+
+    {"t": 366,  "beat": "pre-boss",       "enemy": "ice-puff",      "count": 28, "pattern": "ring",    "radius": 42},
+    {"t": 373,  "beat": "pre-boss",       "enemy": "frost-bee",     "count": 14, "pattern": "scatter"},
+    {"t": 380,  "beat": "pre-boss",       "enemy": "snow-rat",      "count": 14, "pattern": "scatter"},
+    {"t": 387,  "beat": "pre-boss",       "enemy": "ice-puff",      "count": 22, "pattern": "ring",    "radius": 42},
+
+    {"t": 390,  "beat": "pre-boss-signal","event": "boss-approach-signal", "vfx": "screen-edge-pale-cyan-tint", "sfx": "low-glacial-groan", "music": "boss-stinger-fade-in"},
+
+    {"t": 394,  "beat": "pre-boss-taper", "enemy": "ice-puff",      "count": 11, "pattern": "scatter"},
+    {"t": 404,  "beat": "pre-boss-taper", "enemy": "frost-bee",     "count": 7,  "pattern": "scatter"},
+    {"t": 414,  "beat": "pre-boss-taper", "enemy": "snow-rat",      "count": 5,  "pattern": "scatter"},
+
+    {"t": 420,  "beat": "boss-fight",     "boss": "big-snow-yeti",  "count": 1,  "pattern": "center-spawn", "entrance_seconds": 1.5, "time_dilate_ms": 800, "time_dilate_factor": 0.4, "note": "largest arena, largest boss; cold-aura passive activates immediately"},
+
+    {"t": 444,  "beat": "boss-fight",     "enemy": "ice-puff",      "count": 6,  "pattern": "ring",    "radius": 45, "during_boss": true},
+    {"t": 458,  "beat": "boss-fight",     "enemy": "frost-bee",     "count": 5,  "pattern": "flank",   "from": "east", "during_boss": true},
+    {"t": 470,  "beat": "boss-fight",     "enemy": "snow-rat",      "count": 5,  "pattern": "scatter", "during_boss": true, "note": "minor pressure during phase 3 blizzard-howl"},
+
+    {"t": 482,  "beat": "outro",          "enemy": "ice-puff",      "count": 6,  "pattern": "scatter", "post_boss": true},
+    {"t": 490,  "beat": "outro",          "enemy": "snow-rat",      "count": 4,  "pattern": "scatter", "post_boss": true}
+  ],
+  "elite_windows": [
+    {"t": 122, "pool": ["snow-yeti-cub"], "spawn_direction": "north"},
+    {"t": 204, "pool": ["snow-yeti-cub"], "spawn_direction": "east"},
+    {"t": 278, "pool": ["snow-yeti-cub"], "spawn_direction": "south"},
+    {"t": 334, "pool": ["snow-yeti-cub"], "spawn_direction": "west"}
+  ],
+  "boss": {
+    "t": 420,
+    "id": "big-snow-yeti",
+    "arena_mods": {
+      "hazard_count": 5,
+      "ambient_hazards_active": ["ice-slide", "cold-tick", "snowdrift"],
+      "shrink_radius": false,
+      "phase_1_props": ["snowdrift-fixed-a", "snowdrift-fixed-b"],
+      "phase_2_props": ["yeti-ice-patch-pool-phase2"],
+      "phase_3_props": ["yeti-ice-patch-pool-phase3", "blizzard-howl-cold-rate-amp-marker"]
+    },
+    "minion_adds": [
+      {"phase": 1, "enemy": "ice-puff", "count": 3, "summon_count": 1, "note": "ambient minor adds — boss does not summon; pressure carried by hazards"},
+      {"phase": 2, "enemy": "frost-bee", "count": 3, "summon_count": 1},
+      {"phase": 3, "enemy": "snow-rat", "count": 3, "summon_count": 1}
+    ]
+  },
+  "perf_crosscheck": {
+    "peak_pre_boss_window": "t=366-390, projected peak concurrent ~170 (+10% vs Meadow per Snow density-bias modifier; the densest biome at peak)",
+    "peak_during_boss_window": "t=420-480, projected ambient concurrent ~40-60 + boss (boss has no scripted summons, ambient density picks up the slack)",
+    "method": "Sum of spawn counts in any rolling 6 s window with 6 s avg lifetime. Snow's +10% density brings peak to ~170, leaving 30-enemy headroom to the 200 cap. The boss fight is the only fight where ambient hazards + boss hazards stack fully — balance-engineer must validate TTK under maximum hazard pressure.",
+    "max_observed_window_concurrent_estimate": 170,
+    "headroom_to_perf_cap": 30
+  }
+}

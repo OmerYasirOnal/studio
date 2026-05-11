@@ -1,0 +1,100 @@
+{
+  "biome": "cavern",
+  "schema_version": "1.0",
+  "duration_seconds": 480,
+  "spawner_count": 8,
+  "max_concurrent_enemies": 200,
+  "assumed_avg_enemy_lifetime_seconds": 6,
+  "notes": "Time-keyed spawn schedule for the Cavern vertical-slice arena. Cavern is biome 4 — harder than Meadow but density is slightly LOWER (-10% per pacing model 06-biomes.md) because stalactite hazards + 6.5 u reveal radius do pressure work that raw count would otherwise carry. More elite spawns (4 instead of 3) and earlier elite cadence. Boss is Sneaky Cave Mole (burrow/teleport) at t=420. Frame counts elsewhere assume 60 fps.",
+  "spawns": [
+    {"t": 0,    "beat": "calm-intro",     "enemy": "bat-mini",      "count": 3,  "pattern": "ring",    "radius": 22},
+    {"t": 9,    "beat": "calm-intro",     "enemy": "bat-mini",      "count": 2,  "pattern": "stream",  "from": "east"},
+    {"t": 20,   "beat": "calm-intro",     "enemy": "glow-bug",      "count": 3,  "pattern": "stream",  "from": "west"},
+
+    {"t": 32,   "beat": "first-swarm",    "enemy": "bat-mini",      "count": 5,  "pattern": "ring",    "radius": 22},
+    {"t": 44,   "beat": "first-swarm",    "enemy": "glow-bug",      "count": 4,  "pattern": "stream",  "from": "north"},
+    {"t": 56,   "beat": "first-swarm",    "enemy": "rock-tumble",   "count": 5,  "pattern": "flank",   "from": "south"},
+    {"t": 68,   "beat": "first-swarm",    "enemy": "bat-mini",      "count": 6,  "pattern": "scatter"},
+    {"t": 82,   "beat": "first-swarm",    "enemy": "glow-bug",      "count": 4,  "pattern": "flank",   "from": "east"},
+
+    {"t": 95,   "beat": "build-phase",    "enemy": "bat-mini",      "count": 8,  "pattern": "ring",    "radius": 22},
+    {"t": 108,  "beat": "build-phase",    "enemy": "stone-ox",      "count": 1,  "pattern": "stream",  "from": "south"},
+    {"t": 118,  "beat": "build-phase",    "enemy": "cave-slime",    "count": 5,  "pattern": "scatter"},
+    {"t": 124,  "beat": "build-phase",    "elite": "stalagmite-walker", "count": 1, "pattern": "scripted-spawn", "from": "north", "telegraph_seconds": 1.5},
+    {"t": 134,  "beat": "build-phase",    "enemy": "rock-tumble",   "count": 6,  "pattern": "stream",  "from": "west"},
+    {"t": 146,  "beat": "build-phase",    "enemy": "glow-bug",      "count": 6,  "pattern": "flank",   "from": "east"},
+
+    {"t": 158,  "beat": "escalation-1",   "enemy": "bat-mini",      "count": 11, "pattern": "ring",    "radius": 22},
+    {"t": 168,  "beat": "escalation-1",   "enemy": "crystal-slinger","count": 2, "pattern": "stream",  "from": "north"},
+    {"t": 178,  "beat": "escalation-1",   "enemy": "cave-slime",    "count": 6,  "pattern": "scatter"},
+    {"t": 188,  "beat": "escalation-1",   "enemy": "stone-ox",      "count": 1,  "pattern": "stream",  "from": "east"},
+    {"t": 198,  "beat": "escalation-1",   "enemy": "bat-mini",      "count": 12, "pattern": "ring",    "radius": 22},
+    {"t": 204,  "beat": "escalation-1",   "elite": "stalagmite-walker", "count": 1, "pattern": "scripted-spawn", "from": "south", "telegraph_seconds": 1.5},
+    {"t": 216,  "beat": "escalation-1",   "enemy": "glow-bug",      "count": 7,  "pattern": "flank",   "from": "west"},
+
+    {"t": 228,  "beat": "mid-swarm",      "enemy": "bat-mini",      "count": 14, "pattern": "ring",    "radius": 22},
+    {"t": 242,  "beat": "mid-swarm",      "enemy": "bat-mini",      "count": 16, "pattern": "ring",    "radius": 22},
+    {"t": 254,  "beat": "mid-swarm",      "enemy": "rock-tumble",   "count": 9,  "pattern": "scatter"},
+    {"t": 262,  "beat": "mid-swarm",      "enemy": "glow-bug",      "count": 10, "pattern": "flank",   "from": "north"},
+    {"t": 272,  "beat": "mid-swarm",      "enemy": "crystal-slinger","count": 3, "pattern": "stream",  "from": "south"},
+    {"t": 278,  "beat": "mid-swarm",      "elite": "stalagmite-walker", "count": 1, "pattern": "scripted-spawn", "from": "east", "telegraph_seconds": 1.5, "note": "extra elite — Cavern runs 4 elites total vs 3 in other biomes"},
+    {"t": 288,  "beat": "mid-swarm",      "enemy": "bat-mini",      "count": 17, "pattern": "ring",    "radius": 22},
+    {"t": 297,  "beat": "mid-swarm",      "enemy": "cave-slime",    "count": 8,  "pattern": "scatter"},
+
+    {"t": 308,  "beat": "escalation-2",   "enemy": "bat-mini",      "count": 19, "pattern": "ring",    "radius": 22},
+    {"t": 318,  "beat": "escalation-2",   "enemy": "rock-tumble",   "count": 10, "pattern": "scatter"},
+    {"t": 328,  "beat": "escalation-2",   "enemy": "glow-bug",      "count": 11, "pattern": "flank",   "from": "east"},
+    {"t": 334,  "beat": "escalation-2",   "elite": "stalagmite-walker", "count": 1, "pattern": "scripted-spawn", "from": "west", "telegraph_seconds": 1.5},
+    {"t": 344,  "beat": "escalation-2",   "enemy": "bat-mini",      "count": 20, "pattern": "ring",    "radius": 22},
+    {"t": 352,  "beat": "escalation-2",   "enemy": "crystal-slinger","count": 4, "pattern": "stream",  "from": "north"},
+    {"t": 360,  "beat": "escalation-2",   "enemy": "stone-ox",      "count": 2,  "pattern": "stream",  "from": "south"},
+
+    {"t": 366,  "beat": "pre-boss",       "enemy": "bat-mini",      "count": 21, "pattern": "ring",    "radius": 22},
+    {"t": 374,  "beat": "pre-boss",       "enemy": "glow-bug",      "count": 11, "pattern": "scatter"},
+    {"t": 382,  "beat": "pre-boss",       "enemy": "rock-tumble",   "count": 11, "pattern": "scatter"},
+    {"t": 388,  "beat": "pre-boss",       "enemy": "bat-mini",      "count": 16, "pattern": "ring",    "radius": 22},
+
+    {"t": 390,  "beat": "pre-boss-signal","event": "boss-approach-signal", "vfx": "screen-edge-violet-tint", "sfx": "deep-rumble-from-below", "music": "boss-stinger-fade-in"},
+
+    {"t": 393,  "beat": "pre-boss-taper", "enemy": "bat-mini",      "count": 8,  "pattern": "scatter"},
+    {"t": 403,  "beat": "pre-boss-taper", "enemy": "bat-mini",      "count": 6,  "pattern": "scatter"},
+    {"t": 413,  "beat": "pre-boss-taper", "enemy": "glow-bug",      "count": 4,  "pattern": "scatter"},
+
+    {"t": 420,  "beat": "boss-fight",     "boss": "sneaky-cave-mole","count": 1, "pattern": "center-spawn", "entrance_seconds": 1.5, "time_dilate_ms": 800, "time_dilate_factor": 0.4, "note": "spawns at center, then immediately burrows for first dig-strike cycle"},
+
+    {"t": 445,  "beat": "boss-fight",     "enemy": "bat-mini",      "count": 5,  "pattern": "ring",    "radius": 25, "during_boss": true},
+    {"t": 460,  "beat": "boss-fight",     "enemy": "glow-bug",      "count": 4,  "pattern": "flank",   "from": "north", "during_boss": true},
+    {"t": 472,  "beat": "boss-fight",     "enemy": "bat-mini",      "count": 5,  "pattern": "scatter", "during_boss": true},
+
+    {"t": 482,  "beat": "outro",          "enemy": "bat-mini",      "count": 4,  "pattern": "scatter", "post_boss": true},
+    {"t": 490,  "beat": "outro",          "enemy": "glow-bug",      "count": 3,  "pattern": "scatter", "post_boss": true}
+  ],
+  "elite_windows": [
+    {"t": 124, "pool": ["stalagmite-walker"], "spawn_direction": "north"},
+    {"t": 204, "pool": ["stalagmite-walker"], "spawn_direction": "south"},
+    {"t": 278, "pool": ["stalagmite-walker"], "spawn_direction": "east"},
+    {"t": 334, "pool": ["stalagmite-walker"], "spawn_direction": "west"}
+  ],
+  "boss": {
+    "t": 420,
+    "id": "sneaky-cave-mole",
+    "arena_mods": {
+      "hazard_count": 2,
+      "shrink_radius": false,
+      "ambient_hazards_active": ["stalactite-drop-zone"],
+      "phase_1_props": ["dig-mound-marker-ne", "dig-mound-marker-se", "dig-mound-marker-sw", "dig-mound-marker-nw"],
+      "phase_2_props": ["dig-mound-marker-ne", "dig-mound-marker-se", "dig-mound-marker-sw", "dig-mound-marker-nw", "stalactite-shake-zone-pool"]
+    },
+    "minion_adds": [
+      {"phase": 1, "enemy": "bat-mini", "count": 3, "summon_count": 1, "note": "ambient minions only — boss does not summon, but mid-fight bat-mini pulses keep pressure"},
+      {"phase": 2, "enemy": "bat-mini", "count": 4, "summon_count": 1}
+    ]
+  },
+  "perf_crosscheck": {
+    "peak_pre_boss_window": "t=366-390, projected peak concurrent ~135-145 (-10% vs Meadow per Cavern density-bias modifier)",
+    "peak_during_boss_window": "t=420-480, projected ambient concurrent ~25-40 + boss",
+    "method": "Sum of spawn counts in any rolling 6 s window. Lower raw count is intentional — reveal radius + stalactite hazards do the pressure work. The 4th elite (at t=278) is the variety knob that replaces some swarmer density.",
+    "max_observed_window_concurrent_estimate": 145,
+    "headroom_to_perf_cap": 55
+  }
+}

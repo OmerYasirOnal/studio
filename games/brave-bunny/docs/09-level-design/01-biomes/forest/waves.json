@@ -1,0 +1,99 @@
+{
+  "biome": "forest",
+  "schema_version": "1.0",
+  "duration_seconds": 480,
+  "spawner_count": 8,
+  "max_concurrent_enemies": 200,
+  "assumed_avg_enemy_lifetime_seconds": 6,
+  "notes": "Time-keyed spawn schedule for the Forest vertical-slice arena. Forest is biome 3 — medium-hard difficulty (~25% harder than Meadow per 06-biomes.md). Pacing curve has a softer taper into pre-boss because low-vision underbrush is already doing cognitive-load work. Vine-trip swarmers are Mama Oak boss minions, but a small population seeds the rotation pre-boss. Boss is Mama Oak (stationary) at t=420. Frame counts elsewhere assume 60 fps.",
+  "spawns": [
+    {"t": 0,    "beat": "calm-intro",     "enemy": "nut-bug",       "count": 3,  "pattern": "ring",    "radius": 35},
+    {"t": 9,    "beat": "calm-intro",     "enemy": "nut-bug",       "count": 2,  "pattern": "stream",  "from": "north"},
+    {"t": 20,   "beat": "calm-intro",     "enemy": "shroom-bounce", "count": 3,  "pattern": "stream",  "from": "south"},
+
+    {"t": 32,   "beat": "first-swarm",    "enemy": "nut-bug",       "count": 6,  "pattern": "ring",    "radius": 35},
+    {"t": 44,   "beat": "first-swarm",    "enemy": "shroom-bounce", "count": 4,  "pattern": "stream",  "from": "east"},
+    {"t": 56,   "beat": "first-swarm",    "enemy": "nut-bug",       "count": 5,  "pattern": "flank",   "from": "west"},
+    {"t": 68,   "beat": "first-swarm",    "enemy": "worm",          "count": 6,  "pattern": "scatter"},
+    {"t": 82,   "beat": "first-swarm",    "enemy": "shroom-bounce", "count": 4,  "pattern": "flank",   "from": "north"},
+
+    {"t": 95,   "beat": "build-phase",    "enemy": "nut-bug",       "count": 9,  "pattern": "ring",    "radius": 35},
+    {"t": 108,  "beat": "build-phase",    "enemy": "sleepy-bear-cub","count": 1, "pattern": "stream",  "from": "south"},
+    {"t": 118,  "beat": "build-phase",    "enemy": "vine-trip",     "count": 4,  "pattern": "scatter", "note": "first appearance of vine-trip swarmer; foreshadows boss"},
+    {"t": 124,  "beat": "build-phase",    "elite": "treant-sprout", "count": 1,  "pattern": "scripted-spawn", "from": "north", "telegraph_seconds": 1.5},
+    {"t": 134,  "beat": "build-phase",    "enemy": "worm",          "count": 7,  "pattern": "stream",  "from": "east"},
+    {"t": 146,  "beat": "build-phase",    "enemy": "shroom-bounce", "count": 6,  "pattern": "flank",   "from": "south"},
+
+    {"t": 158,  "beat": "escalation-1",   "enemy": "nut-bug",       "count": 12, "pattern": "ring",    "radius": 35},
+    {"t": 168,  "beat": "escalation-1",   "enemy": "acorn-slinger", "count": 2,  "pattern": "stream",  "from": "west"},
+    {"t": 178,  "beat": "escalation-1",   "enemy": "vine-trip",     "count": 6,  "pattern": "scatter"},
+    {"t": 188,  "beat": "escalation-1",   "enemy": "oak-walker",    "count": 1,  "pattern": "stream",  "from": "east"},
+    {"t": 198,  "beat": "escalation-1",   "enemy": "nut-bug",       "count": 13, "pattern": "ring",    "radius": 35},
+    {"t": 204,  "beat": "escalation-1",   "elite": "treant-sprout", "count": 1,  "pattern": "scripted-spawn", "from": "south", "telegraph_seconds": 1.5},
+    {"t": 216,  "beat": "escalation-1",   "enemy": "shroom-bounce", "count": 7,  "pattern": "flank",   "from": "north"},
+
+    {"t": 228,  "beat": "mid-swarm",      "enemy": "nut-bug",       "count": 16, "pattern": "ring",    "radius": 35},
+    {"t": 242,  "beat": "mid-swarm",      "enemy": "nut-bug",       "count": 18, "pattern": "ring",    "radius": 35},
+    {"t": 254,  "beat": "mid-swarm",      "enemy": "vine-trip",     "count": 10, "pattern": "scatter"},
+    {"t": 262,  "beat": "mid-swarm",      "enemy": "shroom-bounce", "count": 11, "pattern": "flank",   "from": "west"},
+    {"t": 272,  "beat": "mid-swarm",      "enemy": "acorn-slinger", "count": 3,  "pattern": "stream",  "from": "north"},
+    {"t": 280,  "beat": "mid-swarm",      "enemy": "sleepy-bear-cub","count": 2, "pattern": "stream",  "from": "east"},
+    {"t": 288,  "beat": "mid-swarm",      "enemy": "nut-bug",       "count": 20, "pattern": "ring",    "radius": 35},
+    {"t": 297,  "beat": "mid-swarm",      "enemy": "worm",          "count": 8,  "pattern": "scatter"},
+
+    {"t": 308,  "beat": "escalation-2",   "enemy": "nut-bug",       "count": 22, "pattern": "ring",    "radius": 35},
+    {"t": 318,  "beat": "escalation-2",   "enemy": "vine-trip",     "count": 11, "pattern": "scatter"},
+    {"t": 328,  "beat": "escalation-2",   "enemy": "shroom-bounce", "count": 11, "pattern": "flank",   "from": "east"},
+    {"t": 334,  "beat": "escalation-2",   "elite": "treant-sprout", "count": 1,  "pattern": "scripted-spawn", "from": "west", "telegraph_seconds": 1.5},
+    {"t": 344,  "beat": "escalation-2",   "enemy": "nut-bug",       "count": 22, "pattern": "ring",    "radius": 35},
+    {"t": 352,  "beat": "escalation-2",   "enemy": "acorn-slinger", "count": 4,  "pattern": "stream",  "from": "south"},
+    {"t": 360,  "beat": "escalation-2",   "enemy": "oak-walker",    "count": 2,  "pattern": "stream",  "from": "north"},
+
+    {"t": 366,  "beat": "pre-boss",       "enemy": "nut-bug",       "count": 24, "pattern": "ring",    "radius": 35, "note": "Forest taper softer per pacing model — underbrush carries pressure"},
+    {"t": 374,  "beat": "pre-boss",       "enemy": "shroom-bounce", "count": 12, "pattern": "scatter"},
+    {"t": 382,  "beat": "pre-boss",       "enemy": "vine-trip",     "count": 12, "pattern": "scatter"},
+    {"t": 388,  "beat": "pre-boss",       "enemy": "nut-bug",       "count": 18, "pattern": "ring",    "radius": 35},
+
+    {"t": 390,  "beat": "pre-boss-signal","event": "boss-approach-signal", "vfx": "screen-edge-amber-tint", "sfx": "creaking-bark", "music": "boss-stinger-fade-in"},
+
+    {"t": 393,  "beat": "pre-boss-taper", "enemy": "nut-bug",       "count": 10, "pattern": "scatter"},
+    {"t": 403,  "beat": "pre-boss-taper", "enemy": "shroom-bounce", "count": 8,  "pattern": "scatter"},
+    {"t": 413,  "beat": "pre-boss-taper", "enemy": "vine-trip",     "count": 6,  "pattern": "scatter"},
+
+    {"t": 420,  "beat": "boss-fight",     "boss": "mama-oak",       "count": 1,  "pattern": "center-spawn", "entrance_seconds": 1.5, "time_dilate_ms": 800, "time_dilate_factor": 0.4, "note": "stationary boss; arena rotates around her"},
+
+    {"t": 444,  "beat": "boss-fight",     "enemy": "vine-trip",     "count": 5,  "pattern": "ring",    "radius": 40, "during_boss": true, "note": "Mama Oak summon during phase 2"},
+    {"t": 460,  "beat": "boss-fight",     "enemy": "nut-bug",       "count": 4,  "pattern": "flank",   "from": "east", "during_boss": true},
+    {"t": 474,  "beat": "boss-fight",     "enemy": "vine-trip",     "count": 6,  "pattern": "scatter", "during_boss": true, "note": "summon during phase 3"},
+
+    {"t": 483,  "beat": "outro",          "enemy": "nut-bug",       "count": 5,  "pattern": "scatter", "post_boss": true},
+    {"t": 490,  "beat": "outro",          "enemy": "shroom-bounce", "count": 4,  "pattern": "scatter", "post_boss": true}
+  ],
+  "elite_windows": [
+    {"t": 124, "pool": ["treant-sprout"], "spawn_direction": "north"},
+    {"t": 204, "pool": ["treant-sprout"], "spawn_direction": "south"},
+    {"t": 334, "pool": ["treant-sprout"], "spawn_direction": "west"}
+  ],
+  "boss": {
+    "t": 420,
+    "id": "mama-oak",
+    "arena_mods": {
+      "hazard_count": 0,
+      "ambient_hazards_suppressed": ["root-snare"],
+      "shrink_radius": false,
+      "phase_2_props": ["root-snare-patch-n", "root-snare-patch-e", "root-snare-patch-s"],
+      "phase_3_props": ["root-snare-patch-n2", "root-snare-patch-e2", "root-snare-patch-s2", "root-snare-patch-w", "root-snare-patch-c", "acorn-shadow-marker-pool"]
+    },
+    "minion_adds": [
+      {"phase": 2, "enemy": "vine-trip", "count": 3, "summon_count": 1, "note": "single tight summon during the acorn-rain wind-up"},
+      {"phase": 3, "enemy": "vine-trip", "count": 4, "summon_count": 1, "note": "summon during acorn-rain droop window"}
+    ]
+  },
+  "perf_crosscheck": {
+    "peak_pre_boss_window": "t=366-390, projected peak concurrent ~150-155 (softer than Beach because pre-boss taper is gentler)",
+    "peak_during_boss_window": "t=420-480, projected ambient concurrent ~30-50 + boss",
+    "method": "Sum of spawn counts in any rolling 6 s window. Forest's vine-trip swarmers root the player on first contact, so 'effective density' is higher per spawn than raw count. Balance-engineer to validate TTK ladder accounts for root-time loss.",
+    "max_observed_window_concurrent_estimate": 155,
+    "headroom_to_perf_cap": 45
+  }
+}
