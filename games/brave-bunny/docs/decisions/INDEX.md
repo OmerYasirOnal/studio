@@ -16,6 +16,7 @@ ADRs are numbered sequentially, four-digit zero-padded. Use `/decide "<topic>"` 
 | 0010 | Subscription ROI policy | 2026-05-12 | accepted |
 | 0011 | BGM loop format on iOS | — | proposed (deferred to Phase 5 device validation) |
 | 0012 | Event channel mechanism (SO vs C# events) | — | proposed (deferred to Phase 5 Profiler) |
+| 0013 | Arena spawn-radius invariant | 2026-05-12 | accepted |
 
 ## Conventions
 
