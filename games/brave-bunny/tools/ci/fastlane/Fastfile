@@ -151,29 +151,26 @@ platform :ios do
       UI.success("[register] bundle id created: #{APP_IDENTIFIER}")
     end
 
-    # 2. App Store Connect entry — use `produce` action which has a more lenient
-    # auth surface for app creation. Requires App Manager role on the API key;
-    # if the role is Developer, this fails and the user must create the app
-    # in the ASC web UI (one click at https://appstoreconnect.apple.com/apps).
+    # 2. App Store Connect entry — use Spaceship::ConnectAPI::App.create directly.
+    # The fastlane `produce` action does NOT accept api_key: in this version; it
+    # requires Apple ID + 2FA. Spaceship's Connect API uses the JWT token we
+    # already minted above, so it works with the ASC API key path.
+    # Requires App Manager role on the key; Developer role yields HTTP 403.
     existing_app = Spaceship::ConnectAPI::App.all.find { |a| a.bundle_id == APP_IDENTIFIER }
     if existing_app
       UI.success("[register] ASC app already exists: #{APP_IDENTIFIER} -> '#{existing_app.name}' (id=#{existing_app.id})")
     else
-      UI.message("[register] creating ASC app entry '#{APP_NAME}' via produce...")
+      UI.message("[register] creating ASC app entry '#{APP_NAME}' via Spaceship::ConnectAPI::App.create...")
       begin
-        produce(
-          username: ENV["FASTLANE_USER"] || "omeryasironal@hotmail.com",
-          app_identifier: APP_IDENTIFIER,
-          app_name: APP_NAME,
-          language: APP_PRIMARY_LANGUAGE,
-          app_version: "0.1.0",
+        app = Spaceship::ConnectAPI::App.create(
+          name: APP_NAME,
+          version_string: "0.1.0",
           sku: APP_SKU,
-          skip_itc: false,
-          skip_devcenter: true,         # already created above
-          platform: "ios",
-          api_key: api_key
+          primary_locale: "en-US",
+          bundle_id: APP_IDENTIFIER,
+          platforms: ["IOS"]
         )
-        UI.success("[register] ASC app created via produce")
+        UI.success("[register] ASC app created: #{APP_IDENTIFIER} (id=#{app.id})")
       rescue => e
         UI.error("[register] ASC app create failed: #{e.message}")
         UI.important("[register] MANUAL FALLBACK: create the app at https://appstoreconnect.apple.com/apps")
@@ -182,9 +179,8 @@ platform :ios do
         UI.important("  - Primary Language: English (U.S.)")
         UI.important("  - Bundle ID: #{APP_IDENTIFIER}")
         UI.important("  - SKU: #{APP_SKU}")
-        UI.important("  - User Access: Full Access (or your preference)")
-        UI.important("[register] Cause: API key likely has 'Developer' role; needs 'App Manager' for ASC create.")
-        UI.important("  Upgrade at: https://appstoreconnect.apple.com/access/api")
+        UI.important("[register] If 403/forbidden: API key role is too low (needs App Manager).")
+        UI.important("  Upgrade at: https://appstoreconnect.apple.com/access/api (key #{api_key[:key_id]})")
       end
     end
 
