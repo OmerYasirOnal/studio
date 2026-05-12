@@ -154,7 +154,81 @@ namespace Brave.Boot.Editor
                 using var serialized = new SerializedObject(so);
                 ApplyField(serialized, "slug", slug);
                 ApplyField(serialized, "displayName", entry.Value<string>("display_name"));
-                ApplyField(serialized, "archetype", entry.Value<string>("archetype"));
+                // archetype is an enum on the SO (WeaponArchetype). The JSON ships a kebab-case
+                // string ("projectile" / "area" / etc.). enumValueIndex mapping is done by name
+                // in ApplyEnumField below; for now we leave it (already-imported assets retain
+                // their enum index unless changed in the Inspector).
+                ApplyEnumByJsonString(serialized, "archetype", entry.Value<string>("archetype"));
+
+                // --- WeaponDefinition.levels[5] — per-level rows ---------------------
+                // Per docs/10-balance/00-formulas.md §1 (damage formula):
+                //   damage = dmg_base × level_mult[level]   (other multipliers applied at runtime)
+                // Per weapons.schema.md:
+                //   rate_ms (ms-between-fires) → WeaponLevelData.fireRate is SECONDS (seconds-between-fires)
+                //   range_units → WeaponLevelData.range (game units)
+                //   projectiles_base → WeaponLevelData.projectiles (count per fire; 0 for aura)
+                //   level_mult[i] is the DMG multiplier at L(i+1); level_mult[0] = 1.00 = L1 baseline.
+                //
+                // L2..L5 perks (rate_ms / projectiles / range deltas) live in level_perks[] and ARE applied
+                // per-level here when the perk is one of: "rate_ms", "projectiles", "range_units",
+                // "range_units_delta". Other perks (chain/bounce/pierce/slow_pct/etc.) are runtime
+                // mechanics owned by gameplay-engineer and stay out of this static SO row.
+                float dmgBase   = entry.Value<float?>("dmg_base") ?? 0f;
+                int   rateMs0   = entry.Value<int?>("rate_ms") ?? 0;
+                float range0    = entry.Value<float?>("range_units") ?? 0f;
+                int   projs0    = entry.Value<int?>("projectiles_base") ?? 0;
+                var   levelMult = entry["level_mult"] as JArray;
+                var   perks     = entry["level_perks"] as JArray;
+
+                // Carry-forward (per-level) state — perks at level N modify the state used from N onward.
+                int   curRateMs = rateMs0;
+                float curRange  = range0;
+                int   curProjs  = projs0;
+
+                for (int i = 0; i < 5; i++)
+                {
+                    int level1Based = i + 1;
+                    float mult = (levelMult != null && i < levelMult.Count) ? levelMult[i].Value<float>() : 1f;
+
+                    // Apply any perk targeting THIS level (level 2..5 only — L1 is the baseline).
+                    if (perks != null && level1Based >= 2)
+                    {
+                        foreach (var p in perks.OfType<JObject>())
+                        {
+                            if ((p.Value<int?>("level") ?? -1) != level1Based) continue;
+                            var perkName = p.Value<string>("perk");
+                            switch (perkName)
+                            {
+                                case "rate_ms":
+                                    // value is the NEW absolute rate_ms after this level.
+                                    curRateMs = p.Value<int?>("value") ?? curRateMs;
+                                    break;
+                                case "projectiles":
+                                    // value is the DELTA (+1 per occurrence per schema).
+                                    curProjs += p.Value<int?>("value") ?? 0;
+                                    break;
+                                case "range_units":
+                                    // value is the NEW absolute range (Whirligig L4: 3.0).
+                                    curRange = p.Value<float?>("value") ?? curRange;
+                                    break;
+                                case "range_units_delta":
+                                    // additive delta (Honey Aura L2: +0.5).
+                                    curRange += p.Value<float?>("value") ?? 0f;
+                                    break;
+                                // Other perks are runtime-mechanic and don't belong in static row fields.
+                            }
+                        }
+                    }
+
+                    // Per-level SO row — SerializedProperty array path syntax.
+                    var rowPath = $"levels.Array.data[{i}]";
+                    ApplyField(serialized, $"{rowPath}.damage",       dmgBase * mult);
+                    ApplyField(serialized, $"{rowPath}.fireRate",     curRateMs / 1000f);  // ms → seconds
+                    ApplyField(serialized, $"{rowPath}.range",        curRange);
+                    ApplyField(serialized, $"{rowPath}.projectiles",  curProjs);
+                    // upgradeFlavor is designer copy; left at default (empty) — no JSON source.
+                }
+
                 serialized.ApplyModifiedPropertiesWithoutUndo();
                 EditorUtility.SetDirty(so);
 
@@ -191,6 +265,13 @@ namespace Brave.Boot.Editor
             var root = LoadJson("enemies.json");
             if (root == null) return;
             var list = (root is JArray arr) ? (JArray)arr : (JArray)(root["enemies"] ?? new JArray());
+
+            // File-level reference: player's baseline move speed (used to convert
+            // enemy.scaling.speed_mult_vs_player → absolute units/sec for the SO).
+            // Per docs/10-balance/00-formulas.md §3, base_move = 4.5 (Bunny anchor).
+            // characters.json owns this constant; mirror the default here.
+            const float playerBaseMoveUnitsPerSec = 4.5f;
+
             foreach (JObject entry in list.OfType<JObject>())
             {
                 var slug = entry.Value<string>("id") ?? entry.Value<string>("slug");
@@ -203,7 +284,61 @@ namespace Brave.Boot.Editor
                 using var serialized = new SerializedObject(so);
                 ApplyField(serialized, "slug", slug);
                 ApplyField(serialized, "displayName", entry.Value<string>("display_name"));
-                ApplyField(serialized, "role", entry.Value<string>("role"));
+                // role is an enum on the SO (EnemyRole) but JSON ships a string ("swarmer"/"tank"/...).
+                ApplyEnumByJsonString(serialized, "role", entry.Value<string>("role"));
+
+                // --- Stats (minute-1 baseline) ---------------------------------------
+                // Per docs/10-balance/00-formulas.md §9: enemies.json hp_base = minute-1 HP;
+                // per-minute scaling (hp_per_min) is applied at runtime by the spawner —
+                // NOT in the SO. The SO baseline is the minute-1 anchor only.
+                // ADR-0006 values already in JSON (swarmer 6+4, elite 300+80, boss 2000/3000).
+                var scaling = entry["scaling"] as JObject;
+                if (scaling != null)
+                {
+                    // Boss uses hp_mid_boss/hp_end_boss instead of hp_base.
+                    // For the SO baseline, pick hp_mid_boss (mid-run encounter) when present;
+                    // the spawner picks mid- vs end- at run time per minute mark.
+                    float baseHp =
+                        scaling.Value<float?>("hp_base")
+                        ?? scaling.Value<float?>("hp_mid_boss")
+                        ?? scaling.Value<float?>("hp_end_boss")
+                        ?? 0f;
+                    ApplyField(serialized, "baseHP", baseHp);
+
+                    float contactDmg = scaling.Value<float?>("contact_dmg") ?? 0f;
+                    ApplyField(serialized, "contactDamage", contactDmg);
+
+                    // ranged_dmg is optional (only ranged role + boss have it). Default 0.
+                    float rangedDmg = scaling.Value<float?>("ranged_dmg") ?? 0f;
+                    ApplyField(serialized, "rangedDamage", rangedDmg);
+
+                    // Per §3 movement: enemy speed_mult_vs_player × player_base_move.
+                    float speedMult = scaling.Value<float?>("speed_mult_vs_player") ?? 1f;
+                    ApplyField(serialized, "moveSpeed", playerBaseMoveUnitsPerSec * speedMult);
+
+                    // Clamped to [0, 0.75] per §11; EnemyDefinition.OnValidate enforces this.
+                    float defMult = scaling.Value<float?>("defense_mult") ?? 0f;
+                    ApplyField(serialized, "defenseMultiplier", defMult);
+                }
+
+                // Telegraph window (seconds) — tanks/elites/bosses telegraph their attacks.
+                // JSON has multiple sources:
+                //   - tank:  charge.telegraph_ms
+                //   - ranged: ranged.telegraph_ms
+                //   - elite/boss: telegraph_min_ms (top-level)
+                int telegraphMs =
+                    entry.Value<int?>("telegraph_min_ms")
+                    ?? (entry["charge"] as JObject)?.Value<int?>("telegraph_ms")
+                    ?? (entry["ranged"] as JObject)?.Value<int?>("telegraph_ms")
+                    ?? 0;
+                ApplyField(serialized, "telegraphWindowSeconds", telegraphMs / 1000f);
+
+                // Note: DropTable fields populated by a separate drops.json importer pass
+                // (deferred — ImportSingle("drops.json") is currently a no-op). Leaving at
+                // struct defaults means no XP/gold/heart drops yet; this is a documented
+                // follow-up wave, not a balance regression (the JSON still owns the numbers).
+                // telegraphSfxKey is asset-curator territory; no JSON source.
+
                 serialized.ApplyModifiedPropertiesWithoutUndo();
                 EditorUtility.SetDirty(so);
 
@@ -236,6 +371,49 @@ namespace Brave.Boot.Editor
                 case double d: prop.floatValue = (float)d; break;
                 case bool b: prop.boolValue = b; break;
             }
+        }
+
+        // Maps a JSON kebab-case enum string ("utility-beam", "swarmer") to the matching
+        // SerializedProperty enum index. Match is case-insensitive on the alphanumeric
+        // characters only (so "utility-beam" matches enum "Utility" prefix OR a full
+        // "UtilityBeam" — first-match-wins by stripping non-letters).
+        // If no enum member matches, the property is left at its previous value and a
+        // warning is logged — callers can spot domain mismatches (e.g. boss role missing
+        // from EnemyRole enum) without silently corrupting data.
+        private static void ApplyEnumByJsonString(SerializedObject serialized, string fieldName, string? value)
+        {
+            if (string.IsNullOrEmpty(value)) return;
+            var prop = serialized.FindProperty(fieldName);
+            if (prop == null || prop.propertyType != SerializedPropertyType.Enum) return;
+            var names = prop.enumNames;
+            string norm = NormalizeEnum(value);
+            // First pass: exact normalized match ("projectile" → "Projectile").
+            for (int i = 0; i < names.Length; i++)
+            {
+                if (string.Equals(NormalizeEnum(names[i]), norm, StringComparison.OrdinalIgnoreCase))
+                {
+                    prop.enumValueIndex = i;
+                    return;
+                }
+            }
+            // Second pass: first-kebab-token match. Lets JSON "utility-beam" find enum "Utility".
+            string firstToken = value.Split('-')[0];
+            string firstNorm = NormalizeEnum(firstToken);
+            for (int i = 0; i < names.Length; i++)
+            {
+                if (string.Equals(NormalizeEnum(names[i]), firstNorm, StringComparison.OrdinalIgnoreCase))
+                {
+                    prop.enumValueIndex = i;
+                    return;
+                }
+            }
+            Debug.LogWarning($"[balance-importer] enum '{value}' has no match in {fieldName} enum (members: {string.Join(",", names)}) — left unchanged");
+        }
+
+        private static string NormalizeEnum(string s)
+        {
+            var chars = s.Where(char.IsLetterOrDigit).ToArray();
+            return new string(chars);
         }
     }
 }

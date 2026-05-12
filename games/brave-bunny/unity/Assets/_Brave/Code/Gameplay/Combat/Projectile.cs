@@ -67,6 +67,22 @@ namespace Brave.Gameplay.Combat
             if (_pierceRemaining <= 0) Despawn();
         }
 
+        /// <summary>Wave 4 vertical-slice launch. Linear travel in <paramref name="direction"/>
+        /// (must be normalised by caller). Used by <see cref="CarrotProjectilePool.Spawn"/>.</summary>
+        public void LaunchLinear(Vector3 from, Vector3 direction, float speed, float damage, float lifetime)
+        {
+            transform.position = from;
+            _direction = new Vector2(direction.x, direction.z);  // XZ ground plane
+            if (_direction.sqrMagnitude < ProjectileMath.FacingEpsilonSqr)
+                _direction = Vector2.right;
+            _damage = damage;
+            speedUnitsPerSecond = speed;
+            lifetimeSeconds = lifetime;
+            _ageSeconds = 0f;
+            _alive = true;
+            _pierceRemaining = 1;       // v0.1 baseline: hit one enemy, despawn (boomerang return is follow-up)
+        }
+
         /// <summary>Spawn-time setup. <paramref name="spreadIndex"/> is used to fan a salvo.</summary>
         public void Launch(Vector3 from, Vector3 toward, float damage,
             AutoAttackController owner, int spreadIndex, int totalProjectiles)
@@ -101,17 +117,16 @@ namespace Brave.Gameplay.Combat
             _ageSeconds += dt;
             if (_ageSeconds >= lifetimeSeconds) { Despawn(); return; }
 
-            Vector3 pos = transform.position;
-            pos.x += _direction.x * speedUnitsPerSecond * dt;
-            pos.y += _direction.y * speedUnitsPerSecond * dt;
+            // Wave 4 XZ migration (ADR-0018): direction.x → world.x; direction.y → world.z.
+            // The camera looks down the XZ ground plane — Y stays at the projectile's spawn Y.
+            Vector3 dir = new(_direction.x, 0f, _direction.y);
+            Vector3 pos = ProjectileMath.Step(transform.position, dir, speedUnitsPerSecond, dt);
             transform.position = pos;
 
             var hit = EnemyRegistry.FindFirstWithinRadius(pos, hitRadius);
             if (hit != null)
             {
-                var info = new HitInfo(_damage, pos, isCrit: false, sourceId: 0,
-                    targetId: hit.GetInstanceID());
-                hit.Health.TakeHit(info);
+                DamageApplier.TryApply(hit, _damage, pos, sourceId: _sourceWeaponId);
                 Despawn();
             }
         }
