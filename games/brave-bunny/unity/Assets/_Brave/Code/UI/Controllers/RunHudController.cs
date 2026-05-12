@@ -7,18 +7,28 @@
 // KPI (per wireframe): Joystick → bunny within 1 frame (16 ms). HUD readable
 // in iPhone SE 3 thumb-occluded zones.
 //
-// Wiring contract: this controller subscribes to whichever ScriptableObject
-// event channels the gameplay layer has wired into the Boot scene. To keep
-// the UI assembly buildable BEFORE the gameplay-engineer ships the canonical
-// `HpChangedChannel` / `XpChangedChannel` / `RunTimerChannel`, we expose
-// SerializeField slots — controllers gracefully no-op when not assigned.
+// Wave-5 wiring contract:
+//   * The HUD reads its per-frame state from an IRunRuntimeState binding,
+//     populated by gameplay-engineer in a future dispatch. When no binding is
+//     attached we fall back to a RunHudStubRuntime so the HUD renders
+//     plausible placeholder values in editor + EditMode tests.
+//   * Pulse events (level-up, pickup, pause-button) still flow through the
+//     existing ScriptableObject channels and the UIEvents bus — that contract
+//     is unchanged from Phase-5 Wave-1.
+//
+// Allocation note (per Wave-5 conventions):
+//   The per-frame update path uses class-toggles (AddToClassList /
+//   RemoveFromClassList) for show/hide and a single string.Format for the
+//   "mm:ss" timer + "HP/MaxHP" overlay. That is the Wave-5 baseline; the
+//   stretch goal of zero-alloc formatting via Span<char> is tracked in the
+//   hand-off note.
 
 #nullable enable
 
-using Brave.UI.Bindings;
-using Brave.UI.Theming;
 using Brave.Gameplay.Events;
 using Brave.Systems.Context;
+using Brave.UI.Bindings;
+using Brave.UI.Theming;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -27,23 +37,39 @@ namespace Brave.UI.Controllers
     [RequireComponent(typeof(UIDocument))]
     public sealed class RunHudController : MonoBehaviour
     {
+        // ---- USS class toggles (kebab-case per Wave-5 convention) ----
+        public const string HiddenClass = "is-hidden";
+
+        // ---- Element names (must match RunHud.uxml) ----
+        public const string HpFillName = "hp-bar-fill";
+        public const string XpFillName = "xp-bar-fill";
+        public const string HpNumericName = "lbl-hp-numeric";
+        public const string TimerLabelName = "lbl-timer";
+        public const string WaveCounterName = "lbl-wave-counter";
+        public const string LevelPillName = "lbl-level-pill";
+        public const string WaveToastName = "lbl-wave-toast";
+        public const string BossWarningName = "boss-warning";
+        public const string PickupGoldAmountName = "lbl-pickup-gold-amount";
+        public const string PickupHeartAmountName = "lbl-pickup-heart-amount";
+        public const string PauseButtonName = "btn-pause";
+
         [Header("Gameplay event channels (optional — wired by Boot)")]
         [SerializeField] private LevelUpChannel? _levelUpChannel;
         [SerializeField] private PickupChannel? _pickupChannel;
 
+        /// <summary>
+        /// Per-frame state binding. Populated by gameplay-engineer's RunService
+        /// in a future dispatch. When <c>null</c>, the controller falls back to
+        /// <see cref="RunHudStubRuntime"/> so the HUD renders plausible values
+        /// in editor.
+        /// </summary>
+        public IRunRuntimeState? State { get; set; }
+
         private UIDocument _doc = null!;
         private LocalizationProvider _loc = null!;
+        private readonly RunHudStubRuntime _fallbackState = new();
+        private readonly HudElements _elements = new();
 
-        // Cached element refs — looked up once on enable.
-        private VisualElement _hpFill = null!;
-        private VisualElement _xpFill = null!;
-        private Label _timerLabel = null!;
-        private Label _levelBadge = null!;
-        private Label _waveToast = null!;
-        private Label _pickupGoldAmount = null!;
-        private Label _pickupHeartAmount = null!;
-
-        private float _runStartTime;
         private int _accumulatedGoldPickup;
         private int _accumulatedHeartPickup;
 
@@ -56,69 +82,86 @@ namespace Brave.UI.Controllers
 
         private void OnEnable()
         {
-            var root = _doc.rootVisualElement;
+            _elements.BindFrom(_doc.rootVisualElement);
+            _elements.PauseButton.clicked += OnPauseClicked;
 
-            _hpFill = root.Q<VisualElement>("hp-bar-fill")!;
-            _xpFill = root.Q<VisualElement>("xp-bar-fill")!;
-            _timerLabel = root.Q<Label>("lbl-timer")!;
-            _levelBadge = root.Q<Label>("lbl-level-badge")!;
-            _waveToast = root.Q<Label>("lbl-wave-toast")!;
-            _pickupGoldAmount = root.Q<Label>("lbl-pickup-gold-amount")!;
-            _pickupHeartAmount = root.Q<Label>("lbl-pickup-heart-amount")!;
-
-            root.Q<Button>("btn-pause")!.clicked += OnPauseClicked;
-
-            _runStartTime = Time.time;
             _accumulatedGoldPickup = 0;
             _accumulatedHeartPickup = 0;
 
             if (_levelUpChannel != null) _levelUpChannel.Subscribe(OnLevelUp);
             if (_pickupChannel != null) _pickupChannel.Subscribe(OnPickup);
 
-            _loc.ApplyToTree(root);
+            _loc.ApplyToTree(_doc.rootVisualElement);
         }
 
         private void OnDisable()
         {
             if (_levelUpChannel != null) _levelUpChannel.Unsubscribe(OnLevelUp);
             if (_pickupChannel != null) _pickupChannel.Unsubscribe(OnPickup);
+            _elements.PauseButton.clicked -= OnPauseClicked;
         }
 
         private void Update()
         {
-            // Timer tick — recomputed locally; gameplay layer pushes pauses
-            // through RunService which freezes Time.timeScale.
-            var elapsed = Time.time - _runStartTime;
-            var m = Mathf.FloorToInt(elapsed / 60f);
-            var s = Mathf.FloorToInt(elapsed % 60f);
-            _timerLabel.text = $"{m:D2}:{s:D2}";
+            Render(State ?? _fallbackState, _elements);
         }
 
-        /// <summary>Called by gameplay-engineer's HP service whenever HP changes.</summary>
-        public void SetHp(float ratio01)
+        /// <summary>
+        /// Pure render step — no dependencies on <see cref="UIDocument"/>,
+        /// <see cref="Time"/>, or any MonoBehaviour state. EditMode tests call
+        /// this directly against an in-memory <see cref="HudElements"/>
+        /// instance.
+        /// </summary>
+        public static void Render(IRunRuntimeState state, HudElements el)
         {
-            _hpFill.style.width = new StyleLength(new Length(Mathf.Clamp01(ratio01) * 100f, LengthUnit.Percent));
+            // ---- HP bar ----
+            float maxHp = state.MaxHP <= 0f ? 1f : state.MaxHP;
+            float hpRatio = Mathf.Clamp01(state.CurrentHP / maxHp);
+            el.HpFill.style.width = new StyleLength(new Length(hpRatio * 100f, LengthUnit.Percent));
+            el.HpNumeric.text = $"{Mathf.RoundToInt(state.CurrentHP)} / {Mathf.RoundToInt(state.MaxHP)}";
+
+            // ---- XP bar + level pill ----
+            float xpMax = state.XPToNextLevel <= 0f ? 1f : state.XPToNextLevel;
+            float xpRatio = Mathf.Clamp01(state.CurrentXP / xpMax);
+            el.XpFill.style.width = new StyleLength(new Length(xpRatio * 100f, LengthUnit.Percent));
+            el.LevelPill.text = $"Lv {state.Level}";
+
+            // ---- Wave + timer ----
+            el.WaveCounter.text = $"Wave {state.WaveNumber}";
+            int totalSeconds = Mathf.Max(0, Mathf.FloorToInt(state.RunSecondsElapsed));
+            int m = totalSeconds / 60;
+            int s = totalSeconds % 60;
+            el.Timer.text = $"{m:D2}:{s:D2}";
+
+            // ---- Boss-warning banner (class toggle, no per-frame allocation) ----
+            SetHidden(el.BossWarning, !state.IsBossActive);
         }
 
-        /// <summary>Called whenever XP changes; ratio is xpIntoLevel / xpForNextLevel.</summary>
-        public void SetXp(float ratio01)
+        private static void SetHidden(VisualElement el, bool hidden)
         {
-            _xpFill.style.width = new StyleLength(new Length(Mathf.Clamp01(ratio01) * 100f, LengthUnit.Percent));
+            if (hidden)
+            {
+                if (!el.ClassListContains(HiddenClass)) el.AddToClassList(HiddenClass);
+            }
+            else
+            {
+                if (el.ClassListContains(HiddenClass)) el.RemoveFromClassList(HiddenClass);
+            }
         }
 
         public void ShowWaveToast(string locKey)
         {
-            _waveToast.text = _loc.Loc(locKey);
-            _waveToast.style.display = DisplayStyle.Flex;
-            _waveToast.schedule.Execute(() => _waveToast.style.display = DisplayStyle.None).StartingIn(2500);
+            _elements.WaveToast.text = _loc.Loc(locKey);
+            SetHidden(_elements.WaveToast, false);
+            _elements.WaveToast.schedule.Execute(() => SetHidden(_elements.WaveToast, true)).StartingIn(2500);
         }
 
         private void OnLevelUp(LevelUpEvent evt)
         {
-            _levelBadge.text = $"Lv {evt.newLevel}";
-            // XP bar resets to xpRemainder/nextThreshold; gameplay-engineer's
-            // ProgressionService is the canonical source. UI only displays.
-            SetXp(0f);
+            _elements.LevelPill.text = $"Lv {evt.newLevel}";
+            // XP-bar visual reset; the next Render() pass will refresh from the
+            // canonical IRunRuntimeState.
+            _elements.XpFill.style.width = new StyleLength(new Length(0f, LengthUnit.Percent));
         }
 
         private void OnPickup(PickupEvent evt)
@@ -127,16 +170,51 @@ namespace Brave.UI.Controllers
             {
                 case PickupKind.GoldCoin:
                     _accumulatedGoldPickup += evt.amount;
-                    _pickupGoldAmount.text = $"+ {_accumulatedGoldPickup}";
+                    _elements.PickupGoldAmount.text = $"+ {_accumulatedGoldPickup}";
                     break;
                 case PickupKind.Heart:
                     _accumulatedHeartPickup += evt.amount;
-                    _pickupHeartAmount.text = $"+ {_accumulatedHeartPickup}";
+                    _elements.PickupHeartAmount.text = $"+ {_accumulatedHeartPickup}";
                     break;
-                // XP gems show up via SetXp; nothing to render in pickup feed.
+                // XP gems show up via Render(); nothing to render in pickup feed.
             }
         }
 
         private void OnPauseClicked() => UIEvents.RaisePauseRunRequested();
+
+        /// <summary>
+        /// Bag of resolved HUD <see cref="VisualElement"/> refs. Lifetime-bound
+        /// to the controller; reusable by EditMode tests which construct the
+        /// bag manually (no UXML required).
+        /// </summary>
+        public sealed class HudElements
+        {
+            public VisualElement HpFill = null!;
+            public VisualElement XpFill = null!;
+            public Label HpNumeric = null!;
+            public Label Timer = null!;
+            public Label WaveCounter = null!;
+            public Label LevelPill = null!;
+            public Label WaveToast = null!;
+            public VisualElement BossWarning = null!;
+            public Label PickupGoldAmount = null!;
+            public Label PickupHeartAmount = null!;
+            public Button PauseButton = null!;
+
+            public void BindFrom(VisualElement root)
+            {
+                HpFill = root.Q<VisualElement>(HpFillName)!;
+                XpFill = root.Q<VisualElement>(XpFillName)!;
+                HpNumeric = root.Q<Label>(HpNumericName)!;
+                Timer = root.Q<Label>(TimerLabelName)!;
+                WaveCounter = root.Q<Label>(WaveCounterName)!;
+                LevelPill = root.Q<Label>(LevelPillName)!;
+                WaveToast = root.Q<Label>(WaveToastName)!;
+                BossWarning = root.Q<VisualElement>(BossWarningName)!;
+                PickupGoldAmount = root.Q<Label>(PickupGoldAmountName)!;
+                PickupHeartAmount = root.Q<Label>(PickupHeartAmountName)!;
+                PauseButton = root.Q<Button>(PauseButtonName)!;
+            }
+        }
     }
 }

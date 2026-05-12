@@ -23,6 +23,7 @@ ADRs are numbered sequentially, four-digit zero-padded. Use `/decide "<topic>"` 
 | 0017 | PlayerMover canonical; deprecate legacy XY-plane movers | 2026-05-12 | accepted (partial — deletion gated on 0018) |
 | 0018 | Enemy + AutoAttack XZ-plane migration (closes ADR-0017 deletion gap) | 2026-05-12 | accepted |
 | 0019 | Wave 4 cleanup debt (cross-plane bug + 4 follow-ups) | 2026-05-12 | accepted |
+| 0020 | Weapon archetype-config sidecar + `EnemyRole.Boss` enum value | 2026-05-12 | accepted |
 
 ## Conventions
 

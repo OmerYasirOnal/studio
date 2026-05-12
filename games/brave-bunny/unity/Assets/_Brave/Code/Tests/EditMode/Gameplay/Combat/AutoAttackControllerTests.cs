@@ -10,7 +10,10 @@
 // Pattern: PlayerMover.ComputeVelocity precedent — cast-cadence math extracted into a pure
 //          static helper so we don't need to construct a Unity scene to verify the contract.
 
+using System.Collections.Generic;
 using Brave.Gameplay.Combat;
+using Brave.Gameplay.Definitions;
+using Brave.Gameplay.Enemies;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -169,6 +172,112 @@ namespace Brave.Tests.EditMode.Gameplay.Combat
                 totalCasts += fired;
             }
             Assert.That(totalCasts, Is.EqualTo(0));
+        }
+
+        // ---- AcquireTarget XZ semantics (ADR-0019 Wave 5A) ----
+        //
+        // These tests mirror EnemyRegistryTests.FindNearestWithinRadius — they confirm that
+        // the controller's *own* targeting query (which post-filters Snapshot results by score)
+        // also operates on the XZ ground plane. Pre-migration the controller cast
+        // `(Vector2)transform.position` which folded world.x/world.y instead of world.x/world.z.
+
+        private const float TargetingRadius = 10f;
+        private const float TrickeryY = 50f;            // huge Y offset — must be ignored
+        private const float ScaledHp = 10f;
+        private const float ScaledContactDamage = 1f;
+        private const float ScaledMoveSpeed = 1f;
+
+        // Track scratch state for guaranteed teardown between AcquireTarget tests.
+        private readonly List<GameObject> _xzScratch = new();
+        private EnemyDefinition? _xzDef;
+
+        [TearDown]
+        public void XZTeardown()
+        {
+            for (int i = _xzScratch.Count - 1; i >= 0; i--)
+                if (_xzScratch[i] != null) Object.DestroyImmediate(_xzScratch[i]);
+            _xzScratch.Clear();
+            EnemyRegistry.ResetAll();
+            if (_xzDef != null) { Object.DestroyImmediate(_xzDef); _xzDef = null; }
+        }
+
+        private EnemyBase SpawnEnemyAt(Vector3 worldPos)
+        {
+            if (_xzDef == null)
+            {
+                _xzDef = ScriptableObject.CreateInstance<EnemyDefinition>();
+                _xzDef.slug = "test-enemy-aac";
+                _xzDef.moveSpeed = ScaledMoveSpeed;
+            }
+            var go = new GameObject($"AAC_E_{_xzScratch.Count}");
+            go.transform.position = worldPos;
+            go.AddComponent<EnemyHealth>();
+            var swarmer = go.AddComponent<Swarmer>();
+            swarmer.Configure(_xzDef!, go.transform, ScaledHp, ScaledContactDamage, ScaledMoveSpeed);
+            EnemyRegistry.Register(swarmer);
+            _xzScratch.Add(go);
+            return swarmer;
+        }
+
+        [Test]
+        public void AcquireTarget_UsesXZDistance_IgnoringYOffset()
+        {
+            // far has XZ distance 6 at Y=0; near has XZ distance 2 with a HUGE Y. Pre-migration
+            // (Vector2)transform.position would have read y=TrickeryY for near, mis-scoring it
+            // as far away. With the XZ fix near wins.
+            var controllerGo = new GameObject("AAC_Controller");
+            controllerGo.transform.position = Vector3.zero;
+            try
+            {
+                var controller = controllerGo.AddComponent<AutoAttackController>();
+                var far = SpawnEnemyAt(new Vector3(6f, 0f, 0f));
+                var near = SpawnEnemyAt(new Vector3(2f, TrickeryY, 0f));
+
+                // Facing irrelevant when both candidates are on the same axis with no front-arc
+                // bonus advantage — but we still pass a deterministic facing.
+                var hit = controller.AcquireTarget(TargetingRadius, TargetingMode.Nearest,
+                    new Vector2(1f, 0f));
+
+                Assert.That(hit, Is.SameAs(near),
+                    "AcquireTarget must pick the XZ-nearest enemy regardless of Y offset (ADR-0019).");
+                Assert.That(hit, Is.Not.SameAs(far));
+            }
+            finally { Object.DestroyImmediate(controllerGo); }
+        }
+
+        [Test]
+        public void AcquireTarget_OutOfRangeYOffsetEnemy_StillIncludedWhenXZIsClose()
+        {
+            // Single enemy with XZ distance 1 but Y = 50 — pre-migration `d.x*d.x + d.y*d.y` =
+            // 1 + 2500 = 2501 > range² — would have been excluded. Post-fix it's selected.
+            var controllerGo = new GameObject("AAC_Controller_Single");
+            controllerGo.transform.position = Vector3.zero;
+            try
+            {
+                var controller = controllerGo.AddComponent<AutoAttackController>();
+                var only = SpawnEnemyAt(new Vector3(0f, TrickeryY, 1f));
+
+                var hit = controller.AcquireTarget(TargetingRadius, TargetingMode.Nearest,
+                    new Vector2(0f, 1f));
+
+                Assert.That(hit, Is.SameAs(only),
+                    "An enemy at XZ distance 1 must be acquired even with a huge Y offset.");
+            }
+            finally { Object.DestroyImmediate(controllerGo); }
+        }
+
+        [Test]
+        public void AcquireTarget_EmptyRegistry_ReturnsNull()
+        {
+            var controllerGo = new GameObject("AAC_Controller_Empty");
+            controllerGo.transform.position = Vector3.zero;
+            try
+            {
+                var controller = controllerGo.AddComponent<AutoAttackController>();
+                var hit = controller.AcquireTarget(TargetingRadius, TargetingMode.Nearest, Vector2.right);
+                Assert.That(hit, Is.Null);
+            }
+            finally { Object.DestroyImmediate(controllerGo); }
         }
     }
 }

@@ -1,0 +1,69 @@
+{
+  "_comment": "App Store screenshot copy keys. Spec source of truth: docs/marketing/screenshot-spec.md. EN copy is the picked top candidate from Part B of that spec. TR / tl-PH / id columns to be filled by narrative-designer follow-up dispatch; PH and ID may fall back to EN per cut-list #3 in GAME.md. Naming convention mirrors the existing 89-key table in en.json (snake_case). These keys are NOT loaded at runtime — they are read by the Canva/Figma overlay composition dispatch.",
+  "_schema_version": "1.0.0",
+  "_authored_by": "art-director",
+  "_authored_at": "2026-05-12",
+  "_adr_refs": ["0016-app-store-display-name"],
+  "keys": {
+    "screenshot_1_headline": {
+      "en": "Hop. Swarm. Survive.",
+      "tr": null,
+      "tl-PH": null,
+      "id": null
+    },
+    "screenshot_1_subhead": {
+      "en": "An 8-minute roguelite with a smile on every frame.",
+      "tr": null,
+      "tl-PH": null,
+      "id": null
+    },
+    "screenshot_2_headline": {
+      "en": "One thumb. Big builds.",
+      "tr": null,
+      "tl-PH": null,
+      "id": null
+    },
+    "screenshot_2_subhead": {
+      "en": "Auto-attack, evolve, and watch a build come alive.",
+      "tr": null,
+      "tl-PH": null,
+      "id": null
+    },
+    "screenshot_3_headline": {
+      "en": "Eight heroes. Eight feels.",
+      "tr": null,
+      "tl-PH": null,
+      "id": null
+    },
+    "screenshot_3_subhead": {
+      "en": "Tortoise tanks. Fox crits. Owl scales. Pick your style.",
+      "tr": null,
+      "tl-PH": null,
+      "id": null
+    },
+    "screenshot_4_headline": {
+      "en": "Five worlds, one carrot quest.",
+      "tr": null,
+      "tl-PH": null,
+      "id": null
+    },
+    "screenshot_4_subhead": {
+      "en": "Meadow, beach, forest, cavern, snow — each plays different.",
+      "tr": null,
+      "tl-PH": null,
+      "id": null
+    },
+    "screenshot_5_headline": {
+      "en": "Every level, a tiny puzzle.",
+      "tr": null,
+      "tl-PH": null,
+      "id": null
+    },
+    "screenshot_5_subhead": {
+      "en": "Three offers, six builds, infinite runs.",
+      "tr": null,
+      "tl-PH": null,
+      "id": null
+    }
+  }
+}

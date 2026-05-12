@@ -35,7 +35,10 @@ namespace Brave.Gameplay.Enemies
             _active.RemoveAt(last);
         }
 
-        /// <summary>Caller supplies a scratch buffer; we clear and fill it. Zero allocations.</summary>
+        /// <summary>Caller supplies a scratch buffer; we clear and fill it. Zero allocations.
+        /// ADR-0018/ADR-0019: distance is computed on the XZ ground plane (Y ignored) to match
+        /// the camera and PlayerMover. Y-offsets between enemies (e.g. hop animations) MUST NOT
+        /// affect targeting.</summary>
         public static void SnapshotActiveInRange(Vector3 origin, float radius, List<EnemyBase> outBuffer)
         {
             outBuffer.Clear();
@@ -45,10 +48,12 @@ namespace Brave.Gameplay.Enemies
                 var e = _active[i];
                 if (!e.Health.IsAlive) continue;
                 Vector3 d = e.transform.position - origin;
-                if (d.x * d.x + d.y * d.y <= r2) outBuffer.Add(e);
+                if (d.x * d.x + d.z * d.z <= r2) outBuffer.Add(e);     // XZ ground plane
             }
         }
 
+        /// <summary>Returns the first alive enemy within <paramref name="radius"/> on the XZ
+        /// ground plane (ADR-0018/ADR-0019). Returns null when empty/no match. No allocations.</summary>
         public static EnemyBase? FindFirstWithinRadius(Vector3 origin, float radius)
         {
             float r2 = radius * radius;
@@ -57,9 +62,29 @@ namespace Brave.Gameplay.Enemies
                 var e = _active[i];
                 if (!e.Health.IsAlive) continue;
                 Vector3 d = e.transform.position - origin;
-                if (d.x * d.x + d.y * d.y <= r2) return e;
+                if (d.x * d.x + d.z * d.z <= r2) return e;             // XZ ground plane
             }
             return null;
+        }
+
+        /// <summary>Returns the alive enemy with the smallest XZ distance to
+        /// <paramref name="origin"/> within <paramref name="radius"/>, or null. Used by tests
+        /// asserting nearest-target semantics (ADR-0019). No allocations.</summary>
+        public static EnemyBase? FindNearestWithinRadius(Vector3 origin, float radius)
+        {
+            float r2 = radius * radius;
+            float best = float.PositiveInfinity;
+            EnemyBase? winner = null;
+            for (int i = 0, n = _active.Count; i < n; i++)
+            {
+                var e = _active[i];
+                if (!e.Health.IsAlive) continue;
+                Vector3 d = e.transform.position - origin;
+                float sq = d.x * d.x + d.z * d.z;                      // XZ ground plane
+                if (sq > r2) continue;
+                if (sq < best) { best = sq; winner = e; }
+            }
+            return winner;
         }
 
         public static void ResetAll() => _active.Clear();

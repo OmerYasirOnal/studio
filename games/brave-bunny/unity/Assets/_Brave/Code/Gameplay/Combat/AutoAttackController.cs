@@ -196,7 +196,10 @@ namespace Brave.Gameplay.Combat
             return cooldown;
         }
 
-        /// <summary>Pure targeting helper. Returns null when no in-range target exists.</summary>
+        /// <summary>Pure targeting helper. Returns null when no in-range target exists.
+        /// ADR-0018/ADR-0019: distances are measured on the XZ ground plane (Y ignored). The
+        /// <paramref name="facing"/> Vector2 is treated as a ground-plane direction with x → world.x
+        /// and y → world.z, matching <see cref="PlayerMover.Facing"/>'s XZ convention.</summary>
         public EnemyBase? AcquireTarget(float rangeUnits, TargetingMode mode, Vector2 facing)
         {
             EnemyRegistry.SnapshotActiveInRange(transform.position, rangeUnits, _targetScratch);
@@ -204,18 +207,21 @@ namespace Brave.Gameplay.Combat
 
             EnemyBase? best = null;
             float bestScore = float.PositiveInfinity;
-            Vector2 origin = transform.position;
+            Vector3 origin = transform.position;
 
             for (int i = 0, n = _targetScratch.Count; i < n; i++)
             {
                 var e = _targetScratch[i];
-                Vector2 to = (Vector2)e.transform.position - origin;
+                Vector3 d = e.transform.position - origin;
+                // XZ ground plane: drop world.y (ADR-0018). y of the 2D vector below corresponds
+                // to world Z, matching the facing convention.
+                Vector2 to = new(d.x, d.z);
                 float dist = to.magnitude;
                 if (dist > rangeUnits) continue;
 
                 // Score: nearest first; front-arc preference within ±60° subtracts a small bonus.
                 float score = dist;
-                if (Vector2.Dot(facing, to.normalized) > 0.5f) score -= 0.5f;
+                if (dist > 0f && Vector2.Dot(facing, to / dist) > 0.5f) score -= 0.5f;
 
                 if (score < bestScore) { bestScore = score; best = e; }
             }
