@@ -47,8 +47,12 @@ jobs:
     timeout-minutes: 60  # hard cap to protect mac-minutes budget
 
     env:
-      UNITY_VERSION: 6000.0.31f1
+      UNITY_VERSION: 6000.0.74f1
       LANE: ${{ inputs.lane || 'preview' }}
+      # ASC API key pieces — the .p8 is materialized in a workflow step (it can't
+      # live as a GH secret of type 'file', only string). We base64-decode at need.
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
 
     steps:
       - name: Checkout
@@ -94,18 +98,32 @@ jobs:
           bundle config set deployment 'true'
           bundle install
 
+      - name: Materialize ASC API key JSON
+        # The .p8 is a multi-line PEM stored in the ASC_KEY_P8 secret; reassemble
+        # into the JSON shape the fastlane app_store_connect_api_key action expects.
+        run: |
+          mkdir -p "$HOME/.appstoreconnect/private_keys"
+          KEY_PATH="$HOME/.appstoreconnect/private_keys/AuthKey_${{ secrets.ASC_KEY_ID }}.p8"
+          printf '%s' "${{ secrets.ASC_KEY_P8 }}" > "$KEY_PATH"
+          chmod 600 "$KEY_PATH"
+          # Sanity check: PEM markers present
+          head -1 "$KEY_PATH" | grep -q 'BEGIN PRIVATE KEY' || (echo 'ASC_KEY_P8 secret malformed' >&2; exit 1)
+
+      - name: Configure git for match repo (HTTPS via gh token)
+        run: |
+          # match clones https://github.com/OmerYasirOnal/studio-certs.git
+          # MATCH_GIT_BASIC_AUTHORIZATION is the base64(username:gh-token) blob.
+          git config --global credential.helper store
+          echo "https://${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}@github.com" > ~/.git-credentials || true
+
       - name: Run fastlane ${{ env.LANE }}
         working-directory: games/brave-bunny/tools/ci/fastlane
         run: bundle exec fastlane ios ${{ env.LANE }}
         env:
           CI: "true"
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          MATCH_GIT_AUTHOR: ${{ secrets.MATCH_GIT_AUTHOR }}
-          FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
-          FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
-          FASTLANE_APP_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APP_SPECIFIC_PASSWORD }}
-          FASTLANE_TEAM_ID: ${{ secrets.FASTLANE_TEAM_ID }}
-          FASTLANE_ITC_TEAM_ID: ${{ secrets.FASTLANE_ITC_TEAM_ID }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          # ASC API key path resolved by the Fastfile from ~/.appstoreconnect/.
 
       - name: Upload IPA artifact
         if: success()
