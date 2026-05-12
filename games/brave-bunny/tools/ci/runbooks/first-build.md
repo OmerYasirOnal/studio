@@ -4,104 +4,103 @@
 > Cross-ref: tech-spec `10-build-and-ci.md`, repo-root `CLAUDE.md` ("Escalation triggers").
 >
 > This runbook walks through the interactive steps that **cannot** be automated
-> (Apple Developer agreement screens, App Store Connect app creation, cert
-> repo bootstrap). Run this once. After that, `fastlane beta` is hands-off.
+> (Apple Developer agreement screens, App Store Connect app creation when API
+> key role is insufficient, secrets registration). Run this once. After that,
+> `fastlane beta` is hands-off.
 
-## 1. Apple Developer Program enrollment (one-time, ~24-48h)
+## Pre-flight check — what's already DONE for brave-bunny
 
-1. Enroll at <https://developer.apple.com/programs/> ($99/year).
-2. Accept the latest Program License Agreement at <https://developer.apple.com/account/>
-   (Apple changes the agreement periodically — fastlane fails until accepted).
-3. Note down your **Team ID** (10-char string, top-right of the developer portal).
+The autonomous setup pass has already completed:
 
-## 2. App Store Connect app creation (one-time, ~10 min)
-
-1. Sign in at <https://appstoreconnect.apple.com/>.
-2. My Apps → "+" → New App.
-3. Platform: iOS. Bundle ID: `com.omeryasir.bravebunny` (must match `Appfile`).
-4. SKU: `brave-bunny`. Primary language: English (US) — TR added later via localization tab.
-5. Note the **ITC Team ID** (App Store Connect team id, distinct from Developer team id).
-
-## 3. App-specific password (one-time, ~2 min)
-
-fastlane uploads via Apple's `iTunes Transporter`; this requires either:
-
-- **Recommended:** an app-specific password generated at <https://account.apple.com/account/manage> → Sign-In and Security → App-Specific Passwords → "+". Label it `fastlane-brave-bunny`. Store in `FASTLANE_APP_SPECIFIC_PASSWORD`.
-- Or your Apple ID password directly (less secure; breaks on 2FA prompts).
-
-## 4. Bootstrap the cert repo (one-time, ~5 min)
-
-```bash
-# Create the SEPARATE private repo for cert storage. Never make this public.
-gh repo create OmerYasirOnal/studio-certs --private --description "Fastlane match cert storage"
-```
-
-Then locally, with a strong passphrase ready (store in 1Password etc.):
-
-```bash
-cd /tmp
-git clone git@github.com:OmerYasirOnal/studio-certs.git
-cd studio-certs
-fastlane match appstore     # interactive — generates certs + provisioning profiles
-# fastlane asks for: Apple ID, team id, MATCH_PASSWORD passphrase
-```
-
-Verify the repo now contains encrypted `certs/distribution/*.p12` and
-`profiles/appstore/*.mobileprovision`.
-
-## 5. Configure GitHub Actions secrets (one-time, ~5 min)
-
-Repo settings → Secrets and variables → Actions → New repository secret.
-
-| Secret | Source | Notes |
+| Step | Status | How |
 |---|---|---|
-| `UNITY_LICENSE` | Unity Hub Personal license activated locally, then `~/.local/share/unity3d/Unity/Unity_v6000.x.ulf` | Or use `UNITY_EMAIL` + `UNITY_PASSWORD` for activation fallback |
-| `UNITY_EMAIL` | Unity account email | Fallback if `UNITY_LICENSE` is unset |
-| `UNITY_PASSWORD` | Unity account password | Fallback if `UNITY_LICENSE` is unset |
-| `MATCH_PASSWORD` | Passphrase from step 4 | Decrypts cert repo |
-| `MATCH_GIT_AUTHOR` | GitHub username with access to `studio-certs` | Usually `OmerYasirOnal` |
-| `FASTLANE_USER` | Apple ID email | e.g. `omeryasir.onal@stu.fsm.edu.tr` |
-| `FASTLANE_PASSWORD` | Apple ID password | Avoid if possible — use app-specific |
-| `FASTLANE_APP_SPECIFIC_PASSWORD` | App-specific password from step 3 | Preferred over `FASTLANE_PASSWORD` |
-| `FASTLANE_TEAM_ID` | Apple Developer team id from step 1 | 10-char string |
-| `FASTLANE_ITC_TEAM_ID` | App Store Connect team id from step 2 | Different from above |
+| Apple Developer Program enrollment | ✅ active | Yasir's pre-existing account (Team `9X8FDSW5D8`) |
+| Apple Distribution cert | ✅ live | `K83U6UWWN4` — created by `fastlane match appstore` |
+| Provisioning profile | ✅ live | `match AppStore com.omeryasir.bravebunny` |
+| Apple Developer bundle ID `com.omeryasir.bravebunny` | ✅ active (`SL5GAXYB7T`) | `fastlane register_app` |
+| ASC API key | ✅ at `~/.appstoreconnect/api_key.json` | Pre-existing |
+| match-encrypted cert repo `OmerYasirOnal/studio-certs` | ✅ created + populated | `gh repo create` + `fastlane match` |
+| `MATCH_PASSWORD` | ✅ generated | See `/tmp/match_password.txt` — **save to GH Actions secret + 1Password before tmp is wiped** |
 
-## 6. Local smoke test (one-time, ~15 min on developer mac)
+## What still needs the developer to do
+
+### 1. Create the App Store Connect app entry (one-time, ~2 min)
+
+The autonomous run created the Apple Developer bundle ID but the ASC API key role on this account is `Developer`, which **does not allow CREATE on apps**. Two paths:
+
+**Path A — Upgrade API key role (preferred, 30 sec):**
+1. Open <https://appstoreconnect.apple.com/access/api>
+2. Find the key with Key ID `93HFBMV3MA` ("EAS submit" or similar)
+3. Click → change role from `Developer` to `App Manager`
+4. Re-run `cd games/brave-bunny/tools/ci/fastlane && fastlane register_app` — will create the ASC app automatically
+
+**Path B — Manual ASC create (one click, ~2 min):**
+1. Sign in at <https://appstoreconnect.apple.com/>
+2. My Apps → `+` → New App
+3. Fill exactly:
+   - **Platform:** iOS
+   - **Name:** `Brave Bunny`
+   - **Primary Language:** English (U.S.)
+   - **Bundle ID:** `com.omeryasir.bravebunny` (dropdown shows it — already exists)
+   - **SKU:** `bravebunny`
+   - **User Access:** Full Access (or per your preference)
+
+### 2. Save `MATCH_PASSWORD` to GitHub Actions secrets
+
+CI builds need the same passphrase that encrypted the certs in `studio-certs`.
+
+```bash
+gh secret set MATCH_PASSWORD --repo OmerYasirOnal/studio --body "$(cat /tmp/match_password.txt)"
+```
+
+Also save to 1Password / your preferred password manager — losing this passphrase means re-running match (which rotates the cert).
+
+### 3. Save ASC API key parts as GitHub Actions secrets
+
+```bash
+gh secret set ASC_KEY_ID --repo OmerYasirOnal/studio --body "93HFBMV3MA"
+gh secret set ASC_ISSUER_ID --repo OmerYasirOnal/studio --body "3894e346-c886-4ca5-91b7-773aaa6e85bd"
+gh secret set ASC_KEY_P8 --repo OmerYasirOnal/studio < ~/.appstoreconnect/private_keys/AuthKey_93HFBMV3MA.p8
+```
+
+### 4. Unity license activation (after Unity install completes)
+
+The autonomous run installed Unity 6 LTS 6000.0.74f1 via Unity Hub. License activation is the one interactive step:
+
+```bash
+# Open Unity Hub once — sign in with Unity ID, activate Personal license (free).
+open -a "Unity Hub"
+```
+
+For CI builds, generate `UNITY_LICENSE` content:
+
+```bash
+# Get the .ulf file path after activating
+ls ~/Library/Application\ Support/Unity/Unity_lic.ulf
+gh secret set UNITY_LICENSE --repo OmerYasirOnal/studio < ~/Library/Application\ Support/Unity/Unity_lic.ulf
+```
+
+## Running the lanes
 
 ```bash
 cd games/brave-bunny/tools/ci/fastlane
-gem install bundler
-bundle install
-export MATCH_PASSWORD=...          # passphrase from step 4
-export MATCH_GIT_AUTHOR=OmerYasirOnal
-bundle exec fastlane ios preview   # local archive, NO upload — proves the pipeline
+
+export MATCH_PASSWORD="$(cat /tmp/match_password.txt)"   # or sourced from 1Password
+
+# Smoke: archive without uploading
+fastlane preview
+
+# TestFlight upload (after step 1 above)
+fastlane beta
+
+# Read-only audit
+fastlane list_apps
 ```
 
-A successful run drops `games/brave-bunny/Builds/BraveBunny-preview-*.ipa`.
+All lanes use the ASC API key automatically — no Apple ID 2FA prompts.
 
-## 7. First TestFlight push (one-time, ~25 min)
+## Escalation triggers (when to surface to the developer)
 
-After step 6 passes locally:
-
-```bash
-export FASTLANE_USER=omeryasir.onal@stu.fsm.edu.tr
-export FASTLANE_APP_SPECIFIC_PASSWORD=...   # from step 3
-export FASTLANE_TEAM_ID=...
-export FASTLANE_ITC_TEAM_ID=...
-bash games/brave-bunny/tools/ci/scripts/upload-testflight.sh
-```
-
-Or kick off the GitHub Action manually:
-
-1. Repo → Actions → ios-build → Run workflow → lane: `beta`.
-
-After fastlane finishes, the build appears in App Store Connect → My Apps →
-Brave Bunny → TestFlight tab. Apple's "processing" step takes ~10-20 min.
-
-## Escalation triggers (per repo-root `CLAUDE.md`)
-
-Stop and surface to the human if:
-
-- Apple's web UI requires accepting a new agreement mid-run.
-- `fastlane match` fails with "no matching cert" — needs manual `match nuke` + regenerate.
-- Xcode version on the runner is newer than what tech-spec 00 declares.
+- **Cert expired / Apple agreement changed:** match will surface an error; re-run `fastlane match appstore --readonly false` locally with `MATCH_PASSWORD` exported.
+- **iOS build size > 200 MB:** see `docs/07-art-bible/08-asset-budget.md`. Triage assets.
+- **TestFlight processing > 1h:** investigate via `pilot list`.

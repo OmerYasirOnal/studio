@@ -48,6 +48,14 @@ games/*/logs/**/*.jsonl
 *.pem
 *.key
 *.p12
+*.p8
+
+# Fastlane runtime artifacts
+**/fastlane/report.xml
+**/fastlane/test_output/
+**/fastlane/Preview.html
+**/fastlane/screenshots/**/*.png
+**/fastlane/test_output/**
 
 # Assets we never commit raw
 games/*/assets-raw/**/*.psd

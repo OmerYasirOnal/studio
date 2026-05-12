@@ -9,11 +9,12 @@
 # Decryption passphrase: MATCH_PASSWORD env var (GitHub Actions secret).
 # Read-only mode is forced on CI (lanes pass `readonly: true` explicitly).
 
-git_url "git@github.com:OmerYasirOnal/studio-certs.git"  # private — never make public
+git_url "https://github.com/OmerYasirOnal/studio-certs.git"  # private — uses gh auth token
 storage_mode "git"
 type "appstore"                                          # default; lanes override per use
 app_identifier ["com.omeryasir.bravebunny"]
-username ENV["MATCH_GIT_AUTHOR"]                         # GitHub username with repo access
+# username is intentionally omitted — we use ASC API key (api_key_path) instead
+# of the legacy Apple ID flow. Lanes pass api_key explicitly.
 
 # Optional: branch isolation if multiple games share the studio-certs repo.
 # git_branch "brave-bunny"

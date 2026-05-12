@@ -225,13 +225,15 @@ platform :ios do
   desc "Local archive without uploading (smoke test the pipeline)"
   lane :preview do
     require_env(vars: ["MATCH_PASSWORD"])
+    api_key = asc_api_key
 
     unity_build(target: "iOS")
 
     match(
       type: "appstore",
       readonly: true,                 # never mutates the cert repo
-      app_identifier: APP_IDENTIFIER
+      app_identifier: APP_IDENTIFIER,
+      api_key: api_key
     )
 
     # Bump CFBundleVersion monotonically — CI run number on CI, timestamp locally.
@@ -262,19 +264,16 @@ platform :ios do
   # -------------------------------------------------------------------------
   desc "Build and upload to TestFlight"
   lane :beta do
-    require_env(vars: [
-      "MATCH_PASSWORD",
-      "FASTLANE_USER",
-      "FASTLANE_TEAM_ID",
-      "FASTLANE_ITC_TEAM_ID"
-    ])
+    require_env(vars: ["MATCH_PASSWORD"])
+    api_key = asc_api_key             # supersedes FASTLANE_USER + 2FA
 
     unity_build(target: "iOS")
 
     match(
       type: "appstore",
       readonly: !ENV["CI"].nil?,      # CI: read-only; local: allow refresh
-      app_identifier: APP_IDENTIFIER
+      app_identifier: APP_IDENTIFIER,
+      api_key: api_key
     )
 
     build_number = ENV["GITHUB_RUN_NUMBER"] || Time.now.strftime("%Y%m%d%H%M")
@@ -295,6 +294,7 @@ platform :ios do
     )
 
     upload_to_testflight(
+      api_key: api_key,
       app_identifier: APP_IDENTIFIER,
       skip_waiting_for_build_processing: true,
       changelog: "See games/brave-bunny/CHANGELOG.md for this build's notes.",
@@ -318,19 +318,16 @@ platform :ios do
                      "Trigger it locally after staging review per runbooks/first-build.md.")
     end
 
-    require_env(vars: [
-      "MATCH_PASSWORD",
-      "FASTLANE_USER",
-      "FASTLANE_TEAM_ID",
-      "FASTLANE_ITC_TEAM_ID"
-    ])
+    require_env(vars: ["MATCH_PASSWORD"])
+    api_key = asc_api_key
 
     unity_build(target: "iOS")
 
     match(
       type: "appstore",
       readonly: true,
-      app_identifier: APP_IDENTIFIER
+      app_identifier: APP_IDENTIFIER,
+      api_key: api_key
     )
 
     build_number = Time.now.strftime("%Y%m%d%H%M")
@@ -351,6 +348,7 @@ platform :ios do
     )
 
     upload_to_app_store(
+      api_key: api_key,
       app_identifier: APP_IDENTIFIER,
       submit_for_review: false,       # manual approval per tech-spec 10
       automatic_release: false,       # manual release after Apple approves
