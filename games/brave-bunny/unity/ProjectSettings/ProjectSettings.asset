@@ -168,12 +168,13 @@ PlayerSettings:
     Android: com.omeryasir.bravebunny
     Standalone: com.omeryasir.bravebunny
     iOS: com.omeryasir.bravebunny
+    iPhone: com.omeryasir.bravebunny
   buildNumber:
     Standalone: 0
     VisionOS: 0
     iPhone: 1
     tvOS: 0
-  overrideDefaultApplicationIdentifier: 0
+  overrideDefaultApplicationIdentifier: 1
   AndroidBundleVersionCode: 1
   AndroidMinSdkVersion: 26
   AndroidTargetSdkVersion: 0
@@ -681,7 +682,8 @@ PlayerSettings:
   webWasm2023: 0
   scriptingDefineSymbols: {}
   additionalCompilerArguments: {}
-  platformArchitecture: {}
+  platformArchitecture:
+    iPhone: 1
   scriptingBackend:
     Android: 1
     iPhone: 1

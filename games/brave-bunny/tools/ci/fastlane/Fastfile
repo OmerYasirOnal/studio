@@ -192,6 +192,50 @@ platform :ios do
   end
 
   # -------------------------------------------------------------------------
+  # Lane: enable_iap
+  # Adds the In-App Purchase capability to the bundle id. Unity IAP requires it
+  # in the Xcode project's entitlements; without IAP enabled at the dev portal
+  # the archive step fails with "requires provisioning profile with the
+  # In-App Purchase feature".  After this lane, run :refresh_profile.
+  # -------------------------------------------------------------------------
+  desc "Enable IAP capability on the bundle id (idempotent)"
+  lane :enable_iap do
+    api_key = asc_api_key
+    require 'spaceship'
+    token = Spaceship::ConnectAPI::Token.create(
+      key_id: api_key[:key_id], issuer_id: api_key[:issuer_id], key: api_key[:key])
+    Spaceship::ConnectAPI.token = token
+
+    bid = Spaceship::ConnectAPI::BundleId.all.find { |b| b.identifier == APP_IDENTIFIER }
+    UI.user_error!("bundle id #{APP_IDENTIFIER} not found — run register_app first") unless bid
+
+    existing = bid.bundle_id_capabilities || []
+    types = existing.map { |c| c.capability_type.to_s }
+    UI.message("[enable_iap] existing capabilities: #{types.join(', ')}")
+    if types.any? { |t| t.include?("IN_APP_PURCHASE") }
+      UI.success("[enable_iap] already enabled")
+    else
+      bid.create_capability(Spaceship::ConnectAPI::BundleIdCapability::Type::IN_APP_PURCHASE)
+      UI.success("[enable_iap] enabled IN_APP_PURCHASE on #{APP_IDENTIFIER}")
+    end
+  end
+
+  # -------------------------------------------------------------------------
+  # Lane: refresh_profile — force re-issue the appstore profile (capability change).
+  # -------------------------------------------------------------------------
+  desc "Force-refresh the appstore provisioning profile"
+  lane :refresh_profile do
+    api_key = asc_api_key
+    match(
+      type: "appstore",
+      app_identifier: APP_IDENTIFIER,
+      api_key: api_key,
+      force: true,
+      readonly: false
+    )
+  end
+
+  # -------------------------------------------------------------------------
   # Lane: list_apps
   # Read-only — list all apps + bundle IDs on this Apple Developer account.
   # Useful for debugging "what's already registered?" without web UI.
@@ -234,6 +278,20 @@ platform :ios do
       readonly: true,                 # never mutates the cert repo
       app_identifier: APP_IDENTIFIER,
       api_key: api_key
+    )
+
+    # Switch the Unity-generated Xcode project from Automatic to Manual signing
+    # and pin the exact provisioning profile match installed. Without this,
+    # xcodebuild's signing auto-selection occasionally picks a stale profile.
+    update_code_signing_settings(
+      path: IOS_XCODEPROJ,
+      use_automatic_signing: false,
+      team_id: "9X8FDSW5D8",
+      bundle_identifier: APP_IDENTIFIER,
+      code_sign_identity: "Apple Distribution",
+      profile_name: "match AppStore #{APP_IDENTIFIER}",
+      profile_uuid: ENV["sigh_#{APP_IDENTIFIER}_appstore"],
+      targets: ["Unity-iPhone"]
     )
 
     # Bump CFBundleVersion monotonically — CI run number on CI, timestamp locally.

@@ -23,6 +23,22 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 Create Apple Developer bundle ID + App Store Connect app entry (idempotent)
 
+### ios enable_iap
+
+```sh
+[bundle exec] fastlane ios enable_iap
+```
+
+Enable IAP capability on the bundle id (idempotent)
+
+### ios refresh_profile
+
+```sh
+[bundle exec] fastlane ios refresh_profile
+```
+
+Force-refresh the appstore provisioning profile
+
 ### ios list_apps
 
 ```sh

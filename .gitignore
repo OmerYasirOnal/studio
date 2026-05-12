@@ -62,6 +62,20 @@ Unity_v*.alf
 Unity_v*.ulf
 Unity_lic.ulf
 
+# iOS build artifacts (regenerable via fastlane preview / beta)
+games/*/Builds/*.ipa
+games/*/Builds/*.dSYM.zip
+games/*/Builds/*.xcarchive
+games/*/unity/Build/iOS/
+
+# Generated Unity project files
+games/*/unity/Library/
+games/*/unity/Temp/
+games/*/unity/Obj/
+games/*/unity/Logs/
+games/*/unity/MemoryCaptures/
+games/*/unity/UserSettings/
+
 # Assets we never commit raw
 games/*/assets-raw/**/*.psd
 games/*/assets-raw/**/*.blend1

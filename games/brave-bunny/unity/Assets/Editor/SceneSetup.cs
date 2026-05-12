@@ -25,6 +25,8 @@ public static class SceneSetup
         Directory.CreateDirectory(SceneDir);
 
         EnsureBoot();
+        EnsureMainMenu();
+        EnsureLoadout();
         EnsureRun();
         EnsurePerfStress();
         RegisterInBuildSettings();
@@ -128,6 +130,42 @@ public static class SceneSetup
         Debug.Log($"[SceneSetup] created {path}");
     }
 
+    private static void EnsureMainMenu()
+    {
+        var path = $"{SceneDir}/MainMenu.unity";
+        if (File.Exists(path)) { Debug.Log("[SceneSetup] MainMenu.unity already exists, skipping"); return; }
+        var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        var cam = new GameObject("MainCamera");
+        var camera = cam.AddComponent<Camera>();
+        camera.clearFlags = CameraClearFlags.SolidColor;
+        camera.backgroundColor = new Color(1f, 0.92f, 0.76f);   // bunny-cream
+        cam.tag = "MainCamera";
+        cam.AddComponent<AudioListener>();
+        var eventSystem = new GameObject("EventSystem");
+        var esType = FindType("UnityEngine.EventSystems.EventSystem");
+        if (esType != null) eventSystem.AddComponent(esType);
+        EditorSceneManager.SaveScene(scene, path);
+        Debug.Log($"[SceneSetup] created {path}");
+    }
+
+    private static void EnsureLoadout()
+    {
+        var path = $"{SceneDir}/Loadout.unity";
+        if (File.Exists(path)) { Debug.Log("[SceneSetup] Loadout.unity already exists, skipping"); return; }
+        var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        var cam = new GameObject("MainCamera");
+        var camera = cam.AddComponent<Camera>();
+        camera.clearFlags = CameraClearFlags.SolidColor;
+        camera.backgroundColor = new Color(0.74f, 0.88f, 0.45f); // meadow-lime
+        cam.tag = "MainCamera";
+        cam.AddComponent<AudioListener>();
+        var eventSystem = new GameObject("EventSystem");
+        var esType = FindType("UnityEngine.EventSystems.EventSystem");
+        if (esType != null) eventSystem.AddComponent(esType);
+        EditorSceneManager.SaveScene(scene, path);
+        Debug.Log($"[SceneSetup] created {path}");
+    }
+
     private static void EnsurePerfStress()
     {
         var path = $"{SceneDir}/PerfStress.unity";
@@ -159,7 +197,13 @@ public static class SceneSetup
         var have = new HashSet<string>();
         foreach (var s in scenes) have.Add(s.path);
 
-        foreach (var p in new[] { $"{SceneDir}/Boot.unity", $"{SceneDir}/Run.unity", $"{SceneDir}/PerfStress.unity" })
+        foreach (var p in new[] {
+            $"{SceneDir}/Boot.unity",
+            $"{SceneDir}/MainMenu.unity",
+            $"{SceneDir}/Loadout.unity",
+            $"{SceneDir}/Run.unity",
+            $"{SceneDir}/PerfStress.unity"
+        })
         {
             if (have.Contains(p) || !File.Exists(p)) continue;
             scenes.Add(new EditorBuildSettingsScene(p, enabled: true));
