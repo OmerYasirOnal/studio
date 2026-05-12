@@ -46,15 +46,5 @@ namespace Brave.Gameplay.Definitions
         }
     }
 
-    /// <summary>Per-character stat baseline. Sourced from <c>characters.json</c>.</summary>
-    [Serializable]
-    public struct CharacterStats
-    {
-        public float baseHP;            // hit points (Bunny baseline 100)
-        public float baseMoveSpeed;     // units/second (Bunny baseline 4.5)
-        public float damageMultiplier;  // multiplier vs weapon DMG (Bunny baseline 1.0)
-        public float critRate;          // 0..1 probability (Bunny baseline 0.05)
-        public float critDamage;        // multiplier (Bunny baseline 1.0 = 2x)
-        public float magnetMultiplier;  // multiplier on pickup magnet radius (Bunny baseline 1.0)
-    }
 }
+// CharacterStats lives in its own file: Definitions/CharacterStats.cs

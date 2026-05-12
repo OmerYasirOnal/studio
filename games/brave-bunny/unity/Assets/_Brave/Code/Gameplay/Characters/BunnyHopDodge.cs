@@ -1,5 +1,6 @@
 // characters.json bunny.signature: every 5th weapon hit → hop with 400ms i-frames, 5s cooldown.
 using Brave.Gameplay.Definitions;
+using Brave.Gameplay.Combat;
 
 namespace Brave.Gameplay.Characters;
 

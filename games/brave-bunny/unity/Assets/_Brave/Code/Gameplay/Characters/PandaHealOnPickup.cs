@@ -1,5 +1,6 @@
 // characters.json panda.signature: xp-gem-pickup → +1 hp (capped at max).
 using Brave.Gameplay.Definitions;
+using Brave.Gameplay.Combat;
 using Brave.Gameplay.Events;
 
 namespace Brave.Gameplay.Characters;

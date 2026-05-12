@@ -1,5 +1,6 @@
 // characters.json otter.signature: passive +1 projectile to projectile-archetype weapons, 20° spread.
 using Brave.Gameplay.Definitions;
+using Brave.Gameplay.Combat;
 
 namespace Brave.Gameplay.Characters;
 

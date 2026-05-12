@@ -27,9 +27,11 @@ public sealed class WaveRunner
     public void Tick(float nowSeconds, Vector2 playerPos)
     {
         if (_wave == null || _wave.events == null) return;
-        while (_cursor < _wave.events.Length && _wave.events[_cursor].triggerSeconds <= nowSeconds)
+        while (_cursor < _wave.events.Length)
         {
-            FireEvent(_wave.events[_cursor], playerPos, nowSeconds);
+            var evt = WaveEvent.FromEntry(_wave.events[_cursor]);
+            if (evt.triggerSeconds > nowSeconds) break;
+            FireEvent(evt, playerPos, nowSeconds);
             _cursor++;
         }
         _lastSeconds = nowSeconds;

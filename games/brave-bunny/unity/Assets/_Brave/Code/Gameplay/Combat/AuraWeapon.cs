@@ -1,5 +1,6 @@
 // Concrete weapon for Aura archetype — e.g. Honey Aura, Frost Whisper.
 // Aura ticks damage to all enemies inside CurrentLevelData.range every fireRate seconds.
+using Brave.Gameplay.Definitions;
 using UnityEngine;
 
 namespace Brave.Gameplay.Combat;
@@ -8,7 +9,7 @@ public sealed class AuraWeapon : Weapon
 {
     [SerializeField] private ParticleSystem _auraVfx;
 
-    public override void Initialise(BraveBunny.Gameplay.Data.WeaponDefinition def, Transform owner, int level = 1)
+    public override void Initialise(WeaponDefinition def, Transform owner, int level = 1)
     {
         base.Initialise(def, owner, level);
         if (_auraVfx != null) _auraVfx.Play();

@@ -36,12 +36,14 @@ namespace Brave.Tests.PlayMode.Performance
         {
             // arrange — load a perf reference scene if present.
             const string scenePath = "Assets/_Brave/Scenes/PerfStress.unity";
+            UnityEngine.AsyncOperation? op = null;
             try
             {
-                yield return UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(
+                op = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(
                     scenePath, UnityEngine.SceneManagement.LoadSceneMode.Single);
             }
             catch { /* tolerate; many CI agents won't have a Stress scene yet */ }
+            if (op != null) yield return op;
 
             // act — sample frame times for FrameSampleCount frames.
             var samples = new float[FrameSampleCount];

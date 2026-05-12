@@ -9,6 +9,7 @@
 
 using System;
 using UnityEngine;
+using Brave.Gameplay.Combat;
 
 namespace Brave.Systems.Context;
 
@@ -46,16 +47,16 @@ public static class Bootstrapper
             return;
         }
 
-        var registry = new MechanicRegistry();
+        // MechanicRegistry is a static singleton (per ADR-0009). Scan triggers the
+        // reflection sweep idempotently; no instance is registered with GameContext.
         try
         {
-            registry.ScanAssemblies();
+            MechanicRegistry.ScanAssemblies();
         }
         catch (Exception e)
         {
             Debug.LogError($"[Bootstrapper] MechanicRegistry scan failed: {e.Message}");
         }
-        ctx.Register(registry);
 
         _ready = true;
         try

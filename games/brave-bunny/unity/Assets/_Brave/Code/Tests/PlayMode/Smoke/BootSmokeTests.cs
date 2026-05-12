@@ -34,8 +34,10 @@ namespace Brave.Tests.PlayMode.Smoke
         {
             // arrange — load Boot scene (tolerate absent build-settings registration).
             var scenePath = $"Assets/_Brave/Scenes/{BootSceneName}.unity";
-            try { yield return SceneManager.LoadSceneAsync(scenePath, LoadSceneMode.Single); }
+            AsyncOperation? op = null;
+            try { op = SceneManager.LoadSceneAsync(scenePath, LoadSceneMode.Single); }
             catch { /* tolerate; fall through to assertion below */ }
+            if (op != null) yield return op;
 
             // wait up to MaxFramesWaitingForReady frames for GameContextBootstrap.Context to populate.
             int waited = 0;
@@ -53,11 +55,11 @@ namespace Brave.Tests.PlayMode.Smoke
 
             // assert — every critical IService is registered.
             var ctx = GameContextBootstrap.Context;
-            Assert.That(ctx.TryGet<BraveBunny.Systems.Save.ISaveService>(out _), Is.True, "ISaveService missing");
-            Assert.That(ctx.TryGet<BraveBunny.Systems.Settings.ISettingsService>(out _), Is.True, "ISettingsService missing");
-            Assert.That(ctx.TryGet<BraveBunny.Systems.Localization.ILocalizationService>(out _), Is.True, "ILocalizationService missing");
-            Assert.That(ctx.TryGet<BraveBunny.Systems.Audio.IAudioMixerDriver>(out _), Is.True, "IAudioMixerDriver missing");
-            Assert.That(ctx.TryGet<BraveBunny.Systems.Progression.IProgressionService>(out _), Is.True, "IProgressionService missing");
+            Assert.That(ctx.TryGet<Brave.Systems.Save.ISaveService>(out _), Is.True, "ISaveService missing");
+            Assert.That(ctx.TryGet<Brave.Systems.Settings.ISettingsService>(out _), Is.True, "ISettingsService missing");
+            Assert.That(ctx.TryGet<Brave.Systems.Localization.ILocalizationService>(out _), Is.True, "ILocalizationService missing");
+            Assert.That(ctx.TryGet<Brave.Systems.Audio.IAudioMixerDriver>(out _), Is.True, "IAudioMixerDriver missing");
+            Assert.That(ctx.TryGet<Brave.Systems.Progression.IProgressionService>(out _), Is.True, "IProgressionService missing");
         }
 
         [UnityTest]

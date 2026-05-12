@@ -1,5 +1,6 @@
 // characters.json badger.signature: interval 30s → summon baby-badger companion (0.6× dmg, 60s lifetime, max 3).
 using Brave.Gameplay.Definitions;
+using Brave.Gameplay.Combat;
 
 namespace Brave.Gameplay.Characters;
 

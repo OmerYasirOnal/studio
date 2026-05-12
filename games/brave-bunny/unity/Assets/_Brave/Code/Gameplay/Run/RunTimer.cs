@@ -29,9 +29,15 @@ namespace Brave.Gameplay.Run
 
         public float RunSeconds { get; private set; }
 
+        /// <summary>Alias used by RunController.</summary>
+        public float Seconds => RunSeconds;
+
         public event Action? BossApproachReached;
         public event Action? BossSpawnReached;
         public event Action? TimeoutReached;
+
+        /// <summary>Raised once the run has officially ended (timeout or explicit Stop).</summary>
+        public event Action? RunEnded;
 
         public void StartRun()
         {
@@ -41,7 +47,38 @@ namespace Brave.Gameplay.Run
             _running = true;
         }
 
-        public void StopRun() => _running = false;
+        public void StopRun()
+        {
+            if (!_running) return;
+            _running = false;
+            RunEnded?.Invoke();
+        }
+
+        // Convenience aliases used by RunController.
+        public void Start() => StartRun();
+        public void Stop() => StopRun();
+        public void Pause() => _running = false;
+        public void Resume() => _running = true;
+
+        /// <summary>Manual tick — caller advances the clock by <paramref name="dt"/>. Returns the new RunSeconds.</summary>
+        public float Tick(float dt)
+        {
+            if (_running)
+            {
+                RunSeconds += dt;
+                if (!_bossApproachFired && RunSeconds >= BossApproachAtSeconds)
+                { _bossApproachFired = true; BossApproachReached?.Invoke(); }
+                if (!_bossSpawnFired && RunSeconds >= BossSpawnAtSeconds)
+                { _bossSpawnFired = true; BossSpawnReached?.Invoke(); }
+                if (RunSeconds >= TimeoutSeconds)
+                {
+                    _running = false;
+                    TimeoutReached?.Invoke();
+                    RunEnded?.Invoke();
+                }
+            }
+            return RunSeconds;
+        }
 
         private void Update()
         {

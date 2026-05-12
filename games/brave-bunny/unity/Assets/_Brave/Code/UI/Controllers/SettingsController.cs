@@ -91,7 +91,7 @@ namespace Brave.UI.Controllers
             root.Q<Button>("btn-restore-purchases")!.clicked += () =>
             {
                 if (GameContextBootstrap.Context != null
-                    && GameContextBootstrap.Context.TryGet<BraveBunny.Systems.Iap.IIapService>(out var iap))
+                    && GameContextBootstrap.Context.TryGet<Brave.Systems.Iap.IIapService>(out var iap))
                 {
                     iap.RestorePurchases(_ => { /* result toast wired by NavigationService */ });
                 }

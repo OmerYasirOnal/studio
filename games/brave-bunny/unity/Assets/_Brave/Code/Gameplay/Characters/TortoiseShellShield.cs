@@ -1,6 +1,7 @@
 // characters.json tortoise.signature: hp-below-50pct → shield absorbs 100hp, 8s cooldown.
 using Brave.Gameplay.Damage;
 using Brave.Gameplay.Definitions;
+using Brave.Gameplay.Combat;
 
 namespace Brave.Gameplay.Characters;
 

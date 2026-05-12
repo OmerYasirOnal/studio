@@ -26,12 +26,14 @@ namespace Brave.Tests.PlayMode.Smoke
         {
             // arrange — load a minimal Run scene if present; fall back to pass-skip.
             const string runScenePath = "Assets/_Brave/Scenes/Run.unity";
+            UnityEngine.AsyncOperation? op = null;
             try
             {
-                yield return UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(
+                op = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(
                     runScenePath, UnityEngine.SceneManagement.LoadSceneMode.Single);
             }
             catch { /* tolerate */ }
+            if (op != null) yield return op;
 
             // Wire a kill-event listener.
             int killCount = 0;

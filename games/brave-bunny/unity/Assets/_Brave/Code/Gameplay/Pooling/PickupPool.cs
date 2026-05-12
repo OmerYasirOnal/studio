@@ -40,6 +40,10 @@ public sealed class Pickup : MonoBehaviour, IPoolable
     public void Acquire() { /* reset visuals */ }
     public void Release() { _owner = null; Amount = 0; }
 
+    // IPoolable contract.
+    public void OnGetFromPool() { Acquire(); }
+    public void OnReturnToPool() { Release(); }
+
     /// <summary>Called by magnet logic when the player picks the item up.</summary>
     public void OnCollected() => _owner?.Release(this);
 }

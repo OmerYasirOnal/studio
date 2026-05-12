@@ -6,8 +6,6 @@
         "Brave.Systems",
         "Brave.UI",
         "Brave.Boot",
-        "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner",
         "Unity.InputSystem",
         "Unity.Mathematics",
         "Unity.Collections",

@@ -22,7 +22,10 @@ public sealed class Spawner
             Debug.LogError($"Spawner: no pool for enemy slug '{def.slug}'");
             return null;
         }
-        float scaledHp = def.baseHP + def.hpPerMinute * Mathf.Max(0f, runMinutes - 1f);
+        // TODO(Phase 5): replace with biome ScalingCurve lookup; EnemyDefinition has no per-minute
+        // delta field by design (kept stable per tech-spec). Linear 10%/min placeholder.
+        const float HpPerMinuteFraction = 0.10f;
+        float scaledHp = def.baseHP * (1f + HpPerMinuteFraction * Mathf.Max(0f, runMinutes - 1f));
         var enemy = pool.Acquire(position);
         enemy.Configure(def, scaledHp, behavior, pool);
         return enemy;

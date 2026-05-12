@@ -1,5 +1,6 @@
 // characters.json hedgehog.signature: passive ring of damage every 3s, radius 1.5, dmg_mult_per_tick 0.5.
 using Brave.Gameplay.Definitions;
+using Brave.Gameplay.Combat;
 
 namespace Brave.Gameplay.Characters;
 

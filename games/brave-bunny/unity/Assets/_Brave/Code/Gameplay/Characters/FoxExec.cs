@@ -1,5 +1,6 @@
 // characters.json fox.signature: kills under 25% hp trigger 3x dmg strike (with chain).
 using Brave.Gameplay.Definitions;
+using Brave.Gameplay.Combat;
 
 namespace Brave.Gameplay.Characters;
 

@@ -39,6 +39,10 @@ public sealed class PooledVfx : MonoBehaviour, IPoolable
     public void Acquire() { /* no-op; PlayAndAutoRelease drives lifecycle */ }
     public void Release() { _onComplete = null; if (_ps != null) _ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear); }
 
+    // IPoolable contract.
+    public void OnGetFromPool() { Acquire(); }
+    public void OnReturnToPool() { Release(); }
+
     public void PlayAndAutoRelease(System.Action onComplete)
     {
         _onComplete = onComplete;

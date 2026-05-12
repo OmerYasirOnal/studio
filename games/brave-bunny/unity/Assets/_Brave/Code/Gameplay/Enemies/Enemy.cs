@@ -34,6 +34,10 @@ public sealed class Enemy : MonoBehaviour, IPoolable
     public void Acquire() { /* state reset in Configure */ }
     public void Release() { _definition = null; _behavior = null; _owner = null; Hp = 0f; }
 
+    // IPoolable contract — pool plumbing delegates to Acquire/Release.
+    public void OnGetFromPool() { Acquire(); }
+    public void OnReturnToPool() { Release(); }
+
     public void ApplyHit(in HitContext hit)
     {
         if (!IsAlive) return;

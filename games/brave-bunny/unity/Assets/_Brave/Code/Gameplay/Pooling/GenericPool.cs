@@ -57,7 +57,7 @@ public sealed class GenericPool<T> where T : Component, IPoolable
         }
 
         inst.gameObject.SetActive(true);
-        inst.Acquire();
+        inst.OnGetFromPool();
         InUse++;
         return inst;
     }
@@ -65,7 +65,7 @@ public sealed class GenericPool<T> where T : Component, IPoolable
     public void Release(T inst)
     {
         if (inst == null) return;
-        inst.Release();
+        inst.OnReturnToPool();
         inst.gameObject.SetActive(false);
         if (_parent != null) inst.transform.SetParent(_parent, worldPositionStays: false);
         _free.Push(inst);

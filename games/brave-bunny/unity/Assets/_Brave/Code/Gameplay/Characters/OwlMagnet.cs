@@ -1,5 +1,6 @@
 // characters.json owl.signature: magnet_mult 3.0, xp_gem_value_bonus 0.10 (pure passive carry).
 using Brave.Gameplay.Definitions;
+using Brave.Gameplay.Combat;
 
 namespace Brave.Gameplay.Characters;
 

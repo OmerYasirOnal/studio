@@ -10,6 +10,8 @@
 using System;
 using UnityEngine;
 
+using Brave.Gameplay.Definitions;
+
 namespace Brave.Gameplay.Combat
 {
     /// <summary>
@@ -52,6 +54,16 @@ namespace Brave.Gameplay.Combat
     {
         public Transform? Player { get; init; }
         public IRunContext? Run { get; init; }
+
+        /// <summary>Snapshot of the player's current run stats. Filled by RunController.</summary>
+        public CharacterStats stats;
+
+        /// <summary>Live HP for the active hero — written by the damage pipeline.</summary>
+        public float currentHp;
+
+        /// <summary>Convenience pass-through to <c>Run.RunSeconds</c>; mechanics that
+        /// don't have a full <see cref="IRunContext"/> still see a coherent clock.</summary>
+        public float runSeconds => Run?.RunSeconds ?? 0f;
     }
 
     /// <summary>
@@ -66,8 +78,11 @@ namespace Brave.Gameplay.Combat
         /// <summary>Initialize once when the run begins.</summary>
         public virtual void Initialize(IRunContext ctx) { }
 
-        /// <summary>Called by the run loop every frame (or fixed tick for AI-style mechanics).</summary>
-        public virtual void Tick(float dt) { }
+        /// <summary>Per-frame tick with PlayerContext access. Concrete subclasses override this.</summary>
+        public virtual void Tick(PlayerContext ctx, float dt) { }
+
+        /// <summary>Convenience overload — delegates to the richer one with a null context.</summary>
+        public void Tick(float dt) => Tick(null!, dt);
 
         /// <summary>Called when the player picks up this character at loadout.</summary>
         public virtual void OnAttach(PlayerContext ctx) { }

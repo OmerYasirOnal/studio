@@ -29,8 +29,43 @@ namespace Brave.Gameplay.Combat
         private bool _alive;
         private AutoAttackController? _owner;
         private ObjectPool<Projectile>? _pool;
+        private object? _genericPoolOwner;
+        private int _sourceWeaponId;
+        private int _pierceRemaining;
+
+        // Surface expected by ProjectileWeapon + HitDetector (parallel-agent API drift).
+        public int SourceWeaponId => _sourceWeaponId;
+        public float Damage => _damage;
+        public int PierceRemaining => _pierceRemaining;
 
         public void BindPool(ObjectPool<Projectile> pool) => _pool = pool;
+
+        /// <summary>Configures a freshly-acquired projectile (per ProjectileWeapon fire path).</summary>
+        public void Configure(object pool, float damage, int sourceWeaponId, int pierce, float speed, float lifetime)
+        {
+            _genericPoolOwner = pool;
+            _damage = damage;
+            _sourceWeaponId = sourceWeaponId;
+            _pierceRemaining = pierce;
+            speedUnitsPerSecond = speed;
+            lifetimeSeconds = lifetime;
+            _ageSeconds = 0f;
+            _alive = true;
+        }
+
+        /// <summary>Sets the travel direction (called by the pool after spawn-place positioning).</summary>
+        public void SetDirection(Vector2 dir)
+        {
+            if (dir.sqrMagnitude < 1e-6f) dir = Vector2.right;
+            _direction = dir.normalized;
+        }
+
+        /// <summary>Decrements pierce and despawns when exhausted. Called per-hit by HitDetector.</summary>
+        public void NotifyHit()
+        {
+            _pierceRemaining--;
+            if (_pierceRemaining <= 0) Despawn();
+        }
 
         /// <summary>Spawn-time setup. <paramref name="spreadIndex"/> is used to fan a salvo.</summary>
         public void Launch(Vector3 from, Vector3 toward, float damage,

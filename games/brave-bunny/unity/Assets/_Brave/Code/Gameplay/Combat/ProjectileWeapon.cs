@@ -29,7 +29,8 @@ public sealed class ProjectileWeapon : Weapon
             float spread = (count > 1) ? (i - (count - 1) * 0.5f) * 8f : 0f;
             Vector2 dir = Rotate(baseDir, spread);
             var p = _projectilePool.Acquire(origin, dir);
-            p.Configure(_projectilePool, data.damage, GetInstanceID(), _basePierce, _projectileSpeed, _projectileLifetime);
+            int sourceId = Definition != null ? Definition.GetInstanceID() : 0;
+            p.Configure(_projectilePool, data.damage, sourceId, _basePierce, _projectileSpeed, _projectileLifetime);
         }
     }
 
