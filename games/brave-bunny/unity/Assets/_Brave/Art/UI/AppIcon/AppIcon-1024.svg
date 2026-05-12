@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Brave Bunny: Survivors — App Store icon
+       Palette: art-bible 01-color-palette.md
+       Background Meadow Lime #A8D86B, Hero Bunny Cream #FFF4DC,
+       Outline Coal #2E2A28, Inner ear Berry Pink #F39FB4,
+       Scarf Hero Highlight #FF6B6B
+       Composition: alert centered bunny with brave red scarf -->
+
+  <!-- Background block, full square (Apple rounds corners) -->
+  <rect x="0" y="0" width="1024" height="1024" fill="#A8D86B"/>
+
+  <!-- Subtle radial vignette for depth -->
+  <defs>
+    <radialGradient id="vig" cx="512" cy="430" r="620" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#BCE07F"/>
+      <stop offset="100%" stop-color="#8FC15A"/>
+    </radialGradient>
+    <linearGradient id="furShade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFBE8"/>
+      <stop offset="100%" stop-color="#F2E4C2"/>
+    </linearGradient>
+    <linearGradient id="scarfShade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FF7E7E"/>
+      <stop offset="100%" stop-color="#E83C3C"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="1024" height="1024" fill="url(#vig)"/>
+
+  <!-- ground arc — establishes biome -->
+  <path d="M0 880 Q512 800 1024 880 L1024 1024 L0 1024 Z" fill="#6FAE74"/>
+  <path d="M0 920 Q512 850 1024 920 L1024 1024 L0 1024 Z" fill="#5E8E5C"/>
+
+  <!-- BUNNY -->
+  <g transform="translate(512,540)">
+
+    <!-- Left ear (player's left, bunny's right) — straight up alert -->
+    <g transform="translate(-110,-280) rotate(-8)">
+      <path d="M-55 0 Q-80 -180 -10 -260 Q60 -180 35 0 Z"
+            fill="url(#furShade)" stroke="#2E2A28" stroke-width="14" stroke-linejoin="round"/>
+      <!-- inner ear -->
+      <path d="M-30 -10 Q-50 -160 -10 -220 Q35 -160 15 -10 Z"
+            fill="#F39FB4" stroke="#2E2A28" stroke-width="6"/>
+    </g>
+
+    <!-- Right ear (player's right, bunny's left) — slightly bent for character -->
+    <g transform="translate(120,-275) rotate(14)">
+      <path d="M-55 0 Q-80 -180 -10 -260 Q60 -180 35 0 Z"
+            fill="url(#furShade)" stroke="#2E2A28" stroke-width="14" stroke-linejoin="round"/>
+      <path d="M-30 -10 Q-50 -160 -10 -220 Q35 -160 15 -10 Z"
+            fill="#F39FB4" stroke="#2E2A28" stroke-width="6"/>
+    </g>
+
+    <!-- Head: large round shape — Apple-icon-readability priority -->
+    <ellipse cx="0" cy="-30" rx="240" ry="220"
+             fill="url(#furShade)" stroke="#2E2A28" stroke-width="16"/>
+
+    <!-- Cheek blush -->
+    <ellipse cx="-150" cy="40" rx="42" ry="22" fill="#F39FB4" opacity="0.7"/>
+    <ellipse cx="150" cy="40" rx="42" ry="22" fill="#F39FB4" opacity="0.7"/>
+
+    <!-- Eyes — large, determined-warrior shape, slight slant for "brave" not "cute baby" -->
+    <g>
+      <!-- left eye -->
+      <ellipse cx="-80" cy="-55" rx="32" ry="40" fill="#2E2A28"/>
+      <ellipse cx="-72" cy="-68" rx="11" ry="14" fill="#FFFFFF"/>
+      <circle cx="-66" cy="-74" r="4" fill="#FFFFFF"/>
+      <!-- right eye -->
+      <ellipse cx="80" cy="-55" rx="32" ry="40" fill="#2E2A28"/>
+      <ellipse cx="72" cy="-68" rx="11" ry="14" fill="#FFFFFF"/>
+      <circle cx="66" cy="-74" r="4" fill="#FFFFFF"/>
+    </g>
+
+    <!-- Eyebrows — the "brave" signature: determined slant -->
+    <path d="M-128 -110 Q-100 -130 -50 -118" stroke="#2E2A28" stroke-width="14" stroke-linecap="round" fill="none"/>
+    <path d="M128 -110 Q100 -130 50 -118" stroke="#2E2A28" stroke-width="14" stroke-linecap="round" fill="none"/>
+
+    <!-- Nose -->
+    <path d="M-20 30 Q0 45 20 30 Q15 55 0 60 Q-15 55 -20 30 Z"
+          fill="#F39FB4" stroke="#2E2A28" stroke-width="6" stroke-linejoin="round"/>
+
+    <!-- Mouth — small smirk (confident, not goofy) -->
+    <path d="M0 60 L0 90" stroke="#2E2A28" stroke-width="8" stroke-linecap="round" fill="none"/>
+    <path d="M-22 95 Q0 110 22 95" stroke="#2E2A28" stroke-width="9" stroke-linecap="round" fill="none"/>
+
+    <!-- Front teeth — playful but tough -->
+    <rect x="-14" y="100" width="12" height="22" rx="3" fill="#FFFFFF" stroke="#2E2A28" stroke-width="5"/>
+    <rect x="2" y="100" width="12" height="22" rx="3" fill="#FFFFFF" stroke="#2E2A28" stroke-width="5"/>
+
+    <!-- Whiskers — three each side, tapered look via stroke -->
+    <g stroke="#2E2A28" stroke-width="6" stroke-linecap="round" fill="none">
+      <path d="M-180 50 L-260 30"/>
+      <path d="M-180 70 L-265 70"/>
+      <path d="M-180 90 L-258 105"/>
+      <path d="M180 50 L260 30"/>
+      <path d="M180 70 L265 70"/>
+      <path d="M180 90 L258 105"/>
+    </g>
+  </g>
+
+  <!-- SCARF — the "Brave / Survivors" signature -->
+  <g transform="translate(512,725)">
+    <!-- knot shadow -->
+    <ellipse cx="0" cy="6" rx="195" ry="35" fill="#2E2A28" opacity="0.15"/>
+    <!-- scarf wrap around neck -->
+    <path d="M-200 -5 Q-100 -35 0 -25 Q100 -35 200 -5 Q210 22 195 45 Q100 18 0 30 Q-100 18 -195 45 Q-210 22 -200 -5 Z"
+          fill="url(#scarfShade)" stroke="#2E2A28" stroke-width="14" stroke-linejoin="round"/>
+    <!-- knot -->
+    <ellipse cx="80" cy="22" rx="40" ry="32"
+             fill="url(#scarfShade)" stroke="#2E2A28" stroke-width="13"/>
+    <!-- trailing scarf tail — wind motion -->
+    <path d="M105 35 Q170 80 220 60 Q260 110 195 130 Q180 80 105 60 Z"
+          fill="url(#scarfShade)" stroke="#2E2A28" stroke-width="13" stroke-linejoin="round"/>
+    <!-- subtle highlight stripe -->
+    <path d="M-160 0 Q0 -15 160 0" stroke="#FFB5B5" stroke-width="8" fill="none" opacity="0.9"/>
+  </g>
+
+</svg>

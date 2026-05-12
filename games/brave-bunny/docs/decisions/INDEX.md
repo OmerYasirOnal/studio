@@ -20,6 +20,7 @@ ADRs are numbered sequentially, four-digit zero-padded. Use `/decide "<topic>"` 
 | 0014 | Otter-Beaver fallback for the 8-character launch roster | 2026-05-12 | accepted |
 | 0015 | Test/production API drift (temporarily disabled tests) | 2026-05-12 | accepted |
 | 0016 | App Store display name: "Brave Bunny: Survivors" | 2026-05-12 | accepted |
+| 0017 | PlayerMover canonical; deprecate legacy XY-plane movers | 2026-05-12 | accepted |
 
 ## Conventions
 
