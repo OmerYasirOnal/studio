@@ -20,7 +20,12 @@ namespace Brave.Gameplay.Combat
     /// </summary>
     public sealed class AutoAttackController : MonoBehaviour
     {
-        [SerializeField] private PlayerController? player;
+        // ADR-0018: references the canonical XZ PlayerMover. The field is currently
+        // unread by AutoAttack logic — targeting uses this controller's own transform.position.
+        // When AutoAttack needs the player's facing direction for front-arc preference
+        // (today seeded from a hard-coded Vector2.right at the call-site), it can read
+        // PlayerMover.Facing through this reference.
+        [SerializeField] private PlayerMover? player;
 
         // Pre-allocated lists — never resized in hot loop.
         private readonly List<Weapon> _equipped = new(capacity: 8);

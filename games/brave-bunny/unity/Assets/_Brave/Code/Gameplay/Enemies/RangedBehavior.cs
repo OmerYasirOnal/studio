@@ -1,5 +1,6 @@
 // Archer Mole: kite + fire. Maintains kite_distance_units from player; fires when in window.
-using Brave.Gameplay.Movement;
+//
+// ADR-0018: XZ-plane semantics. See SwarmerBehavior header for the mapping rationale.
 using UnityEngine;
 
 namespace Brave.Gameplay.Enemies;
@@ -23,15 +24,25 @@ public sealed class RangedBehavior : EnemyBehavior
 
     public override void Tick(Enemy enemy, Vector2 playerPos, float dt)
     {
-        Vector2 selfPos = enemy.transform.position;
-        float distance = Vector2.Distance(selfPos, playerPos);
+        Vector3 pos = enemy.transform.position;
+        // self in caller-space XY (world x, world z):
+        Vector2 self;
+        self.x = pos.x;
+        self.y = pos.z;
+        float distance = Vector2.Distance(self, playerPos);
+
         Vector2 dir;
-        if (distance < _kiteDistance) dir = (selfPos - playerPos).normalized;          // back away
-        else if (distance > _fireWindowMax) dir = (playerPos - selfPos).normalized;     // close gap
-        else dir = Vector2.zero;                                                        // hold + fire
+        if (distance < _kiteDistance) dir = (self - playerPos).normalized;          // back away
+        else if (distance > _fireWindowMax) dir = (playerPos - self).normalized;     // close gap
+        else dir = Vector2.zero;                                                     // hold + fire
 
         if (dir != Vector2.zero)
-            enemy.transform.position = Mover.Step(enemy.transform.position, dir, enemy.Definition.moveSpeed, dt);
+        {
+            float step = enemy.Definition.moveSpeed * dt;
+            pos.x += dir.x * step;
+            pos.z += dir.y * step;      // input Y → world Z
+            enemy.transform.position = pos;
+        }
 
         // TODO(Phase 5): telegraph + fire spawn through EnemyProjectilePool.
     }

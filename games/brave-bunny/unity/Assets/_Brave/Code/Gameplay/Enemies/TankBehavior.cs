@@ -1,5 +1,6 @@
 // Sleepy Boar: slow homing with periodic burst-charge (per enemies.json charge block).
-using Brave.Gameplay.Movement;
+//
+// ADR-0018: XZ-plane semantics. See SwarmerBehavior header for the mapping rationale.
 using UnityEngine;
 
 namespace Brave.Gameplay.Enemies;
@@ -23,9 +24,17 @@ public sealed class TankBehavior : EnemyBehavior
 
     public override void Tick(Enemy enemy, Vector2 playerPos, float dt)
     {
-        Vector2 dir = (playerPos - (Vector2)enemy.transform.position).normalized;
+        Vector3 pos = enemy.transform.position;
+        Vector2 dir;
+        dir.x = playerPos.x - pos.x;
+        dir.y = playerPos.y - pos.z;
+        if (dir.sqrMagnitude < 0.0001f) return;
+        dir.Normalize();
+
         // TODO(Phase 5): track per-enemy charge timer (Enemy needs a small AI-state struct).
-        float speed = enemy.Definition.moveSpeed;
-        enemy.transform.position = Mover.Step(enemy.transform.position, dir, speed, dt);
+        float step = enemy.Definition.moveSpeed * dt;
+        pos.x += dir.x * step;
+        pos.z += dir.y * step;          // input Y → world Z
+        enemy.transform.position = pos;
     }
 }

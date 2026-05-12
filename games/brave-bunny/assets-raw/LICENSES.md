@@ -30,6 +30,8 @@ Every asset under `assets-raw/` must appear in this table. asset-curator maintai
 | textures/ambientcg/Ground054_2K-JPG.zip | ambientCG | CC0 1.0 | https://ambientcg.com/view?id=Ground054 | Lennart Demes (ambientCG) | 2026-05-12 |
 | hdri/small_cave_2k.hdr | Polyhaven | CC0 1.0 | https://polyhaven.com/a/small_cave | Andreas Mischok | 2026-05-12 |
 | textures/ambientcg/Ground037_2K-JPG.zip | ambientCG | CC0 1.0 | https://ambientcg.com/view?id=Ground037 | Lennart Demes (ambientCG) | 2026-05-12 |
+| custom/branding/app-icon-1024.svg | In-house (Studio) | MIT (in-house) | n/a (in-house) | Yasir Önal (orchestrator) — palette per docs/07-art-bible/01-color-palette.md; see ADR-0016 | 2026-05-12 |
+| custom/branding/app-icon-1024.png | In-house (Studio) | MIT (in-house) | n/a (in-house, derived from app-icon-1024.svg via `rsvg-convert -w 1024 -h 1024 -f png` + PIL RGB flatten) | Yasir Önal (orchestrator) — derivative of app-icon-1024.svg; see ADR-0016 | 2026-05-12 |
 
 ## Best-effort fetches attempted (2026-05-12)
 
