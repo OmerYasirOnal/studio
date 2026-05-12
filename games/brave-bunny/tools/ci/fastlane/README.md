@@ -63,6 +63,22 @@ Local archive without uploading (smoke test the pipeline)
 
 Build and upload to TestFlight
 
+### ios upload_existing
+
+```sh
+[bundle exec] fastlane ios upload_existing
+```
+
+Upload an existing app-store-signed .ipa to TestFlight (validation shortcut)
+
+### ios rearchive
+
+```sh
+[bundle exec] fastlane ios rearchive
+```
+
+Re-archive the existing Xcode project + upload to TestFlight (skips Unity rebuild)
+
 ### ios release
 
 ```sh
