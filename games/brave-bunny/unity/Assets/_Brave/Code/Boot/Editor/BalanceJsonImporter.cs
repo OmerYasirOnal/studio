@@ -83,6 +83,14 @@ namespace Brave.Boot.Editor
             if (root == null) return;
             // characters.json is an array (or object with "characters" key — handle both)
             var list = (root is JArray arr) ? (JArray)arr : (JArray)(root["characters"] ?? new JArray());
+
+            // File-level calibration constants. Per docs/10-balance/00-formulas.md §3 (movement)
+            // and §1 (damage / HP scaling): per-character mults are applied to these baselines.
+            // base_move_units_per_sec is REQUIRED for baseMoveSpeed math; default to Bunny anchor 4.5.
+            var rootObj = root as JObject;
+            float baseMoveUnitsPerSec = rootObj?.Value<float?>("base_move_units_per_sec") ?? 4.5f;
+            // Note: hp_base is per-character (absolute HP), not a file-level constant — see schema.
+
             foreach (JObject entry in list.OfType<JObject>())
             {
                 var slug = entry.Value<string>("id") ?? entry.Value<string>("slug");
@@ -97,6 +105,31 @@ namespace Brave.Boot.Editor
                 ApplyField(serialized, "displayName", entry.Value<string>("display_name"));
                 ApplyField(serialized, "signatureTypeName", entry.Value<string>("signature_token"));
                 ApplyField(serialized, "unlockStarCost", entry.Value<int?>("unlock_star_cost") ?? 0);
+
+                // --- CharacterStats (baseStats sub-struct) -----------------------
+                // Per docs/10-balance/00-formulas.md:
+                //   §3 movement: move_speed = base_move × character.move_mult
+                //   §1 damage:   character_dmg_mult comes from characters.json → dmg_mult
+                //   §2 crit:     crit_rate, crit_damage are per-character bases
+                //   §4 magnet:   magnet_mult is per-character; base_magnet lives on PlayerMover/Magnet, not in CharacterStats
+                // hp_base in JSON is the absolute level-1 HP (per schema § "hp_base [50,250]"),
+                // so baseStats.baseHP = hp_base directly (no multiplier — it IS the baseline).
+                float hpBase    = entry.Value<float?>("hp_base") ?? 0f;
+                float moveMult  = entry.Value<float?>("move_mult") ?? 1f;
+                float dmgMult   = entry.Value<float?>("dmg_mult") ?? 1f;
+                float critRate  = entry.Value<float?>("crit_rate") ?? 0f;
+                float critDmg   = entry.Value<float?>("crit_damage") ?? 1f;
+                float magnetM   = entry.Value<float?>("magnet_mult") ?? 1f;
+                float xpGemBon  = entry.Value<float?>("xp_gem_value_bonus") ?? 0f;
+
+                ApplyField(serialized, "baseStats.baseHP",           hpBase);
+                ApplyField(serialized, "baseStats.baseMoveSpeed",    baseMoveUnitsPerSec * moveMult);
+                ApplyField(serialized, "baseStats.damageMultiplier", dmgMult);
+                ApplyField(serialized, "baseStats.critRate",         critRate);
+                ApplyField(serialized, "baseStats.critDamage",       critDmg);
+                ApplyField(serialized, "baseStats.magnetMultiplier", magnetM);
+                ApplyField(serialized, "baseStats.xpGemValueBonus",  xpGemBon);
+
                 serialized.ApplyModifiedPropertiesWithoutUndo();
                 EditorUtility.SetDirty(so);
 
