@@ -44,9 +44,9 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   applicationIdentifier:
-    Android: com.yasironal.brave-bunny
-    iOS: com.yasironal.brave-bunny
-    Standalone: com.yasironal.brave-bunny
+    Android: com.omeryasir.bravebunny
+    iOS: com.omeryasir.bravebunny
+    Standalone: com.omeryasir.bravebunny
   buildNumber:
     Standalone: "0"
     VisionOS: "0"

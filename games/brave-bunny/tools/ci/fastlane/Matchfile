@@ -12,7 +12,7 @@
 git_url "git@github.com:OmerYasirOnal/studio-certs.git"  # private — never make public
 storage_mode "git"
 type "appstore"                                          # default; lanes override per use
-app_identifier ["com.yasironal.brave-bunny"]
+app_identifier ["com.omeryasir.bravebunny"]
 username ENV["MATCH_GIT_AUTHOR"]                         # GitHub username with repo access
 
 # Optional: branch isolation if multiple games share the studio-certs repo.

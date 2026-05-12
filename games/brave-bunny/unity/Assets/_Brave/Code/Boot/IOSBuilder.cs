@@ -96,7 +96,7 @@ namespace Brave.Boot
         /// </summary>
         private static void ConfigureIOSPlayerSettings()
         {
-            PlayerSettings.applicationIdentifier = "com.yasironal.brave-bunny";
+            PlayerSettings.applicationIdentifier = "com.omeryasir.bravebunny";
             PlayerSettings.SetScriptingBackend(BuildTargetGroup.iOS, ScriptingImplementation.IL2CPP);
             PlayerSettings.SetApiCompatibilityLevel(BuildTargetGroup.iOS, ApiCompatibilityLevel.NET_Standard);
             PlayerSettings.SetArchitecture(BuildTargetGroup.iOS, 1); // 1 = ARM64

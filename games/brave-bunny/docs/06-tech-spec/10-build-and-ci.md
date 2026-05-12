@@ -8,8 +8,8 @@
 
 | Platform | Status at launch | Bundle / Package id |
 |---|---|---|
-| **iOS** | **Primary** | `com.yasironal.brave-bunny` |
-| Android | Deferred until iOS soft-launch | `com.yasironal.bravebunny` (Android disallows hyphens) |
+| **iOS** | **Primary** | `com.omeryasir.bravebunny` |
+| Android | Deferred until iOS soft-launch | `com.omeryasir.bravebunny` (Android disallows hyphens) |
 
 ## Build pipeline ownership
 
@@ -48,7 +48,7 @@ The `Brave.Build.IOSBuilder.Build` method (in `Brave.Boot` asmdef, `#if UNITY_ED
 
 - Reads version from `GAME.md` (`semver: ...`) + framework `core/VERSION`.
 - Sets `PlayerSettings.iOS.buildNumber = $(CI run id)` monotonic.
-- Sets `PlayerSettings.applicationIdentifier = "com.yasironal.brave-bunny"`.
+- Sets `PlayerSettings.applicationIdentifier = "com.omeryasir.bravebunny"`.
 - Forces `iOS Target SDK = Device SDK`, `Architecture = ARM64`, `Scripting Backend = IL2CPP`.
 - Strips Editor-only define `UNITY_EDITOR` and any `UNITY_INCLUDE_TESTS`.
 - Strips desktop input bindings (`UNITY_IOS` define) per `04-input-system.md`.

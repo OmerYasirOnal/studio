@@ -30,8 +30,18 @@ IOS_BUILD_DIR          = File.join(UNITY_PROJECT_PATH, "Build", "iOS")
 IOS_XCODEPROJ          = File.join(IOS_BUILD_DIR, "Unity-iPhone.xcodeproj")
 IOS_XCWORKSPACE        = File.join(IOS_BUILD_DIR, "Unity-iPhone.xcworkspace")
 BUILD_OUTPUT_ROOT      = File.expand_path("../../../Builds", __dir__)
-APP_IDENTIFIER         = "com.yasironal.brave-bunny"
+APP_IDENTIFIER         = "com.omeryasir.bravebunny"
+APP_NAME               = "Brave Bunny"
+APP_PRIMARY_LANGUAGE   = "en-US"
+APP_SKU                = "bravebunny"
 UNITY_BUILD_SCRIPT     = File.expand_path("../scripts/unity-build-ios.sh", __dir__)
+
+# App Store Connect API key paths. The .p8 file lives outside the repo
+# (~/.appstoreconnect/private_keys/) so it never leaks; key_id + issuer_id
+# can be public (they're identifiers, not credentials).
+ASC_KEY_ID    = "93HFBMV3MA"
+ASC_ISSUER_ID = "3894e346-c886-4ca5-91b7-773aaa6e85bd"
+ASC_KEY_PATH  = File.expand_path("~/.appstoreconnect/private_keys/AuthKey_#{ASC_KEY_ID}.p8")
 
 # ---------------------------------------------------------------------------
 # Global hooks
@@ -85,11 +95,127 @@ private_lane :require_env do |options|
   end
 end
 
+# Authenticate against App Store Connect via API key (.p8). Required for
+# every lane that talks to ASC. Returns the api_key hash that other actions
+# consume via `api_key:` parameter.
+private_lane :asc_api_key do
+  unless File.exist?(ASC_KEY_PATH)
+    UI.user_error!("[asc] API key not found at #{ASC_KEY_PATH}. " \
+                   "Download from https://appstoreconnect.apple.com/access/users and place there.")
+  end
+  app_store_connect_api_key(
+    key_id: ASC_KEY_ID,
+    issuer_id: ASC_ISSUER_ID,
+    key_filepath: ASC_KEY_PATH,
+    duration: 1200,            # 20-minute token
+    in_house: false
+  )
+end
+
 # ---------------------------------------------------------------------------
 # Platform: iOS
 # ---------------------------------------------------------------------------
 
 platform :ios do
+
+  # -------------------------------------------------------------------------
+  # Lane: register_app
+  # Idempotent — creates the Apple Developer bundle ID + ASC app entry if
+  # they don't already exist. Run ONCE per game when starting a new project.
+  # Replaces the manual "create app in ASC web UI" runbook step.
+  # -------------------------------------------------------------------------
+  desc "Create Apple Developer bundle ID + App Store Connect app entry (idempotent)"
+  lane :register_app do
+    api_key = asc_api_key
+
+    require 'spaceship'
+    token = Spaceship::ConnectAPI::Token.create(
+      key_id: api_key[:key_id],
+      issuer_id: api_key[:issuer_id],
+      key: api_key[:key]
+    )
+    Spaceship::ConnectAPI.token = token
+
+    # 1. Bundle ID on Apple Developer Portal
+    existing_bid = Spaceship::ConnectAPI::BundleId.all.find { |b| b.identifier == APP_IDENTIFIER }
+    if existing_bid
+      UI.success("[register] bundle id already exists: #{APP_IDENTIFIER} (id=#{existing_bid.id})")
+    else
+      UI.message("[register] creating bundle id #{APP_IDENTIFIER}...")
+      Spaceship::ConnectAPI::BundleId.create(
+        name: APP_NAME,
+        identifier: APP_IDENTIFIER,
+        platform: "IOS",
+        seed_id: nil
+      )
+      UI.success("[register] bundle id created: #{APP_IDENTIFIER}")
+    end
+
+    # 2. App Store Connect entry — use `produce` action which has a more lenient
+    # auth surface for app creation. Requires App Manager role on the API key;
+    # if the role is Developer, this fails and the user must create the app
+    # in the ASC web UI (one click at https://appstoreconnect.apple.com/apps).
+    existing_app = Spaceship::ConnectAPI::App.all.find { |a| a.bundle_id == APP_IDENTIFIER }
+    if existing_app
+      UI.success("[register] ASC app already exists: #{APP_IDENTIFIER} -> '#{existing_app.name}' (id=#{existing_app.id})")
+    else
+      UI.message("[register] creating ASC app entry '#{APP_NAME}' via produce...")
+      begin
+        produce(
+          username: ENV["FASTLANE_USER"] || "omeryasironal@hotmail.com",
+          app_identifier: APP_IDENTIFIER,
+          app_name: APP_NAME,
+          language: APP_PRIMARY_LANGUAGE,
+          app_version: "0.1.0",
+          sku: APP_SKU,
+          skip_itc: false,
+          skip_devcenter: true,         # already created above
+          platform: "ios",
+          api_key: api_key
+        )
+        UI.success("[register] ASC app created via produce")
+      rescue => e
+        UI.error("[register] ASC app create failed: #{e.message}")
+        UI.important("[register] MANUAL FALLBACK: create the app at https://appstoreconnect.apple.com/apps")
+        UI.important("  - Platform: iOS")
+        UI.important("  - Name: #{APP_NAME}")
+        UI.important("  - Primary Language: English (U.S.)")
+        UI.important("  - Bundle ID: #{APP_IDENTIFIER}")
+        UI.important("  - SKU: #{APP_SKU}")
+        UI.important("  - User Access: Full Access (or your preference)")
+        UI.important("[register] Cause: API key likely has 'Developer' role; needs 'App Manager' for ASC create.")
+        UI.important("  Upgrade at: https://appstoreconnect.apple.com/access/api")
+      end
+    end
+
+    UI.success("[register] done — bundle id present, ASC entry may need manual creation if create failed")
+  end
+
+  # -------------------------------------------------------------------------
+  # Lane: list_apps
+  # Read-only — list all apps + bundle IDs on this Apple Developer account.
+  # Useful for debugging "what's already registered?" without web UI.
+  # -------------------------------------------------------------------------
+  desc "List all apps and bundle IDs on the Apple Developer account (read-only)"
+  lane :list_apps do
+    api_key = asc_api_key
+
+    require 'spaceship'
+    token = Spaceship::ConnectAPI::Token.create(
+      key_id: api_key[:key_id],
+      issuer_id: api_key[:issuer_id],
+      key: api_key[:key]
+    )
+    Spaceship::ConnectAPI.token = token
+
+    apps = Spaceship::ConnectAPI::App.all
+    UI.message("=== #{apps.count} apps on App Store Connect ===")
+    apps.each { |app| UI.message("  #{app.bundle_id.to_s.ljust(40)}  #{app.name}") }
+
+    bids = Spaceship::ConnectAPI::BundleId.all
+    UI.message("\n=== #{bids.count} bundle IDs on Apple Developer Portal ===")
+    bids.each { |b| UI.message("  #{b.identifier.to_s.ljust(40)}  #{b.name}") }
+  end
 
   # -------------------------------------------------------------------------
   # Lane: preview

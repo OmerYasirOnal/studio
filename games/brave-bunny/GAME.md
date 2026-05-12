@@ -41,8 +41,9 @@ camera: top-down-3-4-perspective
 target_release: 2026-Q3
 soft_launch_markets: [tr, ph, id]
 
-# Bundle id (build-engineer reads this)
-bundle_id_pattern: com.yasironal.brave-bunny
+# Bundle id (build-engineer reads this) — matches existing com.omeryasir.* convention
+# on Yasir's Apple Developer account (team F54HW6VY7N / dist 9X8FDSW5D8).
+bundle_id_pattern: com.omeryasir.bravebunny
 
 # Live-ops cadence post-launch (game-designer fills 12-content-roadmap.md from this)
 live_ops:

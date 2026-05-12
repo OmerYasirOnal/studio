@@ -40,7 +40,7 @@
 
 ## Build targets
 
-- **iOS:** primary platform per `GAME.md`. Bundle id pattern `com.yasironal.brave-bunny`. Minimum iOS version 14 (iPhone SE 3 is iOS 15+; safe).
+- **iOS:** primary platform per `GAME.md`. Bundle id pattern `com.omeryasir.bravebunny`. Minimum iOS version 14 (iPhone SE 3 is iOS 15+; safe).
 - **Android:** secondary. Min SDK 26 (Android 8.0).
 
 ## Cross-references

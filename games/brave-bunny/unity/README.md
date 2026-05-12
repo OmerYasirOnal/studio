@@ -1,7 +1,7 @@
 # Brave Bunny — Unity 6 LTS URP Project
 
 Action-roguelite (Survivor.io-like) shipping iOS-first, Android-second.
-Bundle id: `com.yasironal.brave-bunny`.
+Bundle id: `com.omeryasir.bravebunny`.
 
 ## Minimum Unity version
 

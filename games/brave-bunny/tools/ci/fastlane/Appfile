@@ -4,17 +4,20 @@
 # Bundle id pattern is locked in GAME.md (`bundle_id_pattern`).
 #
 # Apple developer team ids and ASC team ids are NOT secrets per Apple's docs
-# (they appear in your provisioning profiles already) but we still source them
-# from env vars so this file stays portable across forks / re-keying events.
+# (they appear in your provisioning profiles already) but we still allow env
+# overrides so this file stays portable across forks / re-keying events.
 
-app_identifier "com.yasironal.brave-bunny"  # Brave Bunny iOS bundle id (GAME.md)
-team_id ENV["FASTLANE_TEAM_ID"]             # Apple Developer team id
-itc_team_id ENV["FASTLANE_ITC_TEAM_ID"]     # App Store Connect team id
+app_identifier "com.omeryasir.bravebunny"   # Brave Bunny iOS bundle id (GAME.md)
+team_id ENV["FASTLANE_TEAM_ID"] || "9X8FDSW5D8"  # Yasir's Apple Distribution team
 
-# Apple ID (account email) for upload_to_testflight / upload_to_app_store.
-# App-specific password lives in FASTLANE_APP_SPECIFIC_PASSWORD (env), never here.
-apple_id ENV["FASTLANE_USER"]
+# itc_team_id: only required when an Apple ID belongs to multiple teams. The
+# ASC API key (Phase 5) supersedes this. Left as env for safety on shared CI.
+itc_team_id ENV["FASTLANE_ITC_TEAM_ID"]
+
+# Apple ID for legacy 2FA path (upload_to_testflight w/o API key).
+# Preferred: ASC API key via app_store_connect_api_key action — see Fastfile.
+apple_id ENV["FASTLANE_USER"] || "omeryasironal@hotmail.com"
 
 # For Google Play (Phase 4+ Android deferral per tech-spec 10):
-# package_name "com.yasironal.bravebunny"   # Android disallows hyphens
+# package_name "com.omeryasir.bravebunny"
 # json_key_file ENV["GOOGLE_PLAY_JSON_KEY_PATH"]

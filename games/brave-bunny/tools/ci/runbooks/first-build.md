@@ -18,7 +18,7 @@
 
 1. Sign in at <https://appstoreconnect.apple.com/>.
 2. My Apps → "+" → New App.
-3. Platform: iOS. Bundle ID: `com.yasironal.brave-bunny` (must match `Appfile`).
+3. Platform: iOS. Bundle ID: `com.omeryasir.bravebunny` (must match `Appfile`).
 4. SKU: `brave-bunny`. Primary language: English (US) — TR added later via localization tab.
 5. Note the **ITC Team ID** (App Store Connect team id, distinct from Developer team id).
 
