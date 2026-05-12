@@ -57,6 +57,11 @@ games/*/logs/**/*.jsonl
 **/fastlane/screenshots/**/*.png
 **/fastlane/test_output/**
 
+# Unity license artifacts (machine-bound, not for sharing)
+Unity_v*.alf
+Unity_v*.ulf
+Unity_lic.ulf
+
 # Assets we never commit raw
 games/*/assets-raw/**/*.psd
 games/*/assets-raw/**/*.blend1
