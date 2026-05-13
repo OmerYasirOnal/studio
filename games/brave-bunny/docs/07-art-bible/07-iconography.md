@@ -37,16 +37,16 @@
 
 ### HUD (8 icons)
 
-| Slug | Use | Accent fill |
-|---|---|---|
-| `icon_hud_hp` | HP indicator (heart) | Berry Pink `#F39FB4` |
-| `icon_hud_xp` | XP gem indicator | Rare Drop Cyan `#3DE0E0` |
-| `icon_hud_timer` | Run timer | mono Coal Outline |
-| `icon_hud_wave` | Wave counter | mono Coal Outline |
-| `icon_hud_kills` | Kill counter | mono Coal Outline |
-| `icon_hud_pause` | Pause button | mono Coal Outline |
-| `icon_hud_boss_warning` | Boss incoming | Danger Red `#E83C3C` |
-| `icon_hud_revive` | Revive offer | Hero Highlight `#FF6B6B` |
+| Slug | Use | Accent fill | Source file |
+|---|---|---|---|
+| `icon_hud_hp` | HP indicator (health/plus) | Berry Pink `#F39FB4` | `PNG/Black/1x/plus.png` from kenney_game-icons.zip (CC0); resized 64×64 |
+| `icon_hud_xp` | XP gem indicator | Rare Drop Cyan `#3DE0E0` | `PNG/Black/1x/star.png` from kenney_game-icons.zip (CC0); resized 64×64 |
+| `icon_hud_timer` | Run timer (circular return arrow) | mono Coal Outline | `PNG/Black/1x/return.png` from kenney_game-icons.zip (CC0); resized 64×64 |
+| `icon_hud_wave` | Wave counter (signal bars) | mono Coal Outline | `PNG/Black/1x/signal3.png` from kenney_game-icons.zip (CC0); resized 64×64 |
+| `icon_hud_kills` | Kill counter (target/crosshair) | mono Coal Outline | `PNG/Black/1x/target.png` from kenney_game-icons.zip (CC0); resized 64×64 |
+| `icon_hud_pause` | Pause button | mono Coal Outline | `PNG/Black/1x/pause.png` from kenney_game-icons.zip (CC0); resized 64×64 |
+| `icon_hud_boss_warning` | Boss incoming (danger triangle + skull) | Danger Red `#E83C3C` | Custom hand-authored SVG `boss-warning.svg` (MIT in-house); rsvg-convert → PNG 64×64 |
+| `icon_hud_revive` | Revive offer (heart + upward arrow) | Hero Highlight `#FF6B6B` | Custom hand-authored SVG `revive.svg` (MIT in-house); rsvg-convert → PNG 64×64 |
 
 ### Weapons (12 icons — 1 per weapon from `docs/02-gdd/04-weapons.md`)
 

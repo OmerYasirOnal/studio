@@ -3,10 +3,11 @@
 // Lives alongside DamageCalculator/DamageFormula (which compute the *amount*); this class
 // is the lightweight *application* surface called from the projectile hit-path.
 //
-// Enemy death wiring (XP gem drop, death VFX, pool return) is OUT OF SCOPE for the Wave 4
-// vertical slice. EnemyHealth.Die already fires registered IDeathListeners; the pool-return
-// is the listener chain's responsibility per existing code comment. Follow-up surfaced in
-// the hand-off.
+// ADR-0019 item 3: on killing blow, DamageApplier now finds all IDeathListener components
+// on the target GameObject and invokes OnDeath. EnemyHealth.TakeHit handles its own
+// Enemies.IDeathListener chain first; the Combat.IDeathListener chain (pool-return etc.)
+// fires after, so drops/XP from the EnemyHealth chain can still spawn before the object
+// is deactivated.
 
 using UnityEngine;
 
@@ -23,22 +24,31 @@ namespace Brave.Gameplay.Combat
     public static class DamageApplier
     {
         /// <summary>Apply <paramref name="damage"/> to the enemy. Returns <c>true</c> when the
-        /// hit was the killing blow (HP dropped to ≤ 0 as a result of this hit).</summary>
+        /// hit was the killing blow (HP dropped to ≤ 0 as a result of this hit).
+        /// On killing blow, all <see cref="IDeathListener"/> components on the enemy's
+        /// GameObject are invoked exactly once (idempotency: if HP was already ≤ 0 before
+        /// this call, no listeners are fired).</summary>
         public static bool TryApply(EnemyBase enemy, float damage, Vector3 hitPoint, int sourceId)
         {
             if (enemy == null) return false;
             EnemyHealth health = enemy.Health;
             if (health == null) return false;
-            if (!health.IsAlive) return false;
+            if (!health.IsAlive) return false;   // already dead — idempotency guard
 
             float hpBefore = health.Hp;
             var info = new HitInfo(damage, hitPoint, isCrit: false, sourceId: sourceId,
                 targetId: enemy.GetInstanceID());
             health.TakeHit(info);
 
-            // Killing-blow signal: HP crossed zero on this hit. (Death-listeners chain handles
-            // XP/loot/pool-return — we don't duplicate that work here.)
-            return hpBefore > 0f && health.Hp <= 0f;
+            bool killingBlow = hpBefore > 0f && health.Hp <= 0f;
+            if (killingBlow)
+            {
+                // ADR-0019 item 3: fire Combat.IDeathListener components (e.g. pool-return).
+                var listeners = enemy.GetComponents<IDeathListener>();
+                for (int i = 0; i < listeners.Length; i++)
+                    listeners[i].OnDeath(enemy.gameObject);
+            }
+            return killingBlow;
         }
 
         /// <summary>Pure-arithmetic variant for unit tests that don't want a MonoBehaviour.
