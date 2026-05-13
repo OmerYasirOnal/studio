@@ -54,7 +54,9 @@ namespace Brave.Editor
                 return;
             }
 
-            var platform = UnityEditor.Build.NamedBuildTarget.iOS;
+            // PlayerSettings.GetSupportedIconKindsForPlatform takes BuildTargetGroup,
+            // not the newer NamedBuildTarget overload (Unity 6 LTS preserves the legacy signature).
+            var platform = BuildTargetGroup.iOS;
 
             // Apply the same 1024 PNG to every icon kind Unity exposes for
             // iOS (Application, Spotlight, Settings, Notification, Marketing).

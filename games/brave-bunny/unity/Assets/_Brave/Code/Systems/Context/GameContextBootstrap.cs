@@ -50,10 +50,29 @@ public sealed class GameContextBootstrap : MonoBehaviour
         var settings = new SettingsService(save);
         ctx.Register<ISettingsService>(settings);
 
-        var localization = new LocalizationService(_languageTables);
+        // Null-safe: shipping build #3 with an empty Boot.unity in CI — the SerializeField
+        // may not be wired yet. LocalizationService already handles a null/empty table set
+        // (keys round-trip as identity strings). Substitute an empty array so we never throw.
+        var tables = _languageTables ?? System.Array.Empty<TextAsset>();
+        if (_languageTables == null)
+        {
+            Debug.LogWarning(
+                "[GameContextBootstrap] _languageTables not wired in Boot.unity — "
+                + "Loc.Tr() will echo keys until the SerializeField is populated.");
+        }
+        var localization = new LocalizationService(tables);
         localization.SetLanguage(settings.Current.Language.ToIso());
         ctx.Register<ILocalizationService>(localization);
 
+        // Null-safe: AudioMixer asset may be missing in CI / first boot. AudioMixerDriver
+        // is internally null-tolerant (every setter no-ops when mixer is null), but we log
+        // a clear warning so the missing reference is obvious in player.log.
+        if (_mixer == null)
+        {
+            Debug.LogWarning(
+                "[GameContextBootstrap] _mixer SerializeField is null — "
+                + "AudioMixerDriver registered in mute-mode (set the BraveBunny.mixer asset on Boot's [Bootstrap] to enable audio).");
+        }
         var mixerDriver = new AudioMixerDriver(_mixer);
         ctx.Register<IAudioMixerDriver>(mixerDriver);
 

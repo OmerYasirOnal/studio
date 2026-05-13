@@ -172,7 +172,8 @@ namespace Brave.Tests.EditMode.Gameplay.Enemies
             Assert.That(buffer, Has.Count.EqualTo(2));
             Assert.That(buffer, Contains.Item(inA));
             Assert.That(buffer, Contains.Item(inB));
-            Assert.That(buffer, Does.Not.Contain(outOfRange));
+            // Does.Not.Contain(string) is the substring overload — use Has.No.Member(object) for membership.
+            Assert.That(buffer, Has.No.Member(outOfRange));
         }
 
         [Test]

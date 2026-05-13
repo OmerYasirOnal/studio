@@ -43,10 +43,58 @@ public static class SceneSetup
         Debug.Log("[SceneSetup] OK — Boot/Run/PerfStress scenes scaffolded and registered.");
     }
 
+    /// <summary>
+    /// Crash-fix (#1) entry — deletes pre-existing empty scaffold scenes
+    /// (Boot, MainMenu, Loadout, PerfStress) BEFORE running the regular Scaffold flow,
+    /// so the EnsureX methods rebuild them from scratch with their full GameObject set.
+    /// Run.unity is preserved (it has real authored content — 24 YAML docs, full gameplay wiring).
+    /// </summary>
+    [MenuItem("Brave/Force-Scaffold Phase-5 Scenes (deletes Boot/MainMenu/Loadout/PerfStress)")]
+    public static void ForceScaffold()
+    {
+        Directory.CreateDirectory(SceneDir);
+
+        // Delete the empty placeholder scenes (and their .meta) so EnsureX runs fresh.
+        // Run.unity is NEVER deleted — it has 24 YAML docs of real authored content.
+        foreach (var sceneName in new[] { "Boot", "MainMenu", "Loadout", "PerfStress" })
+        {
+            var unity = $"{SceneDir}/{sceneName}.unity";
+            var meta = $"{unity}.meta";
+            if (File.Exists(unity))
+            {
+                File.Delete(unity);
+                Debug.Log($"[SceneSetup] ForceScaffold deleted {unity}");
+            }
+            if (File.Exists(meta))
+            {
+                File.Delete(meta);
+                Debug.Log($"[SceneSetup] ForceScaffold deleted {meta}");
+            }
+        }
+
+        // Refresh so AssetDatabase forgets the old GUIDs before we recreate.
+        AssetDatabase.Refresh();
+
+        Scaffold();
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        Debug.Log("[SceneSetup] ForceScaffold OK — scenes deleted and rebuilt with fresh GUIDs.");
+    }
+
     /// <summary>CLI entry for headless invocation.</summary>
     public static void RunHeadless()
     {
         Scaffold();
+        EditorApplication.Exit(0);
+    }
+
+    /// <summary>
+    /// CLI entry for headless force-scaffold — used by crash-fix (#1) batch invocation
+    /// to regenerate Boot/MainMenu/Loadout/PerfStress from scratch.
+    /// </summary>
+    public static void RunHeadlessForce()
+    {
+        ForceScaffold();
         EditorApplication.Exit(0);
     }
 
@@ -56,6 +104,16 @@ public static class SceneSetup
         if (File.Exists(path)) { Debug.Log("[SceneSetup] Boot.unity already exists, skipping"); return; }
 
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+
+        // MainCamera + AudioListener so the very first iOS frame renders something
+        // (bunny-cream clear) instead of black. Black-frame-on-launch is the symptom that
+        // looks like a crash to iOS WatchDog if no transition follows (see GH issue #1).
+        var cam = new GameObject("MainCamera");
+        var camera = cam.AddComponent<Camera>();
+        camera.clearFlags = CameraClearFlags.SolidColor;
+        camera.backgroundColor = new Color(1f, 0.92f, 0.76f); // bunny-cream
+        cam.tag = "MainCamera";
+        cam.AddComponent<AudioListener>();
 
         // [Bootstrap] root GameObject — hosts GameContextBootstrap.
         var bootstrap = new GameObject("[Bootstrap]");
@@ -68,6 +126,18 @@ public static class SceneSetup
         else
         {
             Debug.LogWarning("[SceneSetup] GameContextBootstrap type not resolved — Boot scene shipped without it.");
+        }
+
+        // [SceneFlow] sibling — listens for Bootstrapper.GameContextReady and loads Run.
+        var sceneFlow = new GameObject("[SceneFlow]");
+        var sceneFlowType = FindType("Brave.Systems.Context.SceneFlow");
+        if (sceneFlowType != null)
+        {
+            sceneFlow.AddComponent(sceneFlowType);
+        }
+        else
+        {
+            Debug.LogWarning("[SceneSetup] SceneFlow type not resolved — Boot scene will not transition.");
         }
 
         // EventSystem so UI input works on first run.
@@ -231,6 +301,19 @@ public static class SceneSetup
         cam.tag = "MainCamera";
         cam.AddComponent<AudioListener>();
 
+        // Attach FpsSampler so PerfStressFpsTest can read AverageFps without a separate
+        // populator pass. Resolved by name to avoid a hard reference from this Editor
+        // script to the Brave.Diagnostics asmdef.
+        var fpsType = FindType("Brave.Diagnostics.FpsSampler");
+        if (fpsType != null)
+        {
+            cam.AddComponent(fpsType);
+        }
+        else
+        {
+            Debug.LogWarning("[SceneSetup] Brave.Diagnostics.FpsSampler not resolved — PerfStress scene missing FpsSampler.");
+        }
+
         // Light so things render in screenshots.
         var light = new GameObject("DirectionalLight");
         light.AddComponent<Light>().type = LightType.Directional;
@@ -242,22 +325,31 @@ public static class SceneSetup
 
     private static void RegisterInBuildSettings()
     {
-        var scenes = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
-        var have = new HashSet<string>();
-        foreach (var s in scenes) have.Add(s.path);
+        // Force AssetDatabase to re-import any freshly-created .unity files so their
+        // GUIDs are queryable below (fixes the ForceScaffold case where the old
+        // EditorBuildSettings entry had a stale all-zero GUID).
+        AssetDatabase.Refresh();
 
-        foreach (var p in new[] {
+        var canonical = new[] {
             $"{SceneDir}/Boot.unity",
             $"{SceneDir}/MainMenu.unity",
             $"{SceneDir}/Loadout.unity",
             $"{SceneDir}/Run.unity",
             $"{SceneDir}/PerfStress.unity"
-        })
+        };
+
+        // Start from existing list so any author-added scenes survive, but replace
+        // entries for our canonical paths so their GUIDs match the current asset.
+        var existing = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
+        var canonicalSet = new HashSet<string>(canonical);
+        existing.RemoveAll(s => canonicalSet.Contains(s.path));
+
+        foreach (var p in canonical)
         {
-            if (have.Contains(p) || !File.Exists(p)) continue;
-            scenes.Add(new EditorBuildSettingsScene(p, enabled: true));
+            if (!File.Exists(p)) continue;
+            existing.Add(new EditorBuildSettingsScene(p, enabled: true));
         }
-        EditorBuildSettings.scenes = scenes.ToArray();
+        EditorBuildSettings.scenes = existing.ToArray();
         Debug.Log($"[SceneSetup] EditorBuildSettings.scenes now: {EditorBuildSettings.scenes.Length}");
     }
 

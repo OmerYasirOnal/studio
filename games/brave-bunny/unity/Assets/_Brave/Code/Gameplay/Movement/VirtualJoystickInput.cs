@@ -14,6 +14,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+// Disambiguate: UnityEngine also defines TouchPhase (legacy Input). We want the Input System variant.
+using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 
 namespace Brave.Gameplay.Movement
 {
