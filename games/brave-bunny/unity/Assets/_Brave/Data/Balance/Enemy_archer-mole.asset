@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d773eef46f4354817b62be7b30586532, type: 3}
+  m_Name: Enemy_archer-mole
+  m_EditorClassIdentifier: 
+  slug: archer-mole
+  role: 2
+  biome: {fileID: 0}
+  prefab: {fileID: 0}
+  baseHP: 16
+  contactDamage: 4
+  rangedDamage: 12
+  moveSpeed: 4.0499997
+  defenseMultiplier: 0
+  drops:
+    xpGemSmallChance: 0
+    xpGemMediumChance: 0
+    xpGemLargeChance: 0
+    goldCoinChance: 0
+    heartChance: 0
+    soulShardsOnKill: 0
+  telegraphSfxKey: 
+  telegraphWindowSeconds: 0.5

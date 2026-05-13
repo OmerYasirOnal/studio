@@ -19,8 +19,12 @@ namespace Brave.Boot.Editor
 {
     public static class BalanceJsonImporter
     {
-        // Relative paths from the Unity project root.
-        private const string BalanceDataDir = "../data/balance";
+        // Relative paths from Application.dataPath (= <project>/Assets/).
+        // The balance JSON lives at <project>/../../data/balance relative to Assets/,
+        // i.e. two directories up from Assets/ → the game root → data/balance.
+        // (Application.dataPath = .../brave-bunny/unity/Assets  →  ../../data/balance
+        //  resolves to .../brave-bunny/data/balance which matches the repo layout.)
+        private const string BalanceDataDir = "../../data/balance";
         private const string OutputDir = "Assets/_Brave/Data/Balance";
 
         [MenuItem("Brave/Generate Balance SOs from JSON")]
