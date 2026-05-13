@@ -7,11 +7,13 @@
 // KPI (per wireframe): Joystick → bunny within 1 frame (16 ms). HUD readable
 // in iPhone SE 3 thumb-occluded zones.
 //
-// Wave-5 wiring contract:
-//   * The HUD reads its per-frame state from an IRunRuntimeState binding,
-//     populated by gameplay-engineer in a future dispatch. When no binding is
-//     attached we fall back to a RunHudStubRuntime so the HUD renders
-//     plausible placeholder values in editor + EditMode tests.
+// Wiring contract (ADR-0021):
+//   * BindState(IRunRuntimeState) is the preferred wiring path. RunBootstrap
+//     calls it once after UXML is mounted. The HUD subscribes to StateChanged
+//     and redraws the full view on each signal.
+//   * When no binding is attached (or the binding is later cleared), the
+//     controller falls back to per-frame Update() + RunHudStubRuntime so the
+//     HUD renders plausible placeholder values in editor + EditMode tests.
 //   * Pulse events (level-up, pickup, pause-button) still flow through the
 //     existing ScriptableObject channels and the UIEvents bus — that contract
 //     is unchanged from Phase-5 Wave-1.
@@ -58,10 +60,8 @@ namespace Brave.UI.Controllers
         [SerializeField] private PickupChannel? _pickupChannel;
 
         /// <summary>
-        /// Per-frame state binding. Populated by gameplay-engineer's RunService
-        /// in a future dispatch. When <c>null</c>, the controller falls back to
-        /// <see cref="RunHudStubRuntime"/> so the HUD renders plausible values
-        /// in editor.
+        /// Per-frame state binding. Set via <see cref="BindState"/> or directly.
+        /// When <c>null</c>, the controller falls back to <see cref="RunHudStubRuntime"/>.
         /// </summary>
         public IRunRuntimeState? State { get; set; }
 
@@ -70,8 +70,35 @@ namespace Brave.UI.Controllers
         private readonly RunHudStubRuntime _fallbackState = new();
         private readonly HudElements _elements = new();
 
+        // Retained so the fallback Update() path can show elapsed time even
+        // without a RunController bound (editor play, standalone preview).
+        private float _runStartTime;
+
         private int _accumulatedGoldPickup;
         private int _accumulatedHeartPickup;
+
+        // ---- Event-driven binding (ADR-0021) ----
+
+        /// <summary>
+        /// Binds the HUD to a live <see cref="IRunRuntimeState"/> implementation.
+        /// Call this after UXML is mounted (i.e. after OnEnable) so element refs are valid.
+        /// Idempotent: rebinding unsubscribes the previous state first.
+        /// On bind an immediate <see cref="Render"/> pass is performed so the HUD
+        /// shows correct values before the first <see cref="IRunRuntimeState.StateChanged"/> fires.
+        /// </summary>
+        public void BindState(IRunRuntimeState state)
+        {
+            if (State != null) State.StateChanged -= OnStateChanged;
+            State = state;
+            State.StateChanged += OnStateChanged;
+            // Immediate sync.
+            Render(State, _elements);
+        }
+
+        private void OnStateChanged()
+        {
+            if (State != null) Render(State, _elements);
+        }
 
         private void Awake()
         {
@@ -85,6 +112,7 @@ namespace Brave.UI.Controllers
             _elements.BindFrom(_doc.rootVisualElement);
             _elements.PauseButton.clicked += OnPauseClicked;
 
+            _runStartTime = Time.time;
             _accumulatedGoldPickup = 0;
             _accumulatedHeartPickup = 0;
 
@@ -99,11 +127,25 @@ namespace Brave.UI.Controllers
             if (_levelUpChannel != null) _levelUpChannel.Unsubscribe(OnLevelUp);
             if (_pickupChannel != null) _pickupChannel.Unsubscribe(OnPickup);
             _elements.PauseButton.clicked -= OnPauseClicked;
+
+            // Detach event subscription so we don't hold a reference after disable.
+            if (State != null)
+            {
+                State.StateChanged -= OnStateChanged;
+                State = null;
+            }
         }
 
         private void Update()
         {
-            Render(State ?? _fallbackState, _elements);
+            // When a live state is bound via BindState(), redraws happen through
+            // OnStateChanged() and we skip the per-frame poll to avoid double-work.
+            // When no state is bound we fall back to polling the stub every frame
+            // so the HUD renders plausible preview values in editor.
+            if (State == null)
+            {
+                Render(_fallbackState, _elements);
+            }
         }
 
         /// <summary>
