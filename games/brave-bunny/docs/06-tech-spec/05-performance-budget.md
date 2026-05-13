@@ -99,6 +99,30 @@ Triage ladder. Each step is reversible; we never bake quality regressions into t
 
 The triage is logged: every applied fallback writes an entry to `games/brave-bunny/logs/perf-triage.jsonl` so the post-mortem is honest about which knobs we turned.
 
+## Stress smoke test
+
+An automated PlayMode test validates the perf contract at the scene level.
+
+| Artefact | Path |
+|---|---|
+| Populator (Editor menu) | `unity/Assets/Editor/PerfStressPopulator.cs` |
+| FPS sampler component | `unity/Assets/_Brave/Code/Diagnostics/FpsSampler.cs` |
+| PlayMode test | `unity/Assets/_Brave/Code/Tests/PlayMode/Performance/PerfStressFpsTest.cs` |
+
+**How to run:**
+
+1. Open the Unity project.
+2. Menu: **Brave > Populate PerfStress (200/50/30)** — spawns 200 enemy GameObjects (circle r=30u), 50 projectile spheres, 30 VFX placeholder cubes, and attaches `FpsSampler` to the MainCamera.
+3. Open **Window > General > Test Runner**, select **PlayMode**, filter by `Category=Performance`, and run `PerfStressFpsTest`.
+
+**Assertion:** `FpsSampler.AverageFps >= 30` after a 3-second warmup.
+The 30 fps floor is intentionally loose so the test passes on slow CI VMs; the iPhone 12 hardware target remains 60 fps. Editor runs are treated as soft-pass (frame times in Editor are unreliable).
+
+**CI integration:** tag `[Category("Performance")]` lets resource-constrained runners skip via:
+```
+dotnet test --filter "Category!=Performance"
+```
+
 ## Cross-references
 
 - `brave-bunny/CLAUDE.md` — perf contract (60 fps, 200 enemies, 80 DC, 250k tris).
