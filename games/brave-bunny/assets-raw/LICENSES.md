@@ -32,6 +32,16 @@ Every asset under `assets-raw/` must appear in this table. asset-curator maintai
 | textures/ambientcg/Ground037_2K-JPG.zip | ambientCG | CC0 1.0 | https://ambientcg.com/view?id=Ground037 | Lennart Demes (ambientCG) | 2026-05-12 |
 | custom/branding/app-icon-1024.svg | In-house (Studio) | MIT (in-house) | n/a (in-house) | Yasir Önal (orchestrator) — palette per docs/07-art-bible/01-color-palette.md; see ADR-0016 | 2026-05-12 |
 | custom/branding/app-icon-1024.png | In-house (Studio) | MIT (in-house) | n/a (in-house, derived from app-icon-1024.svg via `rsvg-convert -w 1024 -h 1024 -f png` + PIL RGB flatten) | Yasir Önal (orchestrator) — derivative of app-icon-1024.svg; see ADR-0016 | 2026-05-12 |
+| icons/hud/icon_hud_hp.png | Kenney Game Icons | CC0 1.0 | https://kenney.nl/media/pages/assets/game-icons/94af1f5c0b-1677661579/kenney_game-icons.zip | Kenney (Asbjørn Thirslund) | 2026-05-13 |
+| icons/hud/icon_hud_xp.png | Kenney Game Icons | CC0 1.0 | https://kenney.nl/media/pages/assets/game-icons/94af1f5c0b-1677661579/kenney_game-icons.zip | Kenney (Asbjørn Thirslund) | 2026-05-13 |
+| icons/hud/icon_hud_timer.png | Kenney Game Icons | CC0 1.0 | https://kenney.nl/media/pages/assets/game-icons/94af1f5c0b-1677661579/kenney_game-icons.zip | Kenney (Asbjørn Thirslund) | 2026-05-13 |
+| icons/hud/icon_hud_wave.png | Kenney Game Icons | CC0 1.0 | https://kenney.nl/media/pages/assets/game-icons/94af1f5c0b-1677661579/kenney_game-icons.zip | Kenney (Asbjørn Thirslund) | 2026-05-13 |
+| icons/hud/icon_hud_kills.png | Kenney Game Icons | CC0 1.0 | https://kenney.nl/media/pages/assets/game-icons/94af1f5c0b-1677661579/kenney_game-icons.zip | Kenney (Asbjørn Thirslund) | 2026-05-13 |
+| icons/hud/icon_hud_pause.png | Kenney Game Icons | CC0 1.0 | https://kenney.nl/media/pages/assets/game-icons/94af1f5c0b-1677661579/kenney_game-icons.zip | Kenney (Asbjørn Thirslund) | 2026-05-13 |
+| icons/hud/boss-warning.svg | In-house (Studio) | MIT (in-house) | n/a — hand-authored SVG; danger triangle + skull silhouette; 64×64 viewBox | asset-curator (Claude Sonnet 4.6) | 2026-05-13 |
+| icons/hud/icon_hud_boss_warning.png | In-house (Studio) | MIT (in-house) | n/a — rsvg-convert derivative of boss-warning.svg at 64×64 | asset-curator (Claude Sonnet 4.6) | 2026-05-13 |
+| icons/hud/revive.svg | In-house (Studio) | MIT (in-house) | n/a — hand-authored SVG; heart with upward arrow; 64×64 viewBox | asset-curator (Claude Sonnet 4.6) | 2026-05-13 |
+| icons/hud/icon_hud_revive.png | In-house (Studio) | MIT (in-house) | n/a — rsvg-convert derivative of revive.svg at 64×64 | asset-curator (Claude Sonnet 4.6) | 2026-05-13 |
 
 ## Best-effort fetches attempted (2026-05-12)
 
