@@ -40,6 +40,19 @@
 
 ## Phase 5 — Prototype (MILESTONE HIT — first .ipa archive shipped)
 
+## Wave 6 (2026-05-13) — agent-routed, 6 parallel agents
+
+| Subsystem | Status | Commit |
+|---|---|---|
+| **Crash fix** — empty scenes → populated; Boot→Run SceneFlow; null-safe Bootstrap | ✅ shipped | `7cce787` (closes #1) |
+| **PerfStress populator** + FPS PlayMode test (200 enemies, 50 projectiles, 30 VFX) | ✅ shipped | `5fafb43` |
+| **ADR-0020** WeaponArchetypeConfig + 3 archetypes + EnemyRole.Boss | ✅ shipped | `f0a1b46` |
+| **IDeathListener** + enemy pool return (ADR-0019 item 3) | ✅ shipped (same commit) | `f0a1b46` |
+| **8 HUD icons** — 6 Kenney CC0 + 2 custom SVG | ✅ shipped | `bac168b` |
+| **IRunRuntimeState live binding** — RunController impl + BindState | ⏸️ deferred — duplicate interface conflict with Wave 5; needs reconciliation | branch `worktree-agent-ad5bee576529346e8` |
+
+Wave 6 totals: 5 commits on main + 1 deferred branch. EditMode tests: 209 total (198 pass, 11 fail — pre-existing ADR-0019 backlog, not regressions). PlayMode: 7/7 pass.
+
 What was done autonomously this session series (commits `ac688ed` → `3716734`):
 
 - [x] Unity 6 LTS 6000.0.74f1 + iOS Build Support installed via `Unity Hub --headless`
@@ -55,29 +68,33 @@ What was done autonomously this session series (commits `ac688ed` → `3716734`)
 - [x] ADR-0015: test/production API drift documented
 - [x] GitHub Actions: 5 ASC secrets set on `OmerYasirOnal/studio`; `bb-ios-build.yml` workflow live
 
-## Active blockers (require user action — confirmed 2026-05-12 retry)
+## Active blockers (2026-05-13 status)
 
-These are the **only** two things between us and a TestFlight build. Both verified blockers with retry:
+### 🔴 P0 — TestFlight 0.1.0(2) crashes on launch (Issue #1)
 
-### 1. ASC app entry creation (~30 sec — one Apple web-UI click)
+Tester report: iPhone 14 Pro / iOS 26.3.1 / build 0.1.0(2) crashes immediately.
 
-The bundle id is registered on Apple Developer Portal, but no App Store Connect app entry exists yet. The ASC API key (`93HFBMV3MA`) has read-only Developer role; Apple's API returned `The resource 'apps' does not allow 'CREATE'`. The Fastfile was updated to call `Spaceship::ConnectAPI::App.create` directly (commit follow-up), so the error message is now accurate.
+**Root cause:** Boot/MainMenu/Loadout/PerfStress scenes shipped EMPTY (12 YAML docs each, 0 GameObjects). `SceneSetup.cs::Ensure*` methods skip if file exists, so the empty .unity placeholders no-op the scaffolder. No SceneManager.LoadScene call exists anywhere in non-test code → no Boot → Run transition.
 
-**Path A — upgrade API key role:**
+**Fix:** Wave 6 / `crash-fix-engineer` agent dispatched 2026-05-13. See Issue #1 for full diagnosis.
 
-1. Visit <https://appstoreconnect.apple.com/access/api>
-2. Find key `93HFBMV3MA`, change role to **App Manager**
-3. Re-run: `cd games/brave-bunny/tools/ci/fastlane && fastlane register_app`
+### ✅ ASC app entry — RESOLVED (verified via `fastlane list_apps` 2026-05-13)
 
-**Path B — manual web UI (faster, one-time):**
+```
+com.omeryasir.bravebunny   Brave Bunny: Survivors
+```
 
-1. Visit <https://appstoreconnect.apple.com/apps>
-2. Click `+` → New App
-3. Fill: iOS, name "Brave Bunny", language English (U.S.), bundle id `com.omeryasir.bravebunny` (dropdown), SKU `bravebunny`
+Entry exists in ASC. The earlier "ASC API key role" gate was already cleared.
 
-### 2. Apply pending CI workflow update (~30 sec — one gh auth refresh)
+### ✅ Repo visibility — PUBLIC (flipped 2026-05-13)
 
-The `gh` token lacks the `workflow` scope, so `apply-pending-workflow.sh` correctly refuses. Current scopes: `delete:packages, delete_repo, gist, read:org, read:packages, repo`.
+`gh repo edit OmerYasirOnal/studio --visibility public`. Side benefits: unlimited free CI minutes, no `workflow`-scope gate for community PRs.
+
+### 🟡 P2 — Apply pending bb-ios-build.yml workflow update
+
+`gh` token still lacks `workflow` scope; `apply-pending-workflow.sh` correctly refuses. NOT a blocker for shipping (local `fastlane beta` works), only blocks auto-CI builds.
+
+**Path to fix (one-time, user-side):**
 
 ```bash
 gh auth refresh --hostname github.com --scopes workflow

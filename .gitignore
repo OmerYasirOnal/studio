@@ -2,6 +2,10 @@
 .DS_Store
 Thumbs.db
 
+# Claude Code worktrees + agent transcripts
+.claude/worktrees/
+.claude/tasks/
+
 # Editors
 .idea/
 .vscode/
