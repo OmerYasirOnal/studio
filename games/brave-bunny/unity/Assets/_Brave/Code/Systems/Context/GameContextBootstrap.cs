@@ -82,6 +82,15 @@ public sealed class GameContextBootstrap : MonoBehaviour
         var sfx = new SfxDispatcher(mixerDriver, transform);
         ctx.Register<ISfxDispatcher>(sfx);
 
+        // BgmGameplayDriver: scene/state → BGM snapshot routing. Pure-C# service; the
+        // [SceneFlow] component in Boot.unity does the actual SceneManager.LoadSceneAsync,
+        // so the driver's AttachSceneAutoTransitions() picks up activeSceneChanged after
+        // that load completes. GameplayAudioBindings itself is a MonoBehaviour that lives
+        // in the Run scene (channel SO refs are wired there) — it is NOT registered here.
+        var bgmDriver = new BgmGameplayDriver(music);
+        bgmDriver.AttachSceneAutoTransitions();
+        ctx.Register<BgmGameplayDriver>(bgmDriver);
+
         var progression = new ProgressionService(save);
         ctx.Register<IProgressionService>(progression);
 
