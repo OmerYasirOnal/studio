@@ -1,0 +1,182 @@
+# bb-weekly-ios-smoke.yml — Brave Bunny weekly iOS toolchain smoke build.
+#
+# Owner: build-engineer. Cross-ref: tech-spec 10-build-and-ci.md (Wave 11 — scheduled CI).
+#
+# WHAT
+#   Every Monday at 04:00 UTC, runs the full `fastlane ios preview` lane
+#   end-to-end: Unity → Xcode → fastlane gym. Does NOT upload to TestFlight.
+#   The goal is to detect rot in the macOS / Xcode / Unity / fastlane chain
+#   between manual ship builds, before we hit a real release crunch.
+#
+# WHY
+#   `bb-ios-build.yml` is manual + label-gated to protect mac-minutes, so the
+#   pipeline can quietly break (Xcode bump, Unity package drift, fastlane gem
+#   yank) between explicit ship attempts. A weekly preview build keeps the
+#   toolchain warm and surfaces breakage early.
+#
+# COST AWARENESS
+#   One full iOS build ≈ 30-50 mac-min. Weekly cadence → ~200 mac-min/month.
+#   That alone consumes the GitHub Free macOS budget, so we DO NOT add more
+#   scheduled mac jobs without revisiting cost in tech-spec 10.
+#
+# TRIGGERS
+#   - schedule: 04:00 UTC every Monday (after the nightly tests, so we don't
+#     fight for the macOS runner queue)
+#   - workflow_dispatch: manual fallback for ad-hoc smoke verification
+#
+# TODO (out of scope this wave)
+#   - Slack / Discord notification on failure (issue is opened instead for now)
+
+name: bb-weekly-ios-smoke
+
+on:
+  schedule:
+    - cron: "0 4 * * 1"   # Monday 04:00 UTC
+  workflow_dispatch: {}
+
+concurrency:
+  group: bb-weekly-ios-smoke
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: write
+  actions: read
+
+jobs:
+  ios-smoke:
+    name: iOS smoke build (fastlane preview, no upload)
+    runs-on: macos-14
+    timeout-minutes: 75
+
+    env:
+      UNITY_VERSION: 6000.0.31f1
+      LANE: preview
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          lfs: true
+          fetch-depth: 0
+
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: games/brave-bunny/unity/Library
+          key: Library-brave-bunny-iOS-${{ hashFiles('games/brave-bunny/unity/Packages/manifest.json') }}
+          restore-keys: |
+            Library-brave-bunny-iOS-
+            Library-brave-bunny-
+
+      - name: Build with Unity (headless via game-ci)
+        uses: game-ci/unity-builder@v4
+        with:
+          targetPlatform: iOS
+          unityVersion: ${{ env.UNITY_VERSION }}
+          projectPath: games/brave-bunny/unity
+          buildMethod: Brave.Boot.IOSBuilder.Build
+          buildName: BraveBunny
+          customParameters: -output ../unity/Build/iOS
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+          working-directory: games/brave-bunny/tools/ci/fastlane
+
+      - name: Install fastlane + plugins
+        working-directory: games/brave-bunny/tools/ci/fastlane
+        run: |
+          gem install bundler
+          bundle config set deployment 'true'
+          bundle install
+
+      - name: Run fastlane preview (no upload)
+        working-directory: games/brave-bunny/tools/ci/fastlane
+        env:
+          CI: "true"
+          # Smoke build only — DO NOT pass TestFlight upload credentials so the
+          # preview lane cannot accidentally ship a build. fastlane's preview
+          # lane is configured to skip upload regardless, this is belt + braces.
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_AUTHOR: ${{ secrets.MATCH_GIT_AUTHOR }}
+          FASTLANE_TEAM_ID: ${{ secrets.FASTLANE_TEAM_ID }}
+        run: bundle exec fastlane ios ${{ env.LANE }}
+
+      - name: Upload smoke IPA artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: BraveBunny-iOS-smoke-${{ github.run_number }}
+          path: games/brave-bunny/Builds/*.ipa
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: Upload Unity build logs (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-smoke-logs-${{ github.run_number }}
+          path: |
+            games/brave-bunny/unity/Logs/
+            games/brave-bunny/tools/ci/fastlane/fastlane.log
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Open failure issue
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const title = `[ci-failure] Weekly iOS smoke build failed — run #${context.runNumber}`;
+            const body = [
+              `Weekly iOS smoke build (\`fastlane ios preview\`) failed on \`main\`.`,
+              ``,
+              `- Run: ${runUrl}`,
+              `- Date (UTC): ${new Date().toISOString()}`,
+              ``,
+              `**Likely culprits** (in order of historical likelihood):`,
+              `1. Xcode version bump on \`macos-14\` runner — check Xcode release notes`,
+              `2. Unity package drift — diff \`Packages/manifest.json\``,
+              `3. fastlane / cocoapods gem yank — check \`Gemfile.lock\``,
+              `4. match cert expiry — re-run \`fastlane match\` locally`,
+              ``,
+              `_Filed automatically by bb-weekly-ios-smoke.yml — Wave 11 scheduled CI._`,
+            ].join('\n');
+
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'ci-failure',
+              per_page: 50,
+            });
+            const match = existing.data.find(i => i.title.startsWith('[ci-failure] Weekly iOS smoke build failed'));
+
+            if (match) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: match.number,
+                body,
+              });
+              core.info(`Commented on existing ci-failure issue #${match.number}`);
+            } else {
+              const created = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['ci-failure'],
+                assignees: ['OmerYasirOnal'],
+              });
+              core.info(`Opened ci-failure issue #${created.data.number}`);
+            }
