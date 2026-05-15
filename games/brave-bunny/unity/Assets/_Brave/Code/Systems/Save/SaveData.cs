@@ -38,6 +38,11 @@ public sealed class SaveData
     // to mount the overlay on Run-scene start. Forward-compat per ADR-0008
     // (missing key in v1 saves deserializes as default false).
     [JsonProperty("tutorialSeen")] public bool TutorialSeen;
+    // Wave 9: opaque IAP receipt tokens (<sku>_<utc_timestamp>). One-time
+    // non-consumable SKUs (ad removal, character unlocks, BP premium) check
+    // this list to gate duplicate purchases. The platform-issued receipts
+    // remain inside Unity IAP's own store and are not persisted here.
+    [JsonProperty("purchaseReceipts")] public List<string> PurchaseReceipts = new();
     [JsonProperty("createdAt")] public string CreatedAt = DateTime.UtcNow.ToString("o");
     [JsonProperty("lastSavedAt")] public string LastSavedAt = DateTime.UtcNow.ToString("o");
 
