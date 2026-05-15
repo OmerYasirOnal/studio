@@ -183,6 +183,10 @@ namespace Brave.UI.Controllers
                  "forwarded so the run state machine reflects the modal lifecycle.")]
         [SerializeField] private RunController? _runController;
 
+        [Tooltip("Wave 10 QoL — optional quit-confirm dialog. When wired, Quit-to-Menu " +
+                 "interposes the confirm modal instead of calling QuitToMenu directly.")]
+        [SerializeField] private QuitConfirmController? _quitConfirm;
+
         private UIDocument _doc = null!;
         private LocalizationProvider _loc = null!;
         private Button _btnResume = null!;
@@ -223,7 +227,7 @@ namespace Brave.UI.Controllers
             _btnResume.clicked += _logic.Resume;
             _btnSettings.clicked += OnSettingsClicked;
             _btnRestart.clicked += _logic.RestartRun;
-            _btnQuit.clicked += _logic.QuitToMenu;
+            _btnQuit.clicked += OnQuitClicked;
 
             UIEvents.PauseRunRequested += OnPauseRequested;
 
@@ -238,7 +242,7 @@ namespace Brave.UI.Controllers
             _btnResume.clicked -= _logic.Resume;
             _btnSettings.clicked -= OnSettingsClicked;
             _btnRestart.clicked -= _logic.RestartRun;
-            _btnQuit.clicked -= _logic.QuitToMenu;
+            _btnQuit.clicked -= OnQuitClicked;
             UIEvents.PauseRunRequested -= OnPauseRequested;
 
             // If the panel is being torn down while paused, restore time so the
@@ -265,6 +269,17 @@ namespace Brave.UI.Controllers
         private void OnPauseRequested() => _logic.Show();
 
         private void OnSettingsClicked() => UIEvents.RaisePushScreen(PauseModalLogic.SettingsScreenName);
+
+        /// <summary>
+        /// Wave 10 QoL — interpose the QuitConfirm dialog when wired, otherwise
+        /// fall back to the immediate quit. The confirm dialog itself handles
+        /// timescale restore + scene load on Confirm.
+        /// </summary>
+        private void OnQuitClicked()
+        {
+            if (_quitConfirm != null) _quitConfirm.Show();
+            else _logic.QuitToMenu();
+        }
 
         private void OnVisibilityChanged(bool visible) => SetRootHidden(!visible);
 

@@ -1,0 +1,17 @@
+{
+    "name": "Brave.Systems.Lifecycle",
+    "rootNamespace": "Brave.Systems.Lifecycle",
+    "references": [
+        "Brave.Systems",
+        "Brave.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

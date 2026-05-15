@@ -19,6 +19,7 @@ public interface ISettingsService : IService
     void SetAudioSfx(float linear);
     void SetHaptics(bool on);
     void SetLanguage(LanguageCode code);
+    void SetDevModeEnabled(bool enabled);
     void Commit();
 }
 
@@ -46,6 +47,7 @@ public sealed class SettingsService : ISettingsService
     public void SetAudioSfx(float linear)    { Current.AudioSfx    = Clamp01(linear); RaiseChanged(); }
     public void SetHaptics(bool on)          { Current.HapticsEnabled = on; RaiseChanged(); }
     public void SetLanguage(LanguageCode code) { Current.Language = code; RaiseChanged(); }
+    public void SetDevModeEnabled(bool enabled) { Current.DevModeEnabled = enabled; RaiseChanged(); }
 
     /// <summary>Flush settings into the save POCO and trigger a save write. Called on modal close.</summary>
     public void Commit()
@@ -58,6 +60,7 @@ public sealed class SettingsService : ISettingsService
         s.LowPowerMode = Current.LowPowerMode;
         s.TapToMove = Current.TapToMove;
         s.Language = Current.Language.ToIso();
+        s.DevModeEnabled = Current.DevModeEnabled;
         _save.Save(); // 03-save-system.md trigger: "Settings changed"
     }
 
@@ -70,6 +73,7 @@ public sealed class SettingsService : ISettingsService
         LowPowerMode = raw.LowPowerMode,
         TapToMove = raw.TapToMove,
         Language = LanguageCodeExtensions.FromIso(raw.Language),
+        DevModeEnabled = raw.DevModeEnabled,
     };
 
     private void RaiseChanged() => OnChanged?.Invoke(Current);

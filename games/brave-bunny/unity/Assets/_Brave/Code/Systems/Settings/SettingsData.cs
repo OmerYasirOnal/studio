@@ -21,4 +21,6 @@ public sealed class SettingsData
     public bool LowPowerMode;
     public bool TapToMove;
     public LanguageCode Language = LanguageCode.En;
+    // Wave 10 QoL — gates the FPS counter overlay (no UI yet, cheat-only).
+    public bool DevModeEnabled;
 }
