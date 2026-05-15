@@ -23,4 +23,7 @@ public sealed class SettingsData
     public LanguageCode Language = LanguageCode.En;
     // Wave 10 QoL — gates the FPS counter overlay (no UI yet, cheat-only).
     public bool DevModeEnabled;
+    // Wave 11 — GDPR-friendly opt-in for the local crash reporter. The
+    // CrashReportPrompt UI is the only consumer that flips this to true.
+    public bool CrashOptInEnabled;
 }
