@@ -316,6 +316,13 @@ public sealed class RunController : MonoBehaviour, IRunRuntimeState
         // meta services (BgmGameplayDriver run-end snapshot, CharacterUnlockService
         // run-completion + boss-defeat tally) can react without Gameplay→Systems
         // asmdef coupling. Bridge is a static no-op when no listener is bound.
+        //
+        // Wave 9: BattlePassService.GrantXp(report.xpGained / 10) is dispatched
+        // by the Systems-side bridge subscriber (GameContextBootstrap →
+        // DispatchRunEndToMetaServices). RunController itself cannot reach the
+        // service because Brave.Gameplay does NOT reference Brave.Systems (and
+        // adding that reference would form a cycle — Brave.Systems references
+        // Brave.Gameplay already). Bridge dispatch keeps the dependency one-way.
         RunEndIntegrationBridge.Notify(report);
 
         UnsubscribeFromChannels();

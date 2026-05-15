@@ -1,0 +1,290 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99895e332a1a42169241a9f90e9a512c, type: 3}
+  m_Name: Season1Config
+  m_EditorClassIdentifier:
+  seasonId: season-1
+  startDate: 2026-05-15
+  endDate: 2026-07-15
+  tierXpThresholds:
+  - 1000
+  - 2000
+  - 3000
+  - 4000
+  - 5000
+  - 6000
+  - 7000
+  - 8000
+  - 9000
+  - 10000
+  - 11000
+  - 12000
+  - 13000
+  - 14000
+  - 15000
+  - 16000
+  - 17000
+  - 18000
+  - 19000
+  - 20000
+  - 21000
+  - 22000
+  - 23000
+  - 24000
+  - 25000
+  - 26000
+  - 27000
+  - 28000
+  - 29000
+  - 30000
+  freeRewards:
+  - currencyType: 0
+    amount: 100
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 120
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 150
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 175
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 10
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 200
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 220
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 250
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 275
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 25
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 300
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 325
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 350
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 375
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 50
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 400
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 425
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 450
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 475
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 75
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 500
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 525
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 550
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 600
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 100
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 650
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 700
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 750
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 800
+    isPremium: 0
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 150
+    isPremium: 0
+    characterTokenSlug: fox
+  premiumRewards:
+  - currencyType: 0
+    amount: 250
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 15
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 300
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 20
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 50
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 400
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 30
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 500
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 40
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 100
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 600
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 50
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 700
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 60
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 150
+    isPremium: 1
+    characterTokenSlug: badger
+  - currencyType: 0
+    amount: 800
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 75
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 900
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 90
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 200
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 1000
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 100
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 1100
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 125
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 250
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 1200
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 150
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 0
+    amount: 1500
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 200
+    isPremium: 1
+    characterTokenSlug:
+  - currencyType: 1
+    amount: 500
+    isPremium: 1
+    characterTokenSlug: owl
