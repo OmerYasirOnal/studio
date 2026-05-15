@@ -1,4 +1,4 @@
-# ios-build.yml — Brave Bunny iOS build pipeline.
+# bb-ios-build.yml — Brave Bunny iOS build pipeline (hardened, Wave 11).
 #
 # Owner: build-engineer. Cross-ref: tech-spec 10-build-and-ci.md ("CI: GitHub Actions").
 #
@@ -9,11 +9,21 @@
 #   - PR-triggered ONLY when the PR carries the `build:ios` label
 # No on-push or on-merge triggers in v0.1.
 #
-# DESTINATION: place this file at .github/workflows/ios-build.yml at the repo root.
-# It lives here under tools/ci/github-actions/ for ownership clarity; build-engineer
-# copies (or symlinks) into the workflows dir as part of repo setup.
+# WAVE 11 HARDENING (delta vs v0.1):
+#   - Unity version pin lifted to 6000.0.74f1 (matches ProjectVersion.txt)
+#   - Library/ cache now keyed on Unity version + manifest.json + ProjectVersion.txt
+#   - EditMode + PlayMode test gates run BEFORE the iOS archive (fail-fast).
+#     Tests share the same cached Library so the archive step is warm.
+#   - Unity logfile artifact upload on failure (test step + build step).
+#   - On success, a local-only notification stub records the commit SHA into a
+#     run-summary file. When a real notification surface lands (observer dashboard
+#     or GitHub issue tracker), swap the stub for the real call.
+#
+# DESTINATION: this file lives at .github/workflows/bb-ios-build.yml (canonical).
+# A copy under games/brave-bunny/tools/ci/github-actions/ios-build.yml is kept
+# for ownership clarity; the apply-pending-workflow.sh script syncs it here.
 
-name: ios-build
+name: bb-ios-build
 
 on:
   # Manual trigger — primary entry point in v0.1.
@@ -27,6 +37,11 @@ on:
         options:
           - preview
           - beta
+      skip_tests:
+        description: "Skip EditMode + PlayMode test gates (emergency only)"
+        required: false
+        default: false
+        type: boolean
 
   # Label-gated PR trigger — opt-in per PR to control mac-minutes burn.
   pull_request:
@@ -35,6 +50,7 @@ on:
     paths:
       - "games/brave-bunny/unity/**"
       - "games/brave-bunny/tools/ci/**"
+      - ".github/workflows/bb-ios-build.yml"
 
 jobs:
   ios:
@@ -44,11 +60,17 @@ jobs:
       (github.event_name == 'pull_request' && github.event.label.name == 'build:ios')
 
     runs-on: macos-14    # macOS 14 runner — required for Xcode 16 / iOS SDK 17+
-    timeout-minutes: 60  # hard cap to protect mac-minutes budget
+    timeout-minutes: 90  # hard cap to protect mac-minutes budget; test + build is ~50min
 
     env:
-      UNITY_VERSION: 6000.0.31f1
+      # Unity 6 LTS pin — matches games/brave-bunny/unity/ProjectSettings/ProjectVersion.txt.
+      # Bumping here without bumping ProjectVersion.txt will fail the consistency check.
+      UNITY_VERSION: 6000.0.74f1
       LANE: ${{ inputs.lane || 'preview' }}
+      SKIP_TESTS: ${{ inputs.skip_tests || 'false' }}
+      UNITY_PROJECT_PATH: games/brave-bunny/unity
+      GIT_SHA: ${{ github.sha }}
+      GIT_SHA_SHORT: ${{ github.sha }}
 
     steps:
       - name: Checkout
@@ -57,28 +79,95 @@ jobs:
           lfs: true
           fetch-depth: 0
 
-      - name: Cache Unity Library
+      - name: Verify Unity version pin matches ProjectVersion.txt
+        shell: bash
+        run: |
+          PVT="$UNITY_PROJECT_PATH/ProjectSettings/ProjectVersion.txt"
+          if [[ ! -f "$PVT" ]]; then
+            echo "::error file=$PVT::ProjectVersion.txt missing — cannot verify Unity version pin"
+            exit 1
+          fi
+          PROJ_VER=$(grep '^m_EditorVersion:' "$PVT" | awk '{print $2}')
+          if [[ "$PROJ_VER" != "$UNITY_VERSION" ]]; then
+            echo "::error::UNITY_VERSION env ($UNITY_VERSION) != ProjectVersion.txt ($PROJ_VER). Bump both together."
+            exit 1
+          fi
+          echo "Unity version pin OK: $PROJ_VER"
+
+      - name: Cache Unity Library (shared between test + build)
         uses: actions/cache@v4
         with:
-          path: games/brave-bunny/unity/Library
-          key: Library-brave-bunny-iOS-${{ hashFiles('games/brave-bunny/unity/Packages/manifest.json') }}
+          path: ${{ env.UNITY_PROJECT_PATH }}/Library
+          # Key on Unity version + manifest.json + ProjectVersion.txt so Unity-upgrade
+          # PRs invalidate the cache cleanly. Restore-keys give a warm-start fallback.
+          key: Library-brave-bunny-iOS-${{ env.UNITY_VERSION }}-${{ hashFiles('games/brave-bunny/unity/Packages/manifest.json', 'games/brave-bunny/unity/ProjectSettings/ProjectVersion.txt') }}
           restore-keys: |
+            Library-brave-bunny-iOS-${{ env.UNITY_VERSION }}-
             Library-brave-bunny-iOS-
             Library-brave-bunny-
 
-      - name: Build with Unity (headless via game-ci)
+      # -----------------------------------------------------------------------
+      # Test gates (Wave 11) — fail-fast BEFORE we burn time on iOS archive.
+      # Toggle off only via the skip_tests workflow_dispatch input.
+      # -----------------------------------------------------------------------
+      - name: Run EditMode tests (fail-fast gate)
+        if: ${{ env.SKIP_TESTS != 'true' }}
+        uses: game-ci/unity-test-runner@v4
+        with:
+          projectPath: ${{ env.UNITY_PROJECT_PATH }}
+          unityVersion: ${{ env.UNITY_VERSION }}
+          testMode: editmode
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          artifactsPath: artifacts/editmode
+          customParameters: "-nographics"
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+
+      - name: Run PlayMode smoke tests (VerticalSliceSmokeTest + Boot smoke)
+        if: ${{ env.SKIP_TESTS != 'true' }}
+        uses: game-ci/unity-test-runner@v4
+        with:
+          projectPath: ${{ env.UNITY_PROJECT_PATH }}
+          unityVersion: ${{ env.UNITY_VERSION }}
+          testMode: playmode
+          # Filter to smoke tests so we don't run heavy perf tests on every PR.
+          # Heavier playmode tests live under bb-unity-test.yml on label opt-in.
+          testCategory: "Smoke"
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          artifactsPath: artifacts/playmode
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+
+      - name: Upload test result artifacts
+        if: ${{ always() && env.SKIP_TESTS != 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: unity-test-results-${{ github.run_number }}
+          path: artifacts/
+          retention-days: 14
+          if-no-files-found: warn
+
+      # -----------------------------------------------------------------------
+      # iOS build — only after tests pass.
+      # -----------------------------------------------------------------------
+      - name: Build with Unity (headless iOS player → Xcode project)
         uses: game-ci/unity-builder@v4
         with:
           targetPlatform: iOS
           unityVersion: ${{ env.UNITY_VERSION }}
-          projectPath: games/brave-bunny/unity
-          buildMethod: Brave.Boot.IOSBuilder.Build
+          projectPath: ${{ env.UNITY_PROJECT_PATH }}
+          buildMethod: BraveBunny.Editor.BuildScripts.BuildIOS
           buildName: BraveBunny
           customParameters: -output ../unity/Build/iOS
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          GIT_COMMIT_SHA: ${{ github.sha }}
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -101,6 +190,10 @@ jobs:
           CI: "true"
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_AUTHOR: ${{ secrets.MATCH_GIT_AUTHOR }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          ASC_API_KEY_KEY_ID: ${{ secrets.ASC_API_KEY_KEY_ID }}
+          ASC_API_KEY_ISSUER_ID: ${{ secrets.ASC_API_KEY_ISSUER_ID }}
+          ASC_API_KEY_CONTENT_B64: ${{ secrets.ASC_API_KEY_CONTENT_B64 }}
           FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
           FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
           FASTLANE_APP_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APP_SPECIFIC_PASSWORD }}
@@ -116,11 +209,57 @@ jobs:
           retention-days: 14
           if-no-files-found: warn
 
+      # -----------------------------------------------------------------------
+      # Failure diagnostics — always upload Unity logs on failure so the
+      # post-mortem in ci-troubleshooting.md has the artefacts to inspect.
+      # -----------------------------------------------------------------------
       - name: Upload Unity build logs (on failure)
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: unity-build-logs-${{ github.run_number }}
-          path: games/brave-bunny/unity/Logs/
+          path: |
+            games/brave-bunny/unity/Logs/
+            games/brave-bunny/unity/*.log
+            artifacts/
           retention-days: 7
           if-no-files-found: ignore
+
+      - name: Upload Xcode build logs (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcode-build-logs-${{ github.run_number }}
+          path: |
+            ~/Library/Logs/gym/
+            games/brave-bunny/tools/ci/fastlane/*.log
+            games/brave-bunny/Builds/*.log
+          retention-days: 7
+          if-no-files-found: ignore
+
+      # -----------------------------------------------------------------------
+      # Success notification stub (Wave 11). Today: writes commit SHA + build
+      # number + lane to the workflow summary. Tomorrow: swap for an issue
+      # tracker comment / observer dashboard event when that surface exists.
+      # -----------------------------------------------------------------------
+      - name: Notify success (local stub)
+        if: success()
+        shell: bash
+        run: |
+          {
+            echo "## ios-build success"
+            echo ""
+            echo "| field | value |"
+            echo "|---|---|"
+            echo "| commit | \`${GITHUB_SHA}\` |"
+            echo "| run #  | \`${GITHUB_RUN_NUMBER}\` |"
+            echo "| lane   | \`${LANE}\` |"
+            echo "| skip_tests | \`${SKIP_TESTS}\` |"
+            echo "| unity  | \`${UNITY_VERSION}\` |"
+            echo ""
+            echo "_Notification surface (issue tracker / observer) is a TODO — see ci-troubleshooting.md._"
+          } >> "$GITHUB_STEP_SUMMARY"
+          mkdir -p games/brave-bunny/logs
+          printf '{"ts":"%s","event":"ios_build_success","commit":"%s","run":"%s","lane":"%s"}\n' \
+            "$(date -u +%FT%TZ)" "$GITHUB_SHA" "$GITHUB_RUN_NUMBER" "$LANE" \
+            >> games/brave-bunny/logs/ci-events.jsonl || true
