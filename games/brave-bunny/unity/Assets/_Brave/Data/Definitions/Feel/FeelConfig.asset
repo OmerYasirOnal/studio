@@ -28,3 +28,8 @@ MonoBehaviour:
   screenshakeAmpHigh: 0.22
   screenshakeDurationSeconds: 0.12
   screenshakeFrequencyHz: 35
+  comboWindowSeconds: 2
+  comboTier1Threshold: 3
+  comboTier2Threshold: 5
+  comboTier3Threshold: 10
+  comboFadeOutSeconds: 0.5
