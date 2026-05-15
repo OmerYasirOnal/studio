@@ -6,7 +6,7 @@
 
 | Field | Type | Range | Notes |
 |---|---|---|---|
-| `schema_version` | string | "1.0" | Bump on breaking change. |
+| `schema_version` | string | "1.1" | Bump on breaking change. `1.1` (Wave 9) adds Beach + Cavern rosters; field set unchanged. |
 | `doc` | string | — | Human header. |
 | `scaling_method` | string (enum) | `"linear-per-minute"` | Only mode supported at launch. |
 | `minute_zero_reference` | int | 1 | The minute baseline that `hp_base` corresponds to (minute 1, not 0). |
@@ -22,6 +22,7 @@
 | `biome` | string (kebab-case) | — | — | Owning biome. |
 | `scaling` | object | varies | varies | HP/DMG/SPD baselines + per-minute slope. |
 | `drops_ref` | string | — | — | Reference into `drops.json` table id. |
+| `behavior_note` | string (opt) | — | — | Free-form designer note explaining variant behavior choice. Not consumed at runtime. Added Wave 9 to document biome 2/4 variant intent (e.g. "sidesteps laterally", "hovering motion"). |
 | (role-specific) | (varies) | (varies) | — | `charge` for tanks, `ranged` for ranged, `phases` + telegraph_min_ms for elites/bosses. |
 
 ### `scaling` sub-fields
@@ -82,6 +83,7 @@ Sleepy Boar is the Meadow tank. HP at minute 1 = 80; minute 5 = 80+4×40=240; mi
 - `defense_mult` ≤ 0.75 (per formulas clamp).
 - HP scaling must be cross-checked against `04-enemy-tuning.md` TTK ladders before merge.
 - The current Meadow set diverges from `05-enemies.md` baselines for swarmer/ranged/elite/boss — see pending ADR-0006.
+- **Wave 9 (Beach + Cavern rosters):** biome `"beach"` and `"cavern"` slugs are now valid. Per `docs/02-gdd/06-biomes.md` Beach is +10% harder than Meadow and Cavern is +40% harder; HP/`defense_mult` deltas in the new entries are calibrated to this target. Boss IDs `crab-captain` / `sneaky-cave-mole` are referenced from `waves.json` but intentionally NOT yet present here (single-launch-boss policy — Old Boar King only).
 
 ## Cross-references
 
