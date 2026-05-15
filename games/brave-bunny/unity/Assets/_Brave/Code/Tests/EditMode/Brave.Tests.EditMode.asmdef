@@ -6,6 +6,7 @@
         "Brave.Systems",
         "Brave.UI",
         "Brave.Boot",
+        "Brave.Boot.Editor",
         "Unity.InputSystem",
         "Unity.Mathematics",
         "Unity.Collections",

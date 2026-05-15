@@ -283,6 +283,11 @@ public static class SceneSetup
         EnsureRunController(runTimerGO);
         EnsureRunHud();
 
+        // Wave 7A + 7B — juice services (hitstop / screenshake / damage numbers),
+        // boss container, and modal UI controllers (pause / level-up draft /
+        // run-end tally). All helpers are idempotent.
+        RunSceneWiringSetup.WireRunScene();
+
         EditorSceneManager.SaveScene(scene, path);
         Debug.Log($"[SceneSetup] created {path}");
     }
@@ -575,6 +580,12 @@ public static class SceneSetup
         var eventSystem = new GameObject("EventSystem");
         var esType = FindType("UnityEngine.EventSystems.EventSystem");
         if (esType != null) eventSystem.AddComponent(esType);
+
+        // Wave 7B — wire HomeController + Home.uxml so the MainMenu scene actually shows
+        // a Home screen on launch. Idempotent — re-running the scaffold leaves the
+        // existing GameObject + components intact.
+        RunSceneWiringSetup.EnsureHomeControllerWithUxml();
+
         EditorSceneManager.SaveScene(scene, path);
         Debug.Log($"[SceneSetup] created {path}");
     }
@@ -593,6 +604,11 @@ public static class SceneSetup
         var eventSystem = new GameObject("EventSystem");
         var esType = FindType("UnityEngine.EventSystems.EventSystem");
         if (esType != null) eventSystem.AddComponent(esType);
+
+        // Wave 7B — LoadoutController + Loadout.uxml lets the player pick a character
+        // before the Run scene loads.
+        RunSceneWiringSetup.EnsureLoadoutControllerWithUxml();
+
         EditorSceneManager.SaveScene(scene, path);
         Debug.Log($"[SceneSetup] created {path}");
     }
