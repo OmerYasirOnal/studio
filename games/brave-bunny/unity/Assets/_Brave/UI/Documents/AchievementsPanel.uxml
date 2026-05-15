@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Brave Bunny — Achievements Panel (Wave 10).
+  Scrollable list of all 20 achievement rows. Rows are created at runtime by
+  AchievementsPanelController and parented to #achievements-list. Each row
+  carries an icon, name, progress bar, and claim button.
+  Controller: Code/UI/Controllers/AchievementsPanelController.cs
+  Loc keys: achievement.<id>.name, achievement.<id>.description,
+            achievement.panel.title, achievement.panel.claim,
+            achievement.panel.claimed, achievement.panel.locked.
+-->
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="project://database/Assets/_Brave/UI/Themes/theme.uss" />
+    <Style src="project://database/Assets/_Brave/UI/Styles/screens.uss" />
+
+    <ui:VisualElement name="achievements-root" class="brave-root">
+
+        <ui:VisualElement name="achievements-header" class="home-header">
+            <ui:Label name="lbl-achievements-title" text="Achievements" class="h1" loc-key="achievement.panel.title" />
+            <ui:Button name="btn-close" text="x" class="btn btn-ghost btn-icon" />
+        </ui:VisualElement>
+
+        <ui:ScrollView name="achievements-scroll" mode="Vertical" class="achievements-scroll">
+            <ui:VisualElement name="achievements-list" class="achievements-list" />
+        </ui:ScrollView>
+
+    </ui:VisualElement>
+</ui:UXML>
