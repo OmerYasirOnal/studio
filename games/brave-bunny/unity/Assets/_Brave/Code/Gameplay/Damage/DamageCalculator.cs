@@ -55,5 +55,23 @@ namespace Brave.Gameplay.Damage
         /// <summary>Crit multiplier given crit_damage (default 1.0 = "2x").</summary>
         public static float CritMultiplier(bool isCrit, float critDamage)
             => isCrit ? 1f + critDamage : 1f;
+
+        /// <summary>
+        /// Wave 10 — convenience: roll crit + apply multiplier in one stateless call.
+        /// Returns the post-crit damage and the crit flag (for <see cref="HitInfo.isCrit"/>
+        /// propagation to <c>DamageNumberSpawner</c> + achievement listeners). Allocation-free.
+        /// Caller supplies <paramref name="random01"/> so the RNG source stays injectable
+        /// (deterministic replay / unit tests) — see formulas.md §2.
+        /// </summary>
+        public static (float damage, bool isCrit) RollAndApplyCrit(
+            float baseDamage,
+            float critRate,
+            float critDamage,
+            float random01)
+        {
+            bool isCrit = RollCrit(critRate, random01);
+            float mult = CritMultiplier(isCrit, critDamage);
+            return (baseDamage * mult, isCrit);
+        }
     }
 }
