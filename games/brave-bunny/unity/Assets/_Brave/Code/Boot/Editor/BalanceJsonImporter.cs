@@ -123,6 +123,9 @@ namespace Brave.Boot.Editor
                 ApplyField(serialized, "signatureTypeName", entry.Value<string>("signature_token"));
                 ApplyField(serialized, "unlockStarCost", entry.Value<int?>("unlock_star_cost") ?? 0);
 
+                // Wave 10 — passive ability id (CharacterAbilityRegistry resolves at runtime).
+                ApplyField(serialized, "abilityId", entry.Value<string>("ability_id") ?? string.Empty);
+
                 // --- CharacterStats (baseStats sub-struct) -----------------------
                 // Per docs/10-balance/00-formulas.md:
                 //   §3 movement: move_speed = base_move × character.move_mult
