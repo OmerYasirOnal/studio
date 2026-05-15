@@ -4,6 +4,40 @@
 
 > Phases 0-4 are complete. Phase 5 reached its first major milestone on 2026-05-12: a signed, app-store-ready `.ipa` (104 MB) was produced end-to-end via `fastlane preview`. The next gate is TestFlight upload (`fastlane beta`), which requires the ASC app entry to exist — see "Active blockers" below.
 
+## Wave 7B (2026-05-16) — balance + polish pass
+
+Single-agent pass on top of merged Wave 7A. No code changes.
+
+| Area | Change |
+|---|---|
+| **TTK ladder** | 6 weapons damage bumped +40% to +150%; 5 enemies HP cut 25% to 62%; boss HP 3000 → 1200 |
+| **FeelConfig.asset** | hitstop 20 → 45 ms; flash 60 → 80 ms; dmg number lifetime 0.6 → 0.55 s; screen-shake amps re-tuned to 0.04 / 0.10 / 0.22 |
+| **feel.json** | boss damage tick 40 → 90 ms; basic-enemy-kill 20 → 45 ms; screen-shake values mirrored to FeelConfig |
+| **Localization** | EN/TR copy pass on `runend.*`, `levelup.*`, `pause.*`, `loadout.*` — punchier register |
+| **Doc** | `10-balance/wave7-ttk-pass.md` (math + post-pass band check + follow-ups) |
+
+Known follow-ups flagged in `wave7-ttk-pass.md`:
+- L5 DPS band broken on Carrot Boomerang & Acorn Cannon — needs Wave 7C trim
+- ADR-0006 supersede needed for new boss HP curve
+- Tank `hp_per_min` may need re-bump after playtest
+
+## Wave 7A (2026-05-13 → 2026-05-15) — 8 parallel agents
+
+All systems for the vertical slice landed. Each agent worked in an isolated worktree; orchestrator merged in `merge(brave-bunny): Wave 7A — ...` commits.
+
+| # | Subsystem | Status | Merge commit |
+|---|---|---|---|
+| 1 | **ADR-0020 weapon archetype configs** — three archetype SOs + EnemyRole.Boss enum value | shipped | `bd920a7` |
+| 2 | **RunEndReport capture + RunEndedChannel** — run-end summary plumbing | shipped | `b763df1` |
+| 3 | **Audio gameplay bindings + BGM driver** — events → AudioDispatcher | shipped | `ba34500` |
+| 4 | **Localization TR/EN parity** — 235 keys per file, character bios + weapon descriptions + UI copy | shipped | `ad5a359` |
+| 5 | **VfxPool particle stop callback + TargetSelector dispatch** — pool return on particle complete | shipped | `44d1172` |
+| 6 | **Pause modal UI + tests** — pause panel + settings panel UXML/USS wiring | shipped | `b30f204` |
+| 7 | **Meta-progression character unlocks** — CharacterUnlockService + persistence | shipped | `cd5ccb2` |
+| 8 | **Hit-feedback juice** — hitstop + hit-flash + floating damage numbers + screen-shake | shipped | `e3d6f81` |
+
+Wave 7A totals: 8 merge commits on `main`. Tests: green (no regressions). All eight subsystems are now wired up and the slice is playable end-to-end on Editor; iOS device validation pending the TestFlight gate below.
+
 ## Phase 1 — Discovery (COMPLETE)
 
 - [x] 5 competitor deconstructions (Survivor.io, Vampire Survivors, Archero, Brotato, Capybara Go!)

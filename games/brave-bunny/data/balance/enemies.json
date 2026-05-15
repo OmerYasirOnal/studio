@@ -10,8 +10,8 @@
       "role": "swarmer",
       "biome": "meadow",
       "scaling": {
-        "hp_base": 6,
-        "hp_per_min": 4,
+        "hp_base": 3,
+        "hp_per_min": 3,
         "contact_dmg": 5,
         "speed_mult_vs_player": 1.10,
         "defense_mult": 0
@@ -24,8 +24,8 @@
       "role": "swarmer",
       "biome": "meadow",
       "scaling": {
-        "hp_base": 6,
-        "hp_per_min": 4,
+        "hp_base": 3,
+        "hp_per_min": 3,
         "contact_dmg": 5,
         "speed_mult_vs_player": 1.20,
         "defense_mult": 0
@@ -39,8 +39,8 @@
       "role": "swarmer",
       "biome": "meadow",
       "scaling": {
-        "hp_base": 6,
-        "hp_per_min": 4,
+        "hp_base": 3,
+        "hp_per_min": 3,
         "contact_dmg": 5,
         "speed_mult_vs_player": 1.05,
         "defense_mult": 0
@@ -54,8 +54,8 @@
       "role": "tank",
       "biome": "meadow",
       "scaling": {
-        "hp_base": 80,
-        "hp_per_min": 40,
+        "hp_base": 30,
+        "hp_per_min": 15,
         "contact_dmg": 18,
         "speed_mult_vs_player": 0.60,
         "defense_mult": 0
@@ -74,8 +74,8 @@
       "role": "ranged",
       "biome": "meadow",
       "scaling": {
-        "hp_base": 16,
-        "hp_per_min": 8,
+        "hp_base": 10,
+        "hp_per_min": 6,
         "contact_dmg": 4,
         "ranged_dmg": 12,
         "speed_mult_vs_player": 0.90,
@@ -95,8 +95,8 @@
       "role": "elite",
       "biome": "meadow",
       "scaling": {
-        "hp_base": 300,
-        "hp_per_min": 80,
+        "hp_base": 150,
+        "hp_per_min": 40,
         "contact_dmg": 25,
         "speed_mult_vs_player": 0.70,
         "defense_mult": 0
@@ -111,8 +111,8 @@
       "role": "boss",
       "biome": "meadow",
       "scaling": {
-        "hp_mid_boss": 2000,
-        "hp_end_boss": 3000,
+        "hp_mid_boss": 800,
+        "hp_end_boss": 1200,
         "contact_dmg": 35,
         "ranged_dmg": 25,
         "aoe_dmg": 50,

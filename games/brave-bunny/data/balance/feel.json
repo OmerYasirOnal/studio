@@ -4,10 +4,10 @@
   "adr_reference": "0003-hitstop-timings",
   "hitstop": {
     "basic_enemy_hit_ms": 0,
-    "basic_enemy_kill_ms": 20,
+    "basic_enemy_kill_ms": 45,
     "elite_hit_ms": 30,
     "elite_kill_ms": 80,
-    "boss_damage_tick_ms": 40,
+    "boss_damage_tick_ms": 90,
     "boss_phase_change_ms": 150,
     "boss_kill_ms": 250
   },
@@ -24,10 +24,10 @@
     "note": "After 4x expected-crit-interval without a crit, force-crit on next hit. Per 00-formulas.md § 2."
   },
   "screen_shake": {
-    "basic_kill_amp": 0.05,
-    "elite_kill_amp": 0.15,
-    "boss_phase_change_amp": 0.35,
-    "boss_kill_amp": 0.50,
+    "basic_kill_amp": 0.04,
+    "elite_kill_amp": 0.10,
+    "boss_phase_change_amp": 0.22,
+    "boss_kill_amp": 0.35,
     "unit": "screen-fraction"
   }
 }
