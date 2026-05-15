@@ -35,6 +35,14 @@ namespace Brave.Gameplay.Definitions
         public int maxLevel = 30;
         public int unlockStarCost;                         // 0 for starter (Bunny)
 
+        // Meta-progression: optional unlock condition. Inlined as raw scalar fields
+        // (not a Systems.Progression.UnlockCondition reference) because asmdef layering
+        // forbids Gameplay→Systems references. Brave.Systems.Progression.CharacterUnlockService
+        // translates these into a runtime UnlockCondition POCO at boot.
+        // Empty / "none" / null type = unlocked from start (starter).
+        [Header("Unlock (meta-progression)")]
+        public UnlockConditionData unlockCondition = new UnlockConditionData();
+
         private void OnValidate()
         {
             if (string.IsNullOrEmpty(slug))
@@ -46,5 +54,24 @@ namespace Brave.Gameplay.Definitions
         }
     }
 
+    /// <summary>
+    /// Inspector-friendly raw unlock condition payload. Mirrors
+    /// <c>characters.json:unlock_condition</c>. Brave.Systems.Progression
+    /// translates this into a runtime <c>UnlockCondition</c> via
+    /// <c>UnlockConditionDataExtensions.ToRuntime()</c> (Systems.Progression
+    /// references Gameplay, so the translation lives on that side of the
+    /// asmdef boundary).
+    /// </summary>
+    [Serializable]
+    public sealed class UnlockConditionData
+    {
+        // One of: "" / "none" / "reach_wave" / "defeat_boss" / "complete_runs" / "pay_stars"
+        public string type = string.Empty;
+        public int wave;
+        public string boss = string.Empty;
+        public int runs;
+        public string withCharacter = string.Empty;
+        public int stars;
+    }
 }
 // CharacterStats lives in its own file: Definitions/CharacterStats.cs
