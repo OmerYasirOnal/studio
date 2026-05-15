@@ -5,10 +5,18 @@
 // directly to it via BindState(). Mutators (SetHp, AddXp, SetWave, RecordKill,
 // Pause/Resume) raise StateChanged after each mutation. The HUD subscribes to this
 // event and redraws the full view — see RunHudController.BindState().
+//
+// Run-end report capture (Phase 5 Wave 6):
+//   On run end (player death / boss defeated / quit / timeout), RunController
+//   builds a populated RunEndReport from running tallies (kills via
+//   EnemyKilledChannel, xp via LevelUp/AddXp, gold via PickupChannel, wave via
+//   SetWave) and raises RunEndedChannel. CurrentRunEndReport is exposed on
+//   IRunRuntimeState for UI consumers (RunEndTallyController).
 
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using Brave.Gameplay.Definitions;
 using Brave.Gameplay.Events;
 using Brave.Gameplay.Spawning;
@@ -31,6 +39,10 @@ public sealed class RunController : MonoBehaviour, IRunRuntimeState
     [SerializeField] private CharacterDefinition? _activeCharacter;
     [SerializeField] private BiomeDefinition? _activeBiome;
     [SerializeField] private DeathChannel? _deathChannel;
+    [SerializeField] private RunEndedChannel? _runEndedChannel;
+    [SerializeField] private EnemyKilledChannel? _enemyKilledChannel;
+    [SerializeField] private LevelUpChannel? _levelUpChannel;
+    [SerializeField] private PickupChannel? _pickupChannel;
 
     private RunTimer? _timer;
     private WaveRunner? _waveRunner;
@@ -45,6 +57,16 @@ public sealed class RunController : MonoBehaviour, IRunRuntimeState
     private int _level = 1;
     private int _waveNumber = 1;
     private int _killCount;
+
+    // ---- Run-end tally backing fields ----
+    private int _elitesKilled;
+    private int _bossesKilled;
+    private int _goldGained;
+    private int _soulShardsEarned;
+    private int _passXpEarned;
+    private RunEndReport? _currentRunEndReport;
+    private readonly List<string> _weaponIdsUsed = new();
+    private bool _eventsSubscribed;
 
     // ---- public accessors (non-IRunRuntimeState) ----
     public RunState State => _runState;
@@ -90,6 +112,9 @@ public sealed class RunController : MonoBehaviour, IRunRuntimeState
 
     /// <inheritdoc/>
     public bool Paused => _runState == RunState.Paused;
+
+    /// <inheritdoc/>
+    public RunEndReport? CurrentRunEndReport => _currentRunEndReport;
 
     /// <inheritdoc/>
     public event Action? StateChanged;
@@ -150,6 +175,63 @@ public sealed class RunController : MonoBehaviour, IRunRuntimeState
         RaiseStateChanged();
     }
 
+    /// <summary>
+    /// Record an elite-flagged kill. Increments both <see cref="KillCount"/> and the
+    /// elite sub-tally used in the run-end report. Raises <see cref="StateChanged"/>.
+    /// </summary>
+    public void RecordEliteKill()
+    {
+        _killCount++;
+        _elitesKilled++;
+        RaiseStateChanged();
+    }
+
+    /// <summary>
+    /// Record a boss-flagged kill. Increments both <see cref="KillCount"/> and the
+    /// boss sub-tally used in the run-end report. Raises <see cref="StateChanged"/>.
+    /// </summary>
+    public void RecordBossKill()
+    {
+        _killCount++;
+        _bossesKilled++;
+        RaiseStateChanged();
+    }
+
+    /// <summary>Add gold (carrots) gained this run. Used in <see cref="RunEndReport.goldGained"/>.</summary>
+    public void AddGold(int amount)
+    {
+        if (amount <= 0) return;
+        _goldGained += amount;
+        RaiseStateChanged();
+    }
+
+    /// <summary>Add soul shards earned this run. Used in <see cref="RunEndReport.soulShardsEarned"/>.</summary>
+    public void AddSoulShards(int amount)
+    {
+        if (amount <= 0) return;
+        _soulShardsEarned += amount;
+        RaiseStateChanged();
+    }
+
+    /// <summary>Add battle-pass XP earned this run. Used in <see cref="RunEndReport.passXpEarned"/>.</summary>
+    public void AddPassXp(int amount)
+    {
+        if (amount <= 0) return;
+        _passXpEarned += amount;
+        RaiseStateChanged();
+    }
+
+    /// <summary>
+    /// Append a weapon slug to the loadout snapshot captured at run-end. De-duplicates
+    /// repeated calls so multiple stacks of the same weapon list it only once.
+    /// </summary>
+    public void RegisterEquippedWeapon(string slug)
+    {
+        if (string.IsNullOrEmpty(slug)) return;
+        if (_weaponIdsUsed.Contains(slug)) return;
+        _weaponIdsUsed.Add(slug);
+    }
+
     // ---- lifecycle ----
 
     public void Initialise(CharacterDefinition character, BiomeDefinition biome, WaveRunner waveRunner, RunTimer timer)
@@ -162,6 +244,7 @@ public sealed class RunController : MonoBehaviour, IRunRuntimeState
         // Seed HP from character definition if available.
         _maxHp = 100f;
         _currentHp = _maxHp;
+        SubscribeToChannels();
         RaiseStateChanged();
     }
 
@@ -171,6 +254,7 @@ public sealed class RunController : MonoBehaviour, IRunRuntimeState
     {
         _runState = RunState.Running;
         _timer?.Start();
+        SubscribeToChannels();
         RaiseStateChanged();
     }
 
@@ -188,23 +272,76 @@ public sealed class RunController : MonoBehaviour, IRunRuntimeState
         RaiseStateChanged();
     }
 
-    public void End(RunResult result)
+    /// <summary>
+    /// End the run with the given <see cref="RunResult"/>. Populates
+    /// <see cref="CurrentRunEndReport"/> and raises both <c>RunEndedChannel</c> (full
+    /// report) and <c>DeathChannel</c> (legacy slim payload). Raises
+    /// <see cref="StateChanged"/> once at the very end.
+    /// </summary>
+    public void End(RunResult result) => EndInternal(RunEndReport.OutcomeFromResult(result),
+        cause: null);
+
+    /// <summary>
+    /// End the run with a specific <see cref="RunOutcome"/> and an explicit cause string
+    /// (one of <see cref="RunEndCause"/>). Preferred for new call-sites that distinguish
+    /// boss-defeat from timeout — both map to <see cref="RunResult.Victory"/>/<c>Death</c>
+    /// in the legacy payload.
+    /// </summary>
+    public void End(RunOutcome outcome, string cause) => EndInternal(outcome, cause);
+
+    private void EndInternal(RunOutcome outcome, string? cause)
     {
         _runState = RunState.Ending;
         _timer?.Stop();
-        // TODO(Phase 5): build RunEndReport and raise DeathChannel.
+
+        var report = BuildRunEndReport(outcome, cause);
+        _currentRunEndReport = report;
+
+        _runEndedChannel?.Raise(new RunEndedEvent(report));
+
         _deathChannel?.Raise(new DeathEvent(
             characterSlugHash: _activeCharacter != null ? _activeCharacter.slug.GetHashCode() : 0,
-            runSeconds: RunSeconds,
-            enemiesKilled: _killCount,
-            cause: result switch
+            runSeconds: report.runDurationSeconds,
+            enemiesKilled: report.totalKills,
+            cause: outcome switch
             {
-                RunResult.Death   => DeathCause.Killed,
-                RunResult.Quit    => DeathCause.Quit,
-                RunResult.Victory => DeathCause.Victory,
+                RunOutcome.Win     => DeathCause.Victory,
+                RunOutcome.Lose    => DeathCause.Killed,
+                RunOutcome.Timeout => DeathCause.TimedOut,
+                RunOutcome.Quit    => DeathCause.Quit,
                 _ => DeathCause.Killed,
             }));
+
+        UnsubscribeFromChannels();
         RaiseStateChanged();
+    }
+
+    /// <summary>
+    /// Assemble the populated <see cref="RunEndReport"/> from current run tallies.
+    /// Public so unit tests can verify the projection without driving the channel
+    /// side-effects in <see cref="EndInternal"/>.
+    /// </summary>
+    public RunEndReport BuildRunEndReport(RunOutcome outcome, string? cause = null)
+    {
+        var report = new RunEndReport
+        {
+            outcome            = outcome,
+            result             = RunEndReport.ResultFromOutcome(outcome),
+            deathCause         = cause ?? RunEndReport.DefaultCauseFor(outcome),
+            runDurationSeconds = RunSeconds,
+            totalKills         = _killCount,
+            elitesKilled       = _elitesKilled,
+            bossesKilled       = _bossesKilled,
+            wavesCleared       = _waveNumber,
+            finalLevel         = _level,
+            xpGained           = _xpPoints,
+            goldGained         = _goldGained,
+            soulShardsEarned   = _soulShardsEarned,
+            passXpEarned       = _passXpEarned,
+            weaponIdsUsed      = _weaponIdsUsed.ToArray(),
+            characterId        = _activeCharacter != null ? _activeCharacter.slug : string.Empty,
+        };
+        return report;
     }
 
     private void Update()
@@ -217,6 +354,65 @@ public sealed class RunController : MonoBehaviour, IRunRuntimeState
     }
 
     private void OnTimerEnded() => End(RunResult.Victory);
+
+    private void OnDisable() => UnsubscribeFromChannels();
+
+    // ---- Event channel wiring ----
+    // Subscribing in Initialise + Resume covers both bootstrap paths (scene-loaded
+    // RunController and run-time spawned). Unsubscribe on End/Disable so domain reload
+    // doesn't leak listeners.
+
+    private void SubscribeToChannels()
+    {
+        if (_eventsSubscribed) return;
+        _enemyKilledChannel?.Subscribe(OnEnemyKilled);
+        _levelUpChannel?.Subscribe(OnLevelUp);
+        _pickupChannel?.Subscribe(OnPickup);
+        _eventsSubscribed = true;
+    }
+
+    private void UnsubscribeFromChannels()
+    {
+        if (!_eventsSubscribed) return;
+        _enemyKilledChannel?.Unsubscribe(OnEnemyKilled);
+        _levelUpChannel?.Unsubscribe(OnLevelUp);
+        _pickupChannel?.Unsubscribe(OnPickup);
+        _eventsSubscribed = false;
+    }
+
+    private void OnEnemyKilled(EnemyKilledEvent evt)
+    {
+        if (evt.wasElite) RecordEliteKill();
+        else RecordKill();
+    }
+
+    private void OnLevelUp(LevelUpEvent evt)
+    {
+        _level = evt.newLevel;
+        _currentXp = evt.xpRemainder;
+        RaiseStateChanged();
+    }
+
+    private void OnPickup(PickupEvent evt)
+    {
+        switch (evt.kind)
+        {
+            case PickupKind.GoldCoin:
+                AddGold(evt.amount);
+                break;
+            case PickupKind.SoulShard:
+                AddSoulShards(evt.amount);
+                break;
+            case PickupKind.XpGemSmall:
+            case PickupKind.XpGemMedium:
+            case PickupKind.XpGemLarge:
+                AddXp(evt.amount);
+                break;
+            case PickupKind.Heart:
+                SetHp(Mathf.Min(_maxHp, _currentHp + evt.amount));
+                break;
+        }
+    }
 }
 
 }

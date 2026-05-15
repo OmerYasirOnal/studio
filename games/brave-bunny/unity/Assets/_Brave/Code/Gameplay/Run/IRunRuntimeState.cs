@@ -28,6 +28,7 @@
 #nullable enable
 
 using System;
+using Brave.Gameplay.Run;
 
 namespace Brave.UI.Bindings
 {
@@ -84,6 +85,20 @@ namespace Brave.UI.Bindings
 
         /// <summary>True while the run is in the Paused sub-state.</summary>
         bool Paused { get; }
+
+        // ---- Run-end report ----
+
+        /// <summary>
+        /// The populated run-end report, or <c>null</c> while the run is in progress.
+        /// Set in <c>RunController.End()</c> immediately before <c>RunEndedChannel</c> is
+        /// raised, so UI controllers may read it either via subscription to the channel or
+        /// by polling after the run-end state transition. Allocation-free read.
+        ///
+        /// Default-implemented as <c>null</c> so stub/test fakes that pre-date the
+        /// run-end-report pipeline keep compiling. Real impls (e.g. <c>RunController</c>)
+        /// override this.
+        /// </summary>
+        RunEndReport? CurrentRunEndReport => null;
 
         // ---- Event-driven binding ----
 
