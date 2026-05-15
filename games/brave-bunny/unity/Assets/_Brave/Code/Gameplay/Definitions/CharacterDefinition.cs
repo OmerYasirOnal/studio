@@ -30,6 +30,11 @@ namespace Brave.Gameplay.Definitions
         [Header("Signature mechanic (ADR-0009)")]
         public string signatureMechanicTypeName = string.Empty;  // resolves via MechanicRegistry
 
+        [Header("Passive ability (Wave 10)")]
+        // Empty = no passive ability. Populated from characters.json:ability_id by
+        // BalanceJsonImporter; resolved at boot via CharacterAbilityRegistry.
+        public string abilityId = string.Empty;
+
         [Header("Progression")]
         public AnimationCurve levelCurveXp = AnimationCurve.Linear(1f, 100f, 30f, 3000f);
         public int maxLevel = 30;
