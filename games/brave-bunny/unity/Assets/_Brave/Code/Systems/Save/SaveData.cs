@@ -31,6 +31,10 @@ public sealed class SaveData
     [JsonProperty("achievements")] public Dictionary<string, AchievementEntry> Achievements = new();
     [JsonProperty("dailyMissions")] public DailyMissionsSection DailyMissions = new();
     [JsonProperty("dailyStreak")] public DailyStreakSection DailyStreak = new();
+    // Wave 9: 7-day rotating login-reward calendar. Owned by DailyRewardService.
+    // Forward-compat per ADR-0008 — missing key in v1/v2 saves defaults to day 1,
+    // no lastClaimUtc, zero lifetime claims (i.e. claimable on first launch).
+    [JsonProperty("dailyRewardState")] public DailyRewardState DailyRewardState = new();
     [JsonProperty("settings")] public SettingsSection Settings = new();
     [JsonProperty("stats")] public StatsSection Stats = new();
     // Wave 7C: first-run tutorial completion flag. Defaults to false; the
@@ -140,4 +144,20 @@ public sealed class SaveData
         [JsonProperty("bossesDefeated")] public long BossesDefeated;
         [JsonProperty("evolutionsTriggered")] public long EvolutionsTriggered;
     }
+}
+
+/// <summary>
+/// Wave 9 — daily login reward calendar state. Owned by
+/// <see cref="Brave.Systems.LiveOps.DailyRewardService"/>. Top-level (not nested
+/// in SaveData) so the LiveOps service references it without coupling to the
+/// SaveData class graph; the SaveData root holds an instance for serialization.
+/// ADR-0008: every field declares [JsonProperty] for rename-safe forward-compat.
+/// </summary>
+[Serializable]
+[JsonObject(MemberSerialization.OptIn)]
+public sealed class DailyRewardState
+{
+    [JsonProperty("currentDay")] public int CurrentDay = 1;
+    [JsonProperty("lastClaimUtc")] public string? LastClaimUtc;
+    [JsonProperty("lifetimeClaims")] public int LifetimeClaims;
 }

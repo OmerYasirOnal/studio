@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Brave Bunny — Daily Rewards calendar (Wave 9).
+  Wireframe source: docs/05-wireframes/03-home-lobby.html (daily-strap → expand into modal)
+  User story: US-37 0-input streak claim. Design: docs/02-gdd/02-meta-loop.md (7-day cycle).
+  Controller: Code/UI/Controllers/DailyRewardsController.cs binds cells + claim button.
+  Localization: every visible string carries a `loc-key` consumed by LocalizationProvider.
+
+  Cell convention: name="cell-day-N" for N in 1..7. Each cell has children
+  `lbl-day-N` (the day label) and `lbl-amount-N` (the reward amount). The
+  cell receives one of these classes from the controller:
+    .is-today      → highlight ring
+    .is-claimed    → greyed out + check icon
+    .is-milestone  → gold border (day 7)
+-->
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <Style src="project://database/Assets/_Brave/UI/Themes/theme.uss" />
+    <Style src="project://database/Assets/_Brave/UI/Styles/screens.uss" />
+
+    <ui:VisualElement name="daily-root" class="brave-root">
+
+        <!-- Title -->
+        <ui:VisualElement name="daily-header" class="row-spread" style="margin-bottom: 12px;">
+            <ui:Label name="lbl-daily-title" text="Daily rewards" class="h2"
+                      loc-key="daily.title" />
+            <ui:Label name="lbl-streak-day" text="Day 1" class="chip" />
+        </ui:VisualElement>
+
+        <!-- 7-cell grid -->
+        <ui:VisualElement name="daily-grid" class="row" style="flex-wrap: wrap; justify-content: space-between;">
+
+            <ui:VisualElement name="cell-day-1" class="card daily-cell" style="flex-basis: 22%; margin-bottom: 8px;">
+                <ui:Label name="lbl-day-1" text="Day 1" class="micro" loc-key="daily.day_1" />
+                <ui:Label name="lbl-amount-1" text="50" class="num" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="cell-day-2" class="card daily-cell" style="flex-basis: 22%; margin-bottom: 8px;">
+                <ui:Label name="lbl-day-2" text="Day 2" class="micro" loc-key="daily.day_2" />
+                <ui:Label name="lbl-amount-2" text="100" class="num" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="cell-day-3" class="card daily-cell" style="flex-basis: 22%; margin-bottom: 8px;">
+                <ui:Label name="lbl-day-3" text="Day 3" class="micro" loc-key="daily.day_3" />
+                <ui:Label name="lbl-amount-3" text="1 ★" class="num" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="cell-day-4" class="card daily-cell" style="flex-basis: 22%; margin-bottom: 8px;">
+                <ui:Label name="lbl-day-4" text="Day 4" class="micro" loc-key="daily.day_4" />
+                <ui:Label name="lbl-amount-4" text="200" class="num" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="cell-day-5" class="card daily-cell" style="flex-basis: 22%; margin-bottom: 8px;">
+                <ui:Label name="lbl-day-5" text="Day 5" class="micro" loc-key="daily.day_5" />
+                <ui:Label name="lbl-amount-5" text="2 ★" class="num" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="cell-day-6" class="card daily-cell" style="flex-basis: 22%; margin-bottom: 8px;">
+                <ui:Label name="lbl-day-6" text="Day 6" class="micro" loc-key="daily.day_6" />
+                <ui:Label name="lbl-amount-6" text="300" class="num" />
+            </ui:VisualElement>
+
+            <!-- Day 7 spans full row for the milestone treatment -->
+            <ui:VisualElement name="cell-day-7" class="card daily-cell is-milestone" style="flex-basis: 100%; margin-bottom: 8px;">
+                <ui:Label name="lbl-day-7" text="Day 7" class="micro" loc-key="daily.day_7" />
+                <ui:Label name="lbl-amount-7" text="Summon Ticket" class="num" />
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+
+        <!-- Claim CTA -->
+        <ui:Button name="btn-claim" text="Claim today's gift" class="btn btn-primary-lg"
+                   style="margin-top: 12px;"
+                   loc-key="daily.claim" />
+
+        <ui:Label name="lbl-claimed-state" text="Come back tomorrow." class="micro"
+                  style="margin-top: 8px; display: none;"
+                  loc-key="daily.claimed" />
+
+    </ui:VisualElement>
+</ui:UXML>
