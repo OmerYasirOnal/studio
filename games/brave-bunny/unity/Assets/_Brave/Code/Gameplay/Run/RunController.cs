@@ -312,6 +312,12 @@ public sealed class RunController : MonoBehaviour, IRunRuntimeState
                 _ => DeathCause.Killed,
             }));
 
+        // Wave 7A integration: publish on the cross-asmdef bridge so Systems-side
+        // meta services (BgmGameplayDriver run-end snapshot, CharacterUnlockService
+        // run-completion + boss-defeat tally) can react without Gameplay→Systems
+        // asmdef coupling. Bridge is a static no-op when no listener is bound.
+        RunEndIntegrationBridge.Notify(report);
+
         UnsubscribeFromChannels();
         RaiseStateChanged();
     }

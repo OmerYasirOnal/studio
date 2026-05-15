@@ -154,7 +154,25 @@ namespace Brave.Gameplay.Combat
                 _cachedProjectileSpeed,
                 _cachedDamage,
                 _cachedProjectileLifetime);
+
+            // Wave 7A audio integration: publish a weapon-fire pulse on the cross-asmdef
+            // bridge so Brave.Systems.Audio.GameplayAudioBindings can route the right SFX.
+            // The bridge is a static no-op when no listener is bound — safe by default.
+            WeaponFireBridge.Notify(WeaponArchetypeSlugFor(weapon!.archetype), origin);
         }
+
+        // Map WeaponArchetype → audio-bindings archetype slug ("projectile" / "area" / "aura").
+        // Kept private because the bridge consumer (GameplayAudioBindings) owns the slug
+        // taxonomy; AutoAttackController just publishes the lowercase enum name.
+        private static string WeaponArchetypeSlugFor(Brave.Gameplay.Definitions.WeaponArchetype a) => a switch
+        {
+            Brave.Gameplay.Definitions.WeaponArchetype.Projectile => "projectile",
+            Brave.Gameplay.Definitions.WeaponArchetype.Area       => "area",
+            Brave.Gameplay.Definitions.WeaponArchetype.Aura       => "aura",
+            Brave.Gameplay.Definitions.WeaponArchetype.Summon     => "summon",
+            Brave.Gameplay.Definitions.WeaponArchetype.Utility    => "utility",
+            _ => "projectile",
+        };
 
         // The weapon JSON exposes RANGE (units) and RATE (s/fire) but not raw projectile
         // speed/lifetime — the projectile's travel-time is derived from range so the visual
