@@ -134,6 +134,26 @@ namespace Brave.Boot.Editor
                 ApplyField(serialized, "baseStats.magnetMultiplier", magnetM);
                 ApplyField(serialized, "baseStats.xpGemValueBonus",  xpGemBon);
 
+                // --- UnlockCondition (meta-progression) --------------------------
+                // Inlined as raw scalar fields on CharacterDefinition.UnlockConditionData
+                // (asmdef layering — see CharacterDefinition.cs header). Empty / "none"
+                // type marks the slug as a starter.
+                var unlock = entry["unlock_condition"] as JObject;
+                if (unlock != null)
+                {
+                    ApplyField(serialized, "unlockCondition.type",          unlock.Value<string>("type") ?? string.Empty);
+                    ApplyField(serialized, "unlockCondition.wave",          unlock.Value<int?>("wave") ?? 0);
+                    ApplyField(serialized, "unlockCondition.boss",          unlock.Value<string>("boss") ?? string.Empty);
+                    ApplyField(serialized, "unlockCondition.runs",          unlock.Value<int?>("runs") ?? 0);
+                    ApplyField(serialized, "unlockCondition.withCharacter", unlock.Value<string>("with_character") ?? string.Empty);
+                    ApplyField(serialized, "unlockCondition.stars",         unlock.Value<int?>("stars") ?? 0);
+                }
+                else
+                {
+                    // No condition declared in JSON → treat as starter (type=none).
+                    ApplyField(serialized, "unlockCondition.type", "none");
+                }
+
                 serialized.ApplyModifiedPropertiesWithoutUndo();
                 EditorUtility.SetDirty(so);
 

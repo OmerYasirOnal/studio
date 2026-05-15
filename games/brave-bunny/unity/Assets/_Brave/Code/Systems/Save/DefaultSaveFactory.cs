@@ -32,6 +32,11 @@ internal static class DefaultSaveFactory
         data.Characters["bunny"] = new CharacterProfile
         {
             Owned = true,
+            // Meta-progression: starter is also "unlocked" so CharacterUnlockService
+            // surfaces bunny via IsUnlocked even before its in-memory registry has
+            // been seeded (covers boot-order races during scene reloads).
+            Unlocked = true,
+            UnlockedAt = now,
             Level = 1,
             Xp = 0,
             EquippedWeaponSlug = "carrot-boomerang",

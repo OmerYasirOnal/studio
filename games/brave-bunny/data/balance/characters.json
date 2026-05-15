@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "doc": "Source-of-truth character baselines for brave-bunny. See characters.schema.md for field reference. Per ADR-0001 no allowed_weapons array — only default_starter_weapon.",
+  "doc": "Source-of-truth character baselines for brave-bunny. See characters.schema.md for field reference. Per ADR-0001 no allowed_weapons array — only default_starter_weapon. Per docs/02-gdd/03-characters.md, all eight characters ship at launch with unlock_condition driven from the meta-loop ladder (per GDD 02-meta-loop.md). Bunny is the free starter (unlock_condition.type = none).",
   "calibration_anchor": "bunny",
   "base_move_units_per_sec": 4.5,
   "base_magnet_units": 1.5,
@@ -28,7 +28,8 @@
         "trigger": "every-5th-weapon-hit",
         "iframe_ms": 400,
         "cooldown_ms": 5000
-      }
+      },
+      "unlock_condition": { "type": "none" }
     },
     {
       "id": "tortoise",
@@ -46,7 +47,8 @@
         "trigger": "hp-below-50pct",
         "shield_absorb_hp": 100,
         "cooldown_ms": 8000
-      }
+      },
+      "unlock_condition": { "type": "pay_stars", "stars": 200 }
     },
     {
       "id": "hedgehog",
@@ -65,7 +67,8 @@
         "tick_interval_ms": 3000,
         "radius_units": 1.5,
         "dmg_mult_per_tick": 0.5
-      }
+      },
+      "unlock_condition": { "type": "pay_stars", "stars": 400 }
     },
     {
       "id": "fox",
@@ -84,7 +87,8 @@
         "exec_dmg_mult": 3.0,
         "chain_max": 5,
         "chain_window_ms": 1500
-      }
+      },
+      "unlock_condition": { "type": "reach_wave", "wave": 30, "with_character": "bunny" }
     },
     {
       "id": "otter",
@@ -103,7 +107,8 @@
         "projectile_archetype_only": true,
         "extra_projectiles": 1,
         "spread_degrees": 20
-      }
+      },
+      "unlock_condition": { "type": "pay_stars", "stars": 800 }
     },
     {
       "id": "panda",
@@ -121,7 +126,8 @@
         "trigger": "xp-gem-pickup",
         "heal_hp": 1,
         "cap_at_max_hp": true
-      }
+      },
+      "unlock_condition": { "type": "pay_stars", "stars": 1000 }
     },
     {
       "id": "badger",
@@ -141,7 +147,8 @@
         "companion_dmg_mult": 0.6,
         "companion_lifetime_ms": 60000,
         "max_simultaneous": 3
-      }
+      },
+      "unlock_condition": { "type": "defeat_boss", "boss": "old-boar-king" }
     },
     {
       "id": "owl",
@@ -158,7 +165,8 @@
         "id": "far-sight",
         "trigger": "passive",
         "note": "magnet_mult and xp_gem_value_bonus carry the signature; values reduced from GDD spec (4.0/0.15) to keep effective XP-throughput at +15.8% per 01-tuning-philosophy.md and 02-character-tuning.md"
-      }
+      },
+      "unlock_condition": { "type": "reach_wave", "wave": 50, "with_character": "bunny" }
     }
   ]
 }

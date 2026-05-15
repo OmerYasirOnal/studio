@@ -39,6 +39,20 @@
 | `xp_gem_value_bonus` | float | fraction | [0, 0.5] | Owl = 0.10; others = 0.0. |
 | `default_starter_weapon` | string | weapon-id | — | Default-equipped weapon; per ADR-0001, NO `allowed_weapons` array. |
 | `signature` | object | — | — | Signature mechanic spec; varies per character. |
+| `unlock_condition` | object | — | — | Meta-progression gate. Absent / `{type:"none"}` = starter (unlocked from day 0). See `Unlock condition shape` below. |
+
+### `unlock_condition` shape
+
+Drives `Brave.Systems.Progression.CharacterUnlockService`. The importer mirrors these fields onto `CharacterDefinition.unlockCondition` (a `UnlockConditionData` raw struct) at edit-time; runtime translation into `UnlockCondition` happens via `UnlockConditionDataExtensions.ToRuntime()`.
+
+| Field | Type | Required when `type` is | Notes |
+|---|---|---|---|
+| `type` | string enum | always | One of: `"none"`, `"reach_wave"`, `"defeat_boss"`, `"complete_runs"`, `"pay_stars"`. |
+| `wave` | int | `reach_wave` | Wave ordinal threshold (≥ this counts as met). |
+| `boss` | string slug | `defeat_boss` | Boss slug from `enemies.json` (e.g. `"wolf-pack-leader"`). |
+| `runs` | int | `complete_runs` | Number of completed runs required. |
+| `with_character` | string slug | optional (`reach_wave`, `complete_runs`) | Only runs piloted by this character count toward the threshold. Omit for "any character". |
+| `stars` | int | `pay_stars` | Star price spent at purchase. Bypasses passive evaluation — triggered by `CharacterUnlockService.TryPurchase`. |
 
 ### `signature` shape
 
