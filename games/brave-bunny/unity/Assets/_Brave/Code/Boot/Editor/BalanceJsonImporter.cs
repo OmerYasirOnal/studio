@@ -14,6 +14,7 @@ using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
 using Brave.Gameplay.Combat.Archetypes;
+using Brave.Gameplay.Combat.Evolution;
 using Brave.Gameplay.Definitions;
 
 namespace Brave.Boot.Editor
@@ -30,6 +31,9 @@ namespace Brave.Boot.Editor
         // ADR-0020: archetype-config sidecar SOs live alongside WeaponDefinition assets
         // under an Archetypes subfolder so the Project window groups them clearly.
         private const string ArchetypeOutputDir = OutputDir + "/Archetypes";
+        // Wave 9: evolution recipe SOs are designer-data, not balance scalars,
+        // so they live under Definitions/Evolutions/ (mirrors data/balance/evolutions.json).
+        private const string EvolutionOutputDir = "Assets/_Brave/Data/Definitions/Evolutions";
         // Weapon levels are EXACTLY 5 (tech-spec 02 / WeaponDefinition.OnValidate).
         private const int WeaponLevelCount = 5;
 
@@ -38,6 +42,7 @@ namespace Brave.Boot.Editor
         {
             Directory.CreateDirectory(OutputDir);
             Directory.CreateDirectory(ArchetypeOutputDir);
+            Directory.CreateDirectory(EvolutionOutputDir);
 
             int created = 0;
             int updated = 0;
@@ -46,6 +51,7 @@ namespace Brave.Boot.Editor
             ImportWeapons(ref created, ref updated);
             ImportPassives(ref created, ref updated);
             ImportEnemies(ref created, ref updated);
+            ImportEvolutions(ref created, ref updated);
             // Note: xp-curve, drops, economy, feel are smaller scalar/table JSONs;
             // they import into single SO instances rather than collections.
             ImportSingle("xp-curve.json", "XpCurve", ref created, ref updated);
@@ -485,6 +491,38 @@ namespace Brave.Boot.Editor
                 using var serialized = new SerializedObject(so);
                 ApplyField(serialized, "slug", slug);
                 ApplyField(serialized, "displayName", entry.Value<string>("display_name"));
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+                EditorUtility.SetDirty(so);
+
+                if (existed) updated++; else created++;
+            }
+        }
+
+        // Wave 9 — evolutions.json → EvolutionRecipeAsset SOs (one per recipe, 8 total).
+        // Recipe slugs / weapon ids / charm ids are NOT validated against weapons.json
+        // here on purpose: the JSON schema doc owns cross-file validation; this importer
+        // just mirrors the data into SO form. See ADR-0007 for consume-charm semantics.
+        private static void ImportEvolutions(ref int created, ref int updated)
+        {
+            var root = LoadJson("evolutions.json");
+            if (root == null) return;
+            var list = (root is JArray arr) ? (JArray)arr : (JArray)(root["evolutions"] ?? new JArray());
+            foreach (JObject entry in list.OfType<JObject>())
+            {
+                var slug = entry.Value<string>("id");
+                if (string.IsNullOrEmpty(slug)) continue;
+
+                var assetPath = $"{EvolutionOutputDir}/Evolution_{slug}.asset";
+                var existed = File.Exists(assetPath);
+                var so = LoadOrCreate<EvolutionRecipeAsset>(assetPath);
+
+                using var serialized = new SerializedObject(so);
+                ApplyField(serialized, "recipe.baseWeaponId",        entry.Value<string>("base_weapon_id"));
+                ApplyField(serialized, "recipe.requiredCharmId",     entry.Value<string>("required_charm_id"));
+                ApplyField(serialized, "recipe.evolvedWeaponId",     entry.Value<string>("evolved_weapon_id"));
+                ApplyField(serialized, "recipe.requiredWeaponLevel", entry.Value<int?>("required_weapon_level") ?? 5);
+                ApplyField(serialized, "recipe.requiredCharmLevel",  entry.Value<int?>("required_charm_level")  ?? 5);
+                ApplyField(serialized, "recipe.consumeCharm",        entry.Value<bool?>("consume_charm")        ?? true);
                 serialized.ApplyModifiedPropertiesWithoutUndo();
                 EditorUtility.SetDirty(so);
 
