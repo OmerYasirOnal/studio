@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "doc": "Source-of-truth weapon roster for brave-bunny — 12 weapons + 6 evolutions. Per ADR-0001 no allowed_characters array — universal pool.",
+  "doc": "Source-of-truth weapon roster for brave-bunny — 18 weapons (12 launch + 6 Wave 9 expansion) + 8 evolutions. Per ADR-0001 no allowed_characters array — universal pool.",
   "weapons": [
     {
       "id": "carrot-boomerang",
@@ -288,6 +288,131 @@
       },
       "synergy_tags": ["mech", "kinetic"],
       "unlock": "character-bound:owl-default"
+    },
+    {
+      "id": "storm-cloud",
+      "display_name": "Storm Cloud",
+      "archetype": "area",
+      "targeting": "random-in-range",
+      "dmg_base": 1.25,
+      "rate_ms": 2500,
+      "range_units": 5.5,
+      "projectiles_base": 1,
+      "zaps_per_cloud": 4,
+      "cloud_lifetime_ms": 4000,
+      "level_mult": [1.00, 1.00, 1.20, 1.20, 1.20],
+      "level_perks": [
+        {"level": 2, "perk": "zaps_per_cloud", "value": 5},
+        {"level": 3, "perk": "dmg_pct", "value": 0.15},
+        {"level": 4, "perk": "cloud_lifetime_ms", "value": 6000},
+        {"level": 5, "perk": "projectiles", "value": 1}
+      ],
+      "evolution": null,
+      "synergy_tags": ["solar", "storm"],
+      "unlock": "battle-pass:s2-tier-8"
+    },
+    {
+      "id": "sapling-summon",
+      "display_name": "Sapling Summon",
+      "archetype": "summon",
+      "targeting": "drop-in-range",
+      "dmg_base": 1.4,
+      "rate_ms": 700,
+      "range_units": 3.0,
+      "projectiles_base": 1,
+      "lifetime_ms": 8000,
+      "level_mult": [1.00, 1.00, 1.15, 1.15, 1.15],
+      "level_perks": [
+        {"level": 2, "perk": "dmg_pct", "value": 0.15},
+        {"level": 3, "perk": "lifetime_ms", "value": 10000},
+        {"level": 4, "perk": "dot_ms", "value": 600},
+        {"level": 5, "perk": "projectiles", "value": 1}
+      ],
+      "evolution": null,
+      "synergy_tags": ["nature", "summon"],
+      "unlock": "achievement:plant-five-saplings-one-run"
+    },
+    {
+      "id": "maple-boomerang",
+      "display_name": "Maple Boomerang",
+      "archetype": "projectile",
+      "targeting": "nearest",
+      "dmg_base": 2.0,
+      "rate_ms": 1100,
+      "range_units": 5.5,
+      "projectiles_base": 1,
+      "level_mult": [1.00, 1.10, 1.20, 1.25, 1.25],
+      "level_perks": [
+        {"level": 2, "perk": "pierce", "value": 2},
+        {"level": 3, "perk": "dmg_pct", "value": 0.15},
+        {"level": 4, "perk": "rate_ms", "value": 900},
+        {"level": 5, "perk": "projectiles", "value": 1}
+      ],
+      "evolution": null,
+      "synergy_tags": ["kinetic", "nature"],
+      "unlock": "biome:autumn-grove-first-run"
+    },
+    {
+      "id": "sunflower-beam",
+      "display_name": "Sunflower Beam",
+      "archetype": "utility-beam",
+      "targeting": "nearest-sweep-lock",
+      "dmg_base": 0.8,
+      "rate_ms": 200,
+      "range_units": 6.5,
+      "projectiles_base": 1,
+      "level_mult": [1.00, 1.15, 1.25, 1.25, 1.25],
+      "level_perks": [
+        {"level": 2, "perk": "dmg_pct", "value": 0.15},
+        {"level": 3, "perk": "beam_width_mult", "value": 1.5},
+        {"level": 4, "perk": "rate_ms", "value": 150},
+        {"level": 5, "perk": "reflect_off_edge", "value": 1}
+      ],
+      "evolution": null,
+      "synergy_tags": ["solar", "beam", "nature"],
+      "unlock": "battle-pass:s2-tier-18"
+    },
+    {
+      "id": "cherry-bomb",
+      "display_name": "Cherry Bomb",
+      "archetype": "area",
+      "targeting": "random-screen-position",
+      "dmg_base": 2.4,
+      "rate_ms": 1600,
+      "range_units": 7.0,
+      "projectiles_base": 1,
+      "travel_ms": 700,
+      "splash_units_base": 1.2,
+      "level_mult": [1.00, 1.10, 1.20, 1.25, 1.25],
+      "level_perks": [
+        {"level": 2, "perk": "splash_units", "value": 1.6},
+        {"level": 3, "perk": "dmg_pct", "value": 0.15},
+        {"level": 4, "perk": "rate_ms", "value": 1300},
+        {"level": 5, "perk": "projectiles", "value": 1}
+      ],
+      "evolution": null,
+      "synergy_tags": ["explosive", "nature"],
+      "unlock": "achievement:detonate-fifty-splashes"
+    },
+    {
+      "id": "wasp-swarm",
+      "display_name": "Wasp Swarm",
+      "archetype": "summon",
+      "targeting": "orbit-then-dive",
+      "dmg_base": 0.6,
+      "rate_ms": 500,
+      "range_units": 2.5,
+      "projectiles_base": 3,
+      "level_mult": [1.00, 1.00, 1.15, 1.15, 1.15],
+      "level_perks": [
+        {"level": 2, "perk": "projectiles", "value": 1},
+        {"level": 3, "perk": "dmg_pct", "value": 0.15},
+        {"level": 4, "perk": "dot_ms", "value": 400},
+        {"level": 5, "perk": "range_units", "value": 3.0}
+      ],
+      "evolution": null,
+      "synergy_tags": ["nature", "summon", "swarm"],
+      "unlock": "event:bramble-hive-or-bp-s3-tier-15"
     }
   ],
   "evolutions": [

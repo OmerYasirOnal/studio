@@ -1,6 +1,6 @@
 # weapons.json — schema
 
-> Source of truth for the 12-weapon roster + 8 evolved variants. Read into `WeaponDefinition` ScriptableObjects.
+> Source of truth for the 18-weapon roster (12 launch + 6 Wave 9 expansion) + 8 evolved variants. Read into `WeaponDefinition` ScriptableObjects.
 
 ## Top-level fields
 
@@ -8,7 +8,7 @@
 |---|---|---|---|
 | `schema_version` | string | "1.0" | Bump on breaking change. |
 | `doc` | string | — | Human header. |
-| `weapons` | array | length=12 | Base weapon roster. |
+| `weapons` | array | length=18 | Base weapon roster (12 launch + 6 Wave 9). |
 | `evolutions` | array | length=8 | Evolved variants (6 evolution recipes + 2 spec'd post-launch). |
 
 ## `weapons[]` entry
