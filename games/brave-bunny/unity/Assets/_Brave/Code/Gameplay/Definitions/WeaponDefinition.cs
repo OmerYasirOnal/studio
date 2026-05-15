@@ -6,6 +6,8 @@ using System;
 
 using UnityEngine;
 
+using Brave.Gameplay.Combat.Archetypes;
+
 namespace Brave.Gameplay.Definitions
 {
     public enum WeaponArchetype { Projectile, Area, Aura, Summon, Utility }
@@ -33,6 +35,13 @@ namespace Brave.Gameplay.Definitions
 
         [Header("Evolution (null for non-evolving weapons)")]
         public WeaponEvolutionRecipe? evolution;
+
+        // ADR-0020: archetype-specific sidecar config (nullable — null for
+        // weapons whose archetype needs no extra fields beyond the level table).
+        // Concrete subclass discriminator lives in the SO type itself; the
+        // BalanceJsonImporter creates the correct subclass per JSON archetype.
+        [Header("Archetype sidecar (ADR-0020 — null for base-case archetypes)")]
+        public WeaponArchetypeConfig? archetypeConfig;
 
         [Header("Tags")]
         public SynergyTag[] synergyTags = Array.Empty<SynergyTag>();

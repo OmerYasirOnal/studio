@@ -13,6 +13,7 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
+using Brave.Gameplay.Combat.Archetypes;
 using Brave.Gameplay.Definitions;
 
 namespace Brave.Boot.Editor
@@ -26,11 +27,17 @@ namespace Brave.Boot.Editor
         //  resolves to .../brave-bunny/data/balance which matches the repo layout.)
         private const string BalanceDataDir = "../../data/balance";
         private const string OutputDir = "Assets/_Brave/Data/Balance";
+        // ADR-0020: archetype-config sidecar SOs live alongside WeaponDefinition assets
+        // under an Archetypes subfolder so the Project window groups them clearly.
+        private const string ArchetypeOutputDir = OutputDir + "/Archetypes";
+        // Weapon levels are EXACTLY 5 (tech-spec 02 / WeaponDefinition.OnValidate).
+        private const int WeaponLevelCount = 5;
 
         [MenuItem("Brave/Generate Balance SOs from JSON")]
         public static void GenerateAll()
         {
             Directory.CreateDirectory(OutputDir);
+            Directory.CreateDirectory(ArchetypeOutputDir);
 
             int created = 0;
             int updated = 0;
@@ -233,10 +240,211 @@ namespace Brave.Boot.Editor
                     // upgradeFlavor is designer copy; left at default (empty) — no JSON source.
                 }
 
+                // ADR-0020: build / refresh the archetype-config sidecar SO and
+                // wire it onto WeaponDefinition.archetypeConfig BEFORE applying
+                // the SerializedObject (so the objectReferenceValue persists).
+                ImportWeaponArchetypeConfig(so, slug!, entry, serialized);
+
                 serialized.ApplyModifiedPropertiesWithoutUndo();
                 EditorUtility.SetDirty(so);
 
                 if (existed) updated++; else created++;
+            }
+        }
+
+        // --- ADR-0020 archetype dispatch ----------------------------------------
+        // Picks the concrete WeaponArchetypeConfig subclass from the weapon JSON.
+        // Disambiguates the JSON "archetype" enum string with key-presence checks
+        // because the JSON "area" archetype covers Daisy Mine, Thunder Cloud, AND
+        // Cob Mortar — each of which needs a different SO subclass.
+        private static System.Type? ResolveArchetypeType(string? archetypeStr, JObject entry)
+        {
+            if (string.IsNullOrEmpty(archetypeStr)) return null;
+
+            // Key-presence disambiguators (ADR-0020 §Decision).
+            bool hasArmTime      = entry["arm_time_ms"]       != null;
+            bool hasCloudLife    = entry["cloud_lifetime_ms"] != null;
+            bool hasSplashUnits  = entry["splash_units_base"] != null;
+            bool hasSlowPct      = entry["slow_pct_base"]     != null;
+            bool hasLifetimeMs   = entry["lifetime_ms"]       != null;
+
+            string a = archetypeStr.ToLowerInvariant();
+
+            // JSON "area" covers mine / cloud / splash-projectile — disambiguate via key-presence.
+            if (a == "area")
+            {
+                if (hasArmTime)     return typeof(MineArchetypeConfig);
+                if (hasCloudLife)   return typeof(CloudArchetypeConfig);
+                if (hasSplashUnits) return typeof(SplashProjectileArchetypeConfig);
+                return null;
+            }
+
+            if (a == "aura")        return typeof(AuraArchetypeConfig);
+            if (a == "summon")      return typeof(SummonArchetypeConfig);
+            if (a == "projectile")  return typeof(ProjectileArchetypeConfig);
+            // "utility-beam" → Sunbeam.
+            if (a.StartsWith("utility-beam") || a == "beam") return typeof(BeamArchetypeConfig);
+
+            // Fallback by field presence (handles archetypes shipped without an exact-match string).
+            if (hasArmTime)     return typeof(MineArchetypeConfig);
+            if (hasCloudLife)   return typeof(CloudArchetypeConfig);
+            if (hasSplashUnits) return typeof(SplashProjectileArchetypeConfig);
+            if (hasSlowPct)     return typeof(AuraArchetypeConfig);
+            if (hasLifetimeMs)  return typeof(SummonArchetypeConfig);
+            return null;
+        }
+
+        private static void ImportWeaponArchetypeConfig(
+            WeaponDefinition weaponSo, string slug, JObject entry,
+            SerializedObject weaponSerialized)
+        {
+            var archetypeType = ResolveArchetypeType(entry.Value<string>("archetype"), entry);
+            if (archetypeType == null)
+            {
+                Debug.LogWarning($"[balance-importer] weapon '{slug}': no archetype-config subclass for archetype='{entry.Value<string>("archetype")}' — leaving archetypeConfig=null");
+                return;
+            }
+
+            Directory.CreateDirectory(ArchetypeOutputDir);
+            var assetPath = $"{ArchetypeOutputDir}/Weapon_{slug}_archetype.asset";
+
+            // Existing asset must match the dispatched type; if a previous import
+            // landed on the wrong subclass (e.g. JSON archetype was edited), drop
+            // it and re-create.
+            var existing = AssetDatabase.LoadAssetAtPath<WeaponArchetypeConfig>(assetPath);
+            if (existing != null && existing.GetType() != archetypeType)
+            {
+                AssetDatabase.DeleteAsset(assetPath);
+                existing = null;
+            }
+
+            WeaponArchetypeConfig configSo;
+            if (existing != null)
+            {
+                configSo = existing;
+            }
+            else
+            {
+                configSo = (WeaponArchetypeConfig)ScriptableObject.CreateInstance(archetypeType);
+                AssetDatabase.CreateAsset(configSo, assetPath);
+            }
+
+            // Populate per-subclass fields from JSON (top-level baseline + per-level
+            // perk carry-forward array — mirrors ImportWeapons' rate_ms / range carry-forward).
+            using (var cfgSerialized = new SerializedObject(configSo))
+            {
+                if (configSo is MineArchetypeConfig)
+                {
+                    int armTime0 = entry.Value<int?>("arm_time_ms") ?? 0;
+                    ApplyField(cfgSerialized, "armTimeMs", armTime0);
+                    ApplyPerLevelInt(cfgSerialized, "armTimeMsPerLevel", entry["level_perks"] as JArray,
+                                     "arm_time_ms", armTime0);
+                }
+                else if (configSo is CloudArchetypeConfig)
+                {
+                    int cloudLife0 = entry.Value<int?>("cloud_lifetime_ms") ?? 0;
+                    int zaps0      = entry.Value<int?>("zaps_per_cloud")   ?? 0;
+                    ApplyField(cfgSerialized, "cloudLifetimeMs", cloudLife0);
+                    ApplyField(cfgSerialized, "zapsPerCloud",    zaps0);
+                    ApplyPerLevelInt(cfgSerialized, "cloudLifetimeMsPerLevel",
+                                     entry["level_perks"] as JArray, "cloud_lifetime_ms", cloudLife0);
+                    ApplyPerLevelInt(cfgSerialized, "zapsPerCloudPerLevel",
+                                     entry["level_perks"] as JArray, "zaps_per_cloud",    zaps0);
+                }
+                else if (configSo is SplashProjectileArchetypeConfig)
+                {
+                    float splash0 = entry.Value<float?>("splash_units_base") ?? 0f;
+                    int   travel0 = entry.Value<int?>("travel_ms")           ?? 0;
+                    ApplyField(cfgSerialized, "splashUnitsBase", splash0);
+                    ApplyField(cfgSerialized, "travelMs",        travel0);
+                    ApplyPerLevelFloat(cfgSerialized, "splashUnitsPerLevel",
+                                       entry["level_perks"] as JArray, "splash_units", splash0);
+                    ApplyPerLevelInt(cfgSerialized, "travelMsPerLevel",
+                                     entry["level_perks"] as JArray, "travel_ms", travel0);
+                }
+                else if (configSo is AuraArchetypeConfig)
+                {
+                    float slow0 = entry.Value<float?>("slow_pct_base") ?? 0f;
+                    int   tick0 = entry.Value<int?>("tick_lifetime_ms") ?? 0;
+                    ApplyField(cfgSerialized, "slowPctBase",    slow0);
+                    ApplyField(cfgSerialized, "tickLifetimeMs", tick0);
+                    ApplyPerLevelFloat(cfgSerialized, "slowPctPerLevel",
+                                       entry["level_perks"] as JArray, "slow_pct", slow0);
+                    ApplyPerLevelInt(cfgSerialized, "tickLifetimeMsPerLevel",
+                                     entry["level_perks"] as JArray, "tick_lifetime_ms", tick0);
+                }
+                else if (configSo is SummonArchetypeConfig)
+                {
+                    int life0 = entry.Value<int?>("lifetime_ms") ?? 0;
+                    ApplyField(cfgSerialized, "lifetimeMs", life0);
+                    ApplyPerLevelInt(cfgSerialized, "lifetimeMsPerLevel",
+                                     entry["level_perks"] as JArray, "lifetime_ms", life0);
+                }
+                // Projectile / Beam subclasses are field-empty base cases — nothing to populate.
+
+                cfgSerialized.ApplyModifiedPropertiesWithoutUndo();
+                EditorUtility.SetDirty(configSo);
+            }
+
+            // Wire the sidecar onto WeaponDefinition.archetypeConfig. The caller
+            // ApplyModifiedPropertiesWithoutUndo() will persist the reference.
+            var prop = weaponSerialized.FindProperty("archetypeConfig");
+            if (prop != null)
+            {
+                prop.objectReferenceValue = configSo;
+            }
+        }
+
+        // Carries an int perk value forward across the 5 weapon levels, mirroring
+        // the rate_ms / range carry-forward in ImportWeapons. Perk values at level
+        // N apply to levels N..5; baseline applies to levels before any perk hits.
+        private static void ApplyPerLevelInt(SerializedObject so, string arrayPath,
+                                             JArray? perks, string perkName, int baseline)
+        {
+            var arrProp = so.FindProperty(arrayPath);
+            if (arrProp == null || !arrProp.isArray) return;
+            arrProp.arraySize = WeaponLevelCount;
+
+            int current = baseline;
+            for (int i = 0; i < WeaponLevelCount; i++)
+            {
+                int level1Based = i + 1;
+                if (perks != null && level1Based >= 2)
+                {
+                    foreach (var p in perks.OfType<JObject>())
+                    {
+                        if ((p.Value<int?>("level") ?? -1) != level1Based) continue;
+                        if (p.Value<string>("perk") != perkName) continue;
+                        int? v = p.Value<int?>("value");
+                        if (v.HasValue) current = v.Value;
+                    }
+                }
+                arrProp.GetArrayElementAtIndex(i).intValue = current;
+            }
+        }
+
+        private static void ApplyPerLevelFloat(SerializedObject so, string arrayPath,
+                                               JArray? perks, string perkName, float baseline)
+        {
+            var arrProp = so.FindProperty(arrayPath);
+            if (arrProp == null || !arrProp.isArray) return;
+            arrProp.arraySize = WeaponLevelCount;
+
+            float current = baseline;
+            for (int i = 0; i < WeaponLevelCount; i++)
+            {
+                int level1Based = i + 1;
+                if (perks != null && level1Based >= 2)
+                {
+                    foreach (var p in perks.OfType<JObject>())
+                    {
+                        if ((p.Value<int?>("level") ?? -1) != level1Based) continue;
+                        if (p.Value<string>("perk") != perkName) continue;
+                        float? v = p.Value<float?>("value");
+                        if (v.HasValue) current = v.Value;
+                    }
+                }
+                arrProp.GetArrayElementAtIndex(i).floatValue = current;
             }
         }
 
