@@ -9,11 +9,13 @@ using System.Collections.Generic;
 using Brave.Gameplay.Definitions;
 using Brave.Gameplay.Feel;
 using Brave.Gameplay.Run;
+using Brave.Gameplay.Events;
 using Brave.Systems.Ads;
 using Brave.Systems.Analytics;
 using Brave.Systems.Audio;
 using Brave.Systems.Iap;
 using Brave.Systems.Localization;
+using Brave.Systems.LiveOps;
 using Brave.Systems.Progression;
 using Brave.Systems.Save;
 using Brave.Systems.Settings;
@@ -50,6 +52,15 @@ public sealed class GameContextBootstrap : MonoBehaviour
     [Header("Meta-progression (Wave 7A — character unlocks)")]
     [Tooltip("Character catalogue used to seed the unlock-condition registry. Slug → CharacterDefinition.")]
     [SerializeField] private CharacterDefinition[]? _characterCatalogue;
+
+    [Header("LiveOps (Wave 9 — daily quests)")]
+    [Tooltip("Quest pool catalogue. Service rolls 3 daily quests from this SO each UTC day.")]
+    [SerializeField] private QuestPoolConfig? _questPool;
+    [Tooltip("Event channels the QuestService subscribes to for automatic progress.")]
+    [SerializeField] private EnemyKilledChannel? _questEnemyKilled;
+    [SerializeField] private LevelUpChannel? _questLevelUp;
+    [SerializeField] private BossDefeatedChannel? _questBossDefeated;
+    [SerializeField] private PickupChannel? _questPickup;
 
     /// <summary>Singleton-style accessor for code that cannot receive ctx via injection (e.g. static <c>Loc</c>).</summary>
     public static GameContext Context { get; private set; } = null!;
@@ -117,6 +128,19 @@ public sealed class GameContextBootstrap : MonoBehaviour
 
         var achievements = new AchievementService(save);
         ctx.Register<IAchievementService>(achievements);
+
+        // ---- Wave 9 LiveOps: daily quests ----
+        // QuestService rolls 3 quests per UTC day from QuestPoolConfig (deterministic
+        // seed = player-id ^ utc-date). Subscribes to the existing gameplay channels
+        // for kill/level/boss/pickup-gold progress. _questPool may be null in CI builds
+        // that haven't wired the SO yet — the service then exposes an empty quest array.
+        var quests = new QuestService(save, _questPool, currency: null);
+        ctx.Register<IQuestService>(quests);
+        _questUnsubscribe = quests.SubscribeEventChannels(
+            _questEnemyKilled,
+            _questLevelUp,
+            _questBossDefeated,
+            _questPickup);
 
         var analytics = new AnalyticsService(new AnalyticsBackend());
         ctx.Register<IAnalyticsService>(analytics);
@@ -219,6 +243,10 @@ public sealed class GameContextBootstrap : MonoBehaviour
         return dict;
     }
 
+    // Wave 9: token returned by QuestService.SubscribeEventChannels — invoked
+    // on OnDestroy so quest progress handlers don't outlive the bootstrap.
+    private System.Action? _questUnsubscribe;
+
     // Latched at Awake; subscriber re-entrancy on domain reload would dupe handlers.
     private bool _runEndBridgeSubscribed;
 
@@ -289,6 +317,11 @@ public sealed class GameContextBootstrap : MonoBehaviour
             RunEndIntegrationBridge.RunEnded -= OnRunEndedForMetaServices;
             _runEndBridgeSubscribed = false;
         }
+        // Wave 9: drop QuestService event-channel subscriptions to avoid
+        // leaked SO listeners (channels are ScriptableObjects — they survive
+        // scene unloads).
+        _questUnsubscribe?.Invoke();
+        _questUnsubscribe = null;
     }
 
     private void OnApplicationPause(bool pause)

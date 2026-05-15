@@ -1,0 +1,143 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d72abda2b8bd492689b23e8179412766, type: 3}
+  m_Name: QuestPoolConfig
+  m_EditorClassIdentifier:
+  templates:
+  - id: kill_30_enemies_easy
+    type: 0
+    difficulty: 0
+    requiredCount: 30
+    rewardCurrency: 0
+    rewardAmount: 100
+    titleLocKey:
+    bossFilter:
+  - id: kill_100_enemies_medium
+    type: 0
+    difficulty: 1
+    requiredCount: 100
+    rewardCurrency: 0
+    rewardAmount: 250
+    titleLocKey:
+    bossFilter:
+  - id: kill_300_enemies_hard
+    type: 0
+    difficulty: 2
+    requiredCount: 300
+    rewardCurrency: 1
+    rewardAmount: 3
+    titleLocKey:
+    bossFilter:
+  - id: survive_3_waves_easy
+    type: 1
+    difficulty: 0
+    requiredCount: 3
+    rewardCurrency: 0
+    rewardAmount: 100
+    titleLocKey:
+    bossFilter:
+  - id: survive_7_waves_medium
+    type: 1
+    difficulty: 1
+    requiredCount: 7
+    rewardCurrency: 0
+    rewardAmount: 250
+    titleLocKey:
+    bossFilter:
+  - id: survive_12_waves_hard
+    type: 1
+    difficulty: 2
+    requiredCount: 12
+    rewardCurrency: 1
+    rewardAmount: 4
+    titleLocKey:
+    bossFilter:
+  - id: defeat_1_boss_medium
+    type: 2
+    difficulty: 1
+    requiredCount: 1
+    rewardCurrency: 0
+    rewardAmount: 300
+    titleLocKey:
+    bossFilter:
+  - id: defeat_2_bosses_hard
+    type: 2
+    difficulty: 2
+    requiredCount: 2
+    rewardCurrency: 1
+    rewardAmount: 5
+    titleLocKey:
+    bossFilter:
+  - id: reach_level_5_easy
+    type: 3
+    difficulty: 0
+    requiredCount: 5
+    rewardCurrency: 0
+    rewardAmount: 120
+    titleLocKey:
+    bossFilter:
+  - id: reach_level_10_medium
+    type: 3
+    difficulty: 1
+    requiredCount: 10
+    rewardCurrency: 0
+    rewardAmount: 275
+    titleLocKey:
+    bossFilter:
+  - id: reach_level_20_hard
+    type: 3
+    difficulty: 2
+    requiredCount: 20
+    rewardCurrency: 1
+    rewardAmount: 5
+    titleLocKey:
+    bossFilter:
+  - id: collect_200_gold_easy
+    type: 4
+    difficulty: 0
+    requiredCount: 200
+    rewardCurrency: 0
+    rewardAmount: 100
+    titleLocKey:
+    bossFilter:
+  - id: collect_750_gold_medium
+    type: 4
+    difficulty: 1
+    requiredCount: 750
+    rewardCurrency: 0
+    rewardAmount: 300
+    titleLocKey:
+    bossFilter:
+  - id: survive_180s_easy
+    type: 5
+    difficulty: 0
+    requiredCount: 180
+    rewardCurrency: 0
+    rewardAmount: 120
+    titleLocKey:
+    bossFilter:
+  - id: survive_420s_medium
+    type: 5
+    difficulty: 1
+    requiredCount: 420
+    rewardCurrency: 0
+    rewardAmount: 275
+    titleLocKey:
+    bossFilter:
+  - id: survive_600s_hard
+    type: 5
+    difficulty: 2
+    requiredCount: 600
+    rewardCurrency: 1
+    rewardAmount: 6
+    titleLocKey:
+    bossFilter:

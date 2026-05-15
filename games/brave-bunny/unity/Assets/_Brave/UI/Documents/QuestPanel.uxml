@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Brave Bunny — Quest Panel (Wave 9 LiveOps).
+  Three daily quest cards with progress bar + claim button.
+  Controller: Code/UI/Controllers/QuestPanelController.cs
+  Loc keys: quest.<type>.title, quest.claim, quest.progress
+-->
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="project://database/Assets/_Brave/UI/Themes/theme.uss" />
+    <Style src="project://database/Assets/_Brave/UI/Styles/screens.uss" />
+
+    <ui:VisualElement name="quest-root" class="brave-root">
+
+        <ui:VisualElement name="quest-header" class="home-header">
+            <ui:Label name="lbl-title" text="Today's quests" class="h1" loc-key="quest.panel.title" />
+            <ui:Button name="btn-close" text="x" class="btn btn-ghost btn-icon" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="quest-main" class="home-main">
+
+            <ui:VisualElement name="quest-card-0" class="card quest-card">
+                <ui:VisualElement class="row-spread">
+                    <ui:Label name="lbl-quest-0-title" text="" class="h2" />
+                    <ui:Label name="lbl-quest-0-reward" text="" class="chip chip-gold" />
+                </ui:VisualElement>
+                <ui:VisualElement name="quest-0-bar" class="bar bar-pass" style="margin-top: 8px;">
+                    <ui:VisualElement name="quest-0-bar-fill" class="bar-fill" style="width: 0%;" />
+                </ui:VisualElement>
+                <ui:VisualElement class="row-spread" style="margin-top: 6px;">
+                    <ui:Label name="lbl-quest-0-progress" text="0 / 0" class="body-sm" loc-key="quest.progress" />
+                    <ui:Button name="btn-quest-0-claim" text="Claim" class="btn btn-primary" loc-key="quest.claim" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="quest-card-1" class="card quest-card" style="margin-top: 12px;">
+                <ui:VisualElement class="row-spread">
+                    <ui:Label name="lbl-quest-1-title" text="" class="h2" />
+                    <ui:Label name="lbl-quest-1-reward" text="" class="chip chip-gold" />
+                </ui:VisualElement>
+                <ui:VisualElement name="quest-1-bar" class="bar bar-pass" style="margin-top: 8px;">
+                    <ui:VisualElement name="quest-1-bar-fill" class="bar-fill" style="width: 0%;" />
+                </ui:VisualElement>
+                <ui:VisualElement class="row-spread" style="margin-top: 6px;">
+                    <ui:Label name="lbl-quest-1-progress" text="0 / 0" class="body-sm" loc-key="quest.progress" />
+                    <ui:Button name="btn-quest-1-claim" text="Claim" class="btn btn-primary" loc-key="quest.claim" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="quest-card-2" class="card quest-card" style="margin-top: 12px;">
+                <ui:VisualElement class="row-spread">
+                    <ui:Label name="lbl-quest-2-title" text="" class="h2" />
+                    <ui:Label name="lbl-quest-2-reward" text="" class="chip chip-gold" />
+                </ui:VisualElement>
+                <ui:VisualElement name="quest-2-bar" class="bar bar-pass" style="margin-top: 8px;">
+                    <ui:VisualElement name="quest-2-bar-fill" class="bar-fill" style="width: 0%;" />
+                </ui:VisualElement>
+                <ui:VisualElement class="row-spread" style="margin-top: 6px;">
+                    <ui:Label name="lbl-quest-2-progress" text="0 / 0" class="body-sm" loc-key="quest.progress" />
+                    <ui:Button name="btn-quest-2-claim" text="Claim" class="btn btn-primary" loc-key="quest.claim" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

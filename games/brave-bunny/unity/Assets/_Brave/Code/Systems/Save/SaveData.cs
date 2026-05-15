@@ -31,10 +31,10 @@ public sealed class SaveData
     [JsonProperty("achievements")] public Dictionary<string, AchievementEntry> Achievements = new();
     [JsonProperty("dailyMissions")] public DailyMissionsSection DailyMissions = new();
     [JsonProperty("dailyStreak")] public DailyStreakSection DailyStreak = new();
-    // Wave 9: 7-day rotating login-reward calendar. Owned by DailyRewardService.
-    // Forward-compat per ADR-0008 — missing key in v1/v2 saves defaults to day 1,
-    // no lastClaimUtc, zero lifetime claims (i.e. claimable on first launch).
+    // Wave 9: 7-day rotating login-reward calendar (DailyRewardService).
     [JsonProperty("dailyRewardState")] public DailyRewardState DailyRewardState = new();
+    // Wave 9 LiveOps — daily quest/mission system (rotates at UTC midnight).
+    [JsonProperty("questState")] public QuestState QuestState = new();
     [JsonProperty("settings")] public SettingsSection Settings = new();
     [JsonProperty("stats")] public StatsSection Stats = new();
     // Wave 7C: first-run tutorial completion flag. Defaults to false; the
@@ -113,6 +113,22 @@ public sealed class SaveData
     {
         [JsonProperty("rolledForDate")] public string? RolledForDate;
         [JsonProperty("missions")] public List<DailyMissionEntry> Missions = new();
+    }
+
+    // ---- Wave 9 LiveOps: daily quest system ----
+    [JsonObject(MemberSerialization.OptIn)]
+    public sealed class QuestEntry
+    {
+        [JsonProperty("id")] public string Id = string.Empty;
+        [JsonProperty("progress")] public int Progress;
+        [JsonProperty("claimed")] public bool Claimed;
+    }
+
+    [JsonObject(MemberSerialization.OptIn)]
+    public sealed class QuestState
+    {
+        [JsonProperty("rolledForDate")] public string? RolledForDate;
+        [JsonProperty("entries")] public List<QuestEntry> Entries = new();
     }
 
     [JsonObject(MemberSerialization.OptIn)]
