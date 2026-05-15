@@ -86,6 +86,26 @@ namespace Brave.Gameplay.Feel
         [Tooltip("Shake frequency (oscillations per second).")]
         public float screenshakeFrequencyHz = 35f;
 
+        // ---- Combo / kill-streak (Wave 10) ----
+
+        [Header("Combo / kill-streak — Wave 10")]
+        [Tooltip("Rolling window in seconds: kills landing inside this window since the previous " +
+                 "kill extend the streak. If no kill arrives before the window expires, the " +
+                 "streak breaks and resets to zero.")]
+        public float comboWindowSeconds = 2.0f;
+
+        [Tooltip("Streak count at which tier-1 styling (silver) activates on the combo badge.")]
+        public int comboTier1Threshold = 3;
+
+        [Tooltip("Streak count at which tier-2 styling (gold) activates on the combo badge.")]
+        public int comboTier2Threshold = 5;
+
+        [Tooltip("Streak count at which tier-3 styling (rainbow) activates on the combo badge.")]
+        public int comboTier3Threshold = 10;
+
+        [Tooltip("Fade-out delay (seconds) before the combo badge hides after a streak break.")]
+        public float comboFadeOutSeconds = 0.5f;
+
         /// <summary>Hitstop duration in seconds (convenience for callers that work in seconds).</summary>
         public float HitstopSeconds => hitstopMs * 0.001f;
 
