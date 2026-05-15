@@ -1,0 +1,9 @@
+# Output directory for the screenshot pipeline.
+# Actual PNGs (raw/ and <locale>/<device>/*.png) are .gitignored at the repo root.
+# This placeholder keeps the directory in git so the capture scripts can write
+# here without first calling `mkdir -p` on a path users may not expect to exist.
+#
+# Pipeline:
+#   tools/ci/scripts/capture-screenshots.sh
+#     → marketing/screenshots/raw/<device>/<NN>.png           (uncommitted)
+#     → marketing/screenshots/<locale>/<device>/<NN>-<slug>.png (uncommitted)

@@ -1,0 +1,26 @@
+{
+  "_comment": "App Store Connect metadata — en-US (primary). Source of truth for the en-US locale row on App Store Connect. SCHEMA.md documents every field, its character limit, and which ASC API field it maps to. Edit this file, then run tools/ci/scripts/asc-upload-metadata.sh to push. Tone bible: docs/02-gdd/narrative/00-tone-bible.md. Display name locked per ADR-0016.",
+  "_schema_version": "1.0.0",
+  "_locale": "en-US",
+  "_authored_by": "build-engineer + narrative-designer",
+  "_authored_at": "2026-05-16",
+  "_adr_refs": ["0016-app-store-display-name"],
+
+  "name": "Brave Bunny: Survivors",
+  "subtitle": "Hop. Swarm. Survive.",
+  "promotional_text": "Eight 8-minute roguelite runs. Auto-attack heroes, evolve weapons, hop on.",
+  "description": "Brave Bunny: Survivors is a cheerful auto-attack roguelite for one thumb and 8 minutes.\n\nPick a hero. Hop into a meadow full of rascals. Watch your carrot boomerang, sunbeam, and daisy mines do the work while you focus on dodging and picking the right level-up gifts.\n\nFEATURES\n\n— EIGHT HEROES. Bunny, tortoise, fox, owl, panda, and three more to unlock. Each plays its own way.\n— TWELVE WEAPONS THAT EVOLVE. Pair the right two and watch a weapon grow up.\n— FIVE BIOMES. Meadow, beach, forest, cavern, snow. Each adds one new hazard and one new set of troublemakers.\n— LEVEL-UP DRAFT. Three gifts, every level. Pick a build, change your run, keep hopping.\n— ONE THUMB. Auto-attack means you focus on movement and choices, not aiming.\n— EIGHT MINUTES. Every run is a complete arc. Win, lose, dust off, go again.\n\nWHY PLAY\n\n— A roguelite with a smile on every frame. No grimdark, no shouting, no microtransactions that block content.\n— Quick runs that respect your time. 8 minutes start to finish.\n— Family-safe wherever you point your phone. Soft register, no gore, no scary stuff.\n— A friendly older-sibling voice cheering you on, not an esports caster yelling at you.\n\nSUPPORT\n\nWe read every email. If something feels off, write to us and we'll fix it. Thanks for hopping along.",
+  "keywords": "roguelite,survivor,auto attack,bunny,cute,roguelike,arcade,one thumb,casual,action",
+  "release_notes": "Launch! Eight heroes, twelve evolving weapons, five biomes, 8-minute runs. Hop in.",
+  "support_url": "https://omeryasir.dev/brave-bunny/support",
+  "marketing_url": "https://omeryasir.dev/brave-bunny",
+  "privacy_url": "https://omeryasir.dev/brave-bunny/privacy",
+
+  "_field_lengths": {
+    "name": 23,
+    "subtitle": 20,
+    "keywords": 75,
+    "description_approx": 1480
+  },
+  "_todo_validation": "Run `fastlane deliver --validate-only` after first upload to confirm the schema matches current ASC requirements; update SCHEMA.md if fields shift."
+}

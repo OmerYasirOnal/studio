@@ -84,6 +84,12 @@ games/*/unity/UserSettings/
 games/*/assets-raw/**/*.psd
 games/*/assets-raw/**/*.blend1
 
+# Marketing screenshot pipeline outputs — capture-screenshots.sh writes PNGs
+# here; we keep the JSON spec + copy in git but the rendered PNGs are
+# regenerable artifacts (build-engineer runs the script before each ASC push).
+games/*/marketing/screenshots/**/*.png
+games/*/marketing/screenshots/**/*.png.txt
+
 # OS artifacts (macOS Finder icon stub uses a literal carriage-return; '?' glob
 # would catch our 'icons/' directories)
 Icon[$'\r']

@@ -1,0 +1,26 @@
+{
+  "_comment": "App Store Connect metadata — tr-TR (soft-launch market). Translated by narrative-designer + native localizer. Tone bible (TR voice): docs/02-gdd/narrative/00-tone-bible.md §11. Mirror of en-US.json schema; SCHEMA.md is canonical. Display name locked per ADR-0016 (kept English on store front; Turkish copy describes the game).",
+  "_schema_version": "1.0.0",
+  "_locale": "tr-TR",
+  "_authored_by": "narrative-designer + localizer (TR)",
+  "_authored_at": "2026-05-16",
+  "_adr_refs": ["0016-app-store-display-name"],
+
+  "name": "Brave Bunny: Survivors",
+  "subtitle": "Zıpla. Karşı koy. Hayatta kal.",
+  "promotional_text": "Sekiz dakikalık neşeli roguelite turlar. Otomatik saldıran kahramanlar, evrilen silahlar. Hadi zıpla.",
+  "description": "Brave Bunny: Survivors, tek parmakla ve sekiz dakikada oynayabileceğiniz neşeli bir otomatik-saldırı roguelite oyunudur.\n\nBir kahraman seçin. Çayır dolusu yaramazın arasına atlayın. Havuç-bumerangınız, güneş ışını silahınız ve papatya mayınlarınız işi yaparken siz manevrayı yapın, doğru hediyeleri seçin.\n\nÖZELLİKLER\n\n— SEKİZ KAHRAMAN. Tavşan, kaplumbağa, tilki, baykuş, panda ve üç tane daha. Her biri ayrı bir tarz.\n— EVRİMLEŞEN ON İKİ SİLAH. Doğru iki silahı eşleyin, silah büyüsün.\n— BEŞ DÜNYA. Çayır, sahil, orman, mağara, kar. Her biri yeni bir tehlike ve yeni bir grup yaramaz getirir.\n— SEVİYE ATLAMA SEÇİMİ. Her seviyede üç hediye. Birini seçin, turu değiştirin, zıplamaya devam edin.\n— TEK PARMAK. Otomatik saldırı sayesinde nişan değil, hareket ve karar önemli.\n— SEKİZ DAKİKA. Her tur tam bir hikâye. Kazanın, kaybedin, silkinin, tekrar başlayın.\n\nNEDEN OYNAMALI?\n\n— Her karesi tebessümlü bir roguelite. Karanlık bir dünya, bağırış çağırış veya içeriği kilitleyen küçük satın almalar yok.\n— Zamanınıza saygı gösteren hızlı turlar. Baştan sona sekiz dakika.\n— Telefonu kime uzatsanız güvenli. Yumuşak ton, korkutucu hiçbir şey yok.\n— Size bağıran bir spiker değil, mutfak masasında sizi destekleyen büyük kardeş gibi bir anlatıcı.\n\nDESTEK\n\nHer e-postayı okuyoruz. Bir şey yanlış geliyorsa yazın, düzeltelim. Zıplamaya geldiğiniz için teşekkürler.",
+  "keywords": "roguelite,survivor,otomatik,tavşan,sevimli,arcade,tek parmak,casual,aksiyon,roguelike",
+  "release_notes": "İlk sürüm! Sekiz kahraman, evrimleşen on iki silah, beş dünya, sekiz dakikalık turlar. Hadi zıpla.",
+  "support_url": "https://omeryasir.dev/brave-bunny/support",
+  "marketing_url": "https://omeryasir.dev/brave-bunny",
+  "privacy_url": "https://omeryasir.dev/brave-bunny/privacy",
+
+  "_field_lengths": {
+    "name": 23,
+    "subtitle": 30,
+    "keywords": 86,
+    "description_approx": 1450
+  },
+  "_todo_validation": "TR ASC schema fields are identical to en-US; re-run `fastlane deliver --validate-only` after first push to confirm Turkish-specific keyword tokenisation lands as expected."
+}
