@@ -8,14 +8,20 @@
 // Critical fit: iPhone SE 3 (375 × 667). Modal max-height 640. 3 cards stacked
 // vertically, each ≥ 88 pt — verified at design time in the wireframe.
 //
-// Wiring: gameplay-engineer's UpgradePicker passes a `DraftOffer[3]` and a
-// callback. The controller does NOT know about WeaponDefinition etc.; it
-// only renders presentation data the picker prepares for it.
+// Wiring (Wave 7B):
+//   * Subscribes to LevelUpChannel — Gameplay's LevelUpController raises it
+//     when XP threshold crossed. On event: pause run, build 3-card draft from
+//     the passive/weapon catalogue, Show modal.
+//   * Pick → applies (raises UIEvents.UpgradePicked), hides, restores timescale.
+//
+// Draft selection is delegated to LevelUpDraftBuilder (pure-C# helper) so the
+// 3-card invariant can be exercised in EditMode tests without a MonoBehaviour.
 
 #nullable enable
 
 using System;
 using System.Collections.Generic;
+using Brave.Gameplay.Events;
 using Brave.UI.Bindings;
 using Brave.UI.Theming;
 using UnityEngine;
@@ -23,21 +29,97 @@ using UnityEngine.UIElements;
 
 namespace Brave.UI.Controllers
 {
+    /// <summary>One upgrade option — either a passive or a weapon-level bump.</summary>
+    public readonly struct UpgradeOption
+    {
+        public readonly string IconText;
+        public readonly string Title;
+        public readonly string DeltaBody;
+        public readonly bool IsEvolution;
+
+        public UpgradeOption(string iconText, string title, string deltaBody, bool isEvolution)
+        {
+            IconText = iconText;
+            Title = title;
+            DeltaBody = deltaBody;
+            IsEvolution = isEvolution;
+        }
+    }
+
+    /// <summary>
+    /// Pure-C# draft builder. Picks N unique offers from a flat option pool with
+    /// a deterministic seed (for tests + replay-buffer parity). When the pool is
+    /// smaller than N the builder pads with the last option to honour the
+    /// "always 3 cards" UI invariant.
+    /// </summary>
+    public static class LevelUpDraftBuilder
+    {
+        public const int DraftSize = 3;
+
+        /// <summary>Build a draft of exactly 3 offers from <paramref name="pool"/>.</summary>
+        public static UpgradeOption[] Build(IReadOnlyList<UpgradeOption> pool, int seed)
+        {
+            if (pool == null) throw new ArgumentNullException(nameof(pool));
+            var draft = new UpgradeOption[DraftSize];
+
+            if (pool.Count == 0)
+            {
+                // Degenerate case — emit placeholder offers so the modal still has 3 cards.
+                var placeholder = new UpgradeOption("?", "—", "(no offers)", false);
+                for (int i = 0; i < DraftSize; i++) draft[i] = placeholder;
+                return draft;
+            }
+
+            var rng = new System.Random(seed);
+            // Reservoir-style: pick DraftSize distinct indices when pool is large enough,
+            // otherwise sample with replacement (rare — pool size < 3 only at very low levels).
+            var taken = new HashSet<int>();
+            if (pool.Count >= DraftSize)
+            {
+                while (taken.Count < DraftSize)
+                {
+                    taken.Add(rng.Next(pool.Count));
+                }
+                int idx = 0;
+                foreach (var i in taken) draft[idx++] = pool[i];
+            }
+            else
+            {
+                for (int i = 0; i < DraftSize; i++) draft[i] = pool[rng.Next(pool.Count)];
+            }
+            return draft;
+        }
+    }
+
+    /// <summary>
+    /// Optional pool source — the Run scene wires a concrete provider that pulls
+    /// from the live passives catalogue + character weapon upgrades. EditMode tests
+    /// inject a fake provider.
+    /// </summary>
+    public interface IUpgradePoolProvider
+    {
+        IReadOnlyList<UpgradeOption> BuildPool();
+    }
+
     [RequireComponent(typeof(UIDocument))]
     public sealed class LevelUpDraftController : MonoBehaviour
     {
-        /// <summary>One offer card — prepared by UpgradePicker.</summary>
+        /// <summary>One offer card — prepared by UpgradePicker (legacy alias).</summary>
         public readonly struct DraftOffer
         {
-            public readonly string IconText;       // "CC" / "★" / "+HP"
-            public readonly string Title;          // "Carrot Cannon Lv 2"
-            public readonly string DeltaBody;      // "Dmg 8 → 12 · Rate 1.2 → 1.5/s"
-            public readonly bool   IsEvolution;    // adds rare ring
+            public readonly string IconText;
+            public readonly string Title;
+            public readonly string DeltaBody;
+            public readonly bool   IsEvolution;
             public DraftOffer(string iconText, string title, string deltaBody, bool isEvolution)
             {
                 IconText = iconText; Title = title; DeltaBody = deltaBody; IsEvolution = isEvolution;
             }
+            public UpgradeOption ToUpgrade() => new(IconText, Title, DeltaBody, IsEvolution);
         }
+
+        [Header("Gameplay event channels (optional — wired by Run scene)")]
+        [SerializeField] private LevelUpChannel? _levelUpChannel;
 
         private UIDocument _doc = null!;
         private LocalizationProvider _loc = null!;
@@ -47,6 +129,20 @@ namespace Brave.UI.Controllers
         private readonly List<CardSlot> _cardSlots = new(capacity: 3);
         private bool _banishUsedThisRun;
         private int _rerollsUsedThisRun;
+        private float _priorTimeScale = 1f;
+        private IUpgradePoolProvider? _poolProvider;
+
+        // Default pool: 6 hard-coded passives mirroring data/balance/passives.json.
+        // The Run scene replaces this via SetPoolProvider when the live catalogue is wired.
+        private static readonly UpgradeOption[] DefaultPool =
+        {
+            new("MC", "Magnet Charm Lv +1", "Pickup radius +20%", false),
+            new("HC", "Hearty Charm Lv +1", "Max HP +15%", false),
+            new("RC", "Mossy Charm Lv +1", "HP regen +0.5/s", false),
+            new("DC", "Damage Charm Lv +1", "Damage +10%", false),
+            new("SC", "Swift Charm Lv +1", "Move speed +8%", false),
+            new("CC", "Cooldown Charm Lv +1", "Cooldown -8%", false),
+        };
 
         private void Awake()
         {
@@ -76,31 +172,72 @@ namespace Brave.UI.Controllers
             _root.Q<Button>("btn-banish")!.clicked += OnBanishClicked;
             _root.Q<Button>("btn-reroll")!.clicked += OnRerollClicked;
 
+            if (_levelUpChannel != null) _levelUpChannel.Subscribe(OnLevelUp);
+
             _loc.ApplyToTree(_root);
             Hide();
         }
 
-        /// <summary>Show the modal with three concrete offers + level number.</summary>
-        public void Show(int newLevel, DraftOffer[] offers)
+        private void OnDisable()
         {
-            if (offers == null || offers.Length != 3)
-                throw new ArgumentException("LevelUpDraftController requires exactly 3 offers.", nameof(offers));
+            if (_levelUpChannel != null) _levelUpChannel.Unsubscribe(OnLevelUp);
+            // Restore timescale defensively if torn down while paused.
+            if (Time.timeScale == 0f) Time.timeScale = _priorTimeScale;
+        }
+
+        /// <summary>Test/integration hook — Run scene wires the live passive catalogue here.</summary>
+        public void SetPoolProvider(IUpgradePoolProvider provider)
+        {
+            _poolProvider = provider;
+        }
+
+        /// <summary>Subscriber for <see cref="LevelUpChannel"/>. Builds 3 offers and shows.</summary>
+        public void OnLevelUp(LevelUpEvent evt)
+        {
+            var pool = _poolProvider?.BuildPool() ?? DefaultPool;
+            // Seed with new level so the draft is deterministic per level (replay parity).
+            var draft = LevelUpDraftBuilder.Build(pool, seed: evt.newLevel);
+            Show(evt.newLevel, draft);
+        }
+
+        /// <summary>Show the modal with three concrete offers + level number.</summary>
+        public void Show(int newLevel, UpgradeOption[] offers)
+        {
+            if (offers == null || offers.Length != LevelUpDraftBuilder.DraftSize)
+                throw new ArgumentException(
+                    $"LevelUpDraftController requires exactly {LevelUpDraftBuilder.DraftSize} offers.",
+                    nameof(offers));
 
             _levelBadge.text = $"Lv {newLevel}";
             _flavorLabel.text = _loc.Loc("LEVEL_UP_FLAVOR_PLUCKY");
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < _cardSlots.Count; i++)
             {
                 _cardSlots[i].Render(offers[i]);
             }
             _root.style.display = DisplayStyle.Flex;
+
+            _priorTimeScale = Time.timeScale;
             Time.timeScale = 0f; // pause-on-draft per 02-gdd/03-run-loop.md
+        }
+
+        /// <summary>Legacy overload for callers using <see cref="DraftOffer"/>.</summary>
+        public void Show(int newLevel, DraftOffer[] offers)
+        {
+            if (offers == null || offers.Length != LevelUpDraftBuilder.DraftSize)
+                throw new ArgumentException(
+                    $"LevelUpDraftController requires exactly {LevelUpDraftBuilder.DraftSize} offers.",
+                    nameof(offers));
+            var upgrades = new UpgradeOption[offers.Length];
+            for (int i = 0; i < offers.Length; i++) upgrades[i] = offers[i].ToUpgrade();
+            Show(newLevel, upgrades);
         }
 
         public void Hide()
         {
             _root.style.display = DisplayStyle.None;
-            Time.timeScale = 1f;
+            // Restore the timescale we captured on Show() — never blindly snap to 1.
+            Time.timeScale = _priorTimeScale;
         }
 
         private void OnTake(int cardIndex)
@@ -145,7 +282,7 @@ namespace Brave.UI.Controllers
                 TakeButton = root.Q<Button>(btnName)!;
             }
 
-            public void Render(DraftOffer offer)
+            public void Render(UpgradeOption offer)
             {
                 Icon.text = offer.IconText;
                 Title.text = offer.Title;

@@ -413,3 +413,33 @@
     min-height: var(--tap-min);
     margin-top: var(--space-s);
 }
+
+/* ============ Loadout (04-loadout) ============ */
+.loadout-scroll {
+    flex-grow: 1;
+}
+
+.loadout-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.loadout-card {
+    width: 46%;
+    min-height: 88px;
+    margin-top: var(--space-s);
+    padding: var(--space-s);
+    border-radius: var(--radius-chip);
+    background-color: var(--color-mint-wash);
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.loadout-card-locked {
+    opacity: 0.5;
+}
+
+.loadout-card-selected {
+    background-color: var(--color-rare-cyan);
+}
