@@ -49,6 +49,9 @@
                     <ui:Label name="lbl-hero-of-day-eyebrow" text="Hero of the day" class="micro" />
                     <ui:Label name="lbl-hero-of-day-summary" text="Brave Bunny — +10% carrots today" class="num" />
                 </ui:VisualElement>
+                <!-- Wave 10: Profile entry — routes to the lifetime stats + character roster screen. -->
+                <ui:Button name="btn-profile" text="Profile" class="btn btn-ghost"
+                           loc-key="profile.open_button" />
             </ui:VisualElement>
 
             <!-- Daily missions -->

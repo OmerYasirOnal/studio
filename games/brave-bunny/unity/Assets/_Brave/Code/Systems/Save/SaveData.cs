@@ -169,6 +169,12 @@ public sealed class SaveData
         [JsonProperty("bestRunTimeSeconds")] public float BestRunTimeSeconds;
         [JsonProperty("bossesDefeated")] public long BossesDefeated;
         [JsonProperty("evolutionsTriggered")] public long EvolutionsTriggered;
+        // Wave 10 (Profile screen): cumulative time-played accumulator.
+        // LifetimeStatsService folds Time.realtimeSinceStartup deltas at run-end.
+        // ADR-0008 forward-compat: missing in older v1 saves → 0 (no migration).
+        [JsonProperty("totalPlaytimeSeconds")] public double TotalPlaytimeSeconds;
+        // Wave 10: highest wave ordinal reached across all runs (1-based).
+        [JsonProperty("bestWaveReached")] public int BestWaveReached;
     }
 }
 
