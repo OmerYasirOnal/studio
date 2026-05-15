@@ -28,6 +28,11 @@ public sealed class SaveData
     [JsonProperty("passives")] public Dictionary<string, PassiveEntry> Passives = new();
     [JsonProperty("cosmetics")] public Dictionary<string, CosmeticEntry> Cosmetics = new();
     [JsonProperty("battlePass")] public BattlePassSection BattlePass = new();
+    // Wave 9: LiveOps battle-pass scaffold. Lives alongside the legacy
+    // BattlePassSection (v1 schema) for forward-compat per ADR-0008 — the new
+    // BattlePassService writes only to this field. Legacy section is preserved
+    // so older saves don't lose data during migration.
+    [JsonProperty("battlePassState")] public BattlePassState BattlePassState = new();
     [JsonProperty("achievements")] public Dictionary<string, AchievementEntry> Achievements = new();
     [JsonProperty("dailyMissions")] public DailyMissionsSection DailyMissions = new();
     [JsonProperty("dailyStreak")] public DailyStreakSection DailyStreak = new();
@@ -162,12 +167,8 @@ public sealed class SaveData
     }
 }
 
-/// <summary>
 /// Wave 9 — daily login reward calendar state. Owned by
-/// <see cref="Brave.Systems.LiveOps.DailyRewardService"/>. Top-level (not nested
-/// in SaveData) so the LiveOps service references it without coupling to the
-/// SaveData class graph; the SaveData root holds an instance for serialization.
-/// ADR-0008: every field declares [JsonProperty] for rename-safe forward-compat.
+/// <see cref="Brave.Systems.LiveOps.DailyRewardService"/>.
 /// </summary>
 [Serializable]
 [JsonObject(MemberSerialization.OptIn)]
@@ -176,4 +177,33 @@ public sealed class DailyRewardState
     [JsonProperty("currentDay")] public int CurrentDay = 1;
     [JsonProperty("lastClaimUtc")] public string? LastClaimUtc;
     [JsonProperty("lifetimeClaims")] public int LifetimeClaims;
+}
+
+/// <summary>
+/// Wave 9 LiveOps battle-pass persistent state. Top-level POCO referenced by
+/// LiveOps assembly without circular dep. Coexists with the legacy
+/// <see cref="SaveData.BattlePassSection"/> for ADR-0008 forward-compat.
+/// </summary>
+[Serializable]
+[JsonObject(MemberSerialization.OptIn)]
+public sealed class BattlePassState
+{
+    [JsonProperty("seasonId")] public string SeasonId = string.Empty;
+    [JsonProperty("currentXp")] public int CurrentXp;
+    [JsonProperty("currentTier")] public int CurrentTier;
+    [JsonProperty("premiumActive")] public bool PremiumActive;
+    [JsonProperty("claimedFreeTiers")] public List<int> ClaimedFreeTiers = new();
+    [JsonProperty("claimedPremiumTiers")] public List<int> ClaimedPremiumTiers = new();
+    [JsonProperty("lastSeasonResetUtc")] public string LastSeasonResetUtc = string.Empty;
+
+    public void BeginNewSeason(string seasonId)
+    {
+        SeasonId = seasonId;
+        CurrentXp = 0;
+        CurrentTier = 0;
+        PremiumActive = false;
+        ClaimedFreeTiers.Clear();
+        ClaimedPremiumTiers.Clear();
+        LastSeasonResetUtc = DateTime.UtcNow.ToString("o");
+    }
 }
