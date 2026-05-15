@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.0",
-  "doc": "Source-of-truth enemy stats. First-draft archetypes for the Meadow vertical slice: 3 swarmer archetypes (hop-slime, bee-buzz, daisy-bite), 1 tank (sleepy-boar), 1 ranged (archer-mole), 1 elite (big-onion), 1 boss (old-boar-king). HP curves recalibrated vs 05-enemies.md baselines — see 04-enemy-tuning.md and pending ADR-0006. Per-minute scaling lives in scaling.* fields per role.",
+  "schema_version": "1.1",
+  "doc": "Source-of-truth enemy stats. Meadow vertical slice ships 7 entries (3 swarmer archetypes, 1 tank, 1 ranged, 1 elite, 1 boss). Wave 9 adds Beach (biome 2) and Cavern (biome 4) enemy rosters — 7 + 7 = 14 new variants. Per-biome HP curves recalibrated vs 05-enemies.md baselines — see 04-enemy-tuning.md and ADR-0006 (linear per-minute). Beach is ~10% harder than Meadow; Cavern is ~40% harder per docs/02-gdd/06-biomes.md. Per-minute scaling lives in scaling.* fields per role. Old Boar King remains the only launch boss; biome 2/4 boss IDs (crab-captain, sneaky-cave-mole) are referenced from waves.json but not implemented at launch (deferred to post-launch waves).",
   "scaling_method": "linear-per-minute",
   "minute_zero_reference": 1,
   "enemies": [
@@ -130,6 +130,248 @@
       "time_dilate_factor": 0.5,
       "hitstop_on_kill_ms": 250,
       "drops_ref": "boss-end-default"
+    },
+
+    {
+      "id": "crab",
+      "display_name": "Crab",
+      "role": "swarmer",
+      "biome": "beach",
+      "scaling": {
+        "hp_base": 4,
+        "hp_per_min": 3,
+        "contact_dmg": 6,
+        "speed_mult_vs_player": 1.00,
+        "defense_mult": 0
+      },
+      "behavior_note": "sidesteps laterally — new swarmer motion archetype per docs/02-gdd/06-biomes.md Beach swarmer table",
+      "drops_ref": "swarmer-default"
+    },
+    {
+      "id": "gull",
+      "display_name": "Gull",
+      "role": "swarmer",
+      "biome": "beach",
+      "scaling": {
+        "hp_base": 3,
+        "hp_per_min": 3,
+        "contact_dmg": 5,
+        "speed_mult_vs_player": 1.25,
+        "defense_mult": 0
+      },
+      "behavior_note": "first airborne-feeling swarmer; low-flying flank pattern preferred",
+      "drops_ref": "swarmer-default"
+    },
+    {
+      "id": "sand-puff",
+      "display_name": "Sand-Puff",
+      "role": "swarmer",
+      "biome": "beach",
+      "scaling": {
+        "hp_base": 2,
+        "hp_per_min": 2,
+        "contact_dmg": 4,
+        "speed_mult_vs_player": 1.15,
+        "defense_mult": 0
+      },
+      "behavior_note": "tiny dust-devil; also boss-summoned by Crab Captain during phases 2-3",
+      "drops_ref": "swarmer-default"
+    },
+    {
+      "id": "mosquito",
+      "display_name": "Mosquito",
+      "role": "swarmer",
+      "biome": "beach",
+      "scaling": {
+        "hp_base": 3,
+        "hp_per_min": 3,
+        "contact_dmg": 5,
+        "speed_mult_vs_player": 1.30,
+        "defense_mult": 0
+      },
+      "behavior_note": "Honey Swamp recolor; fastest swarmer in Beach, flank/scatter preferred",
+      "drops_ref": "swarmer-default"
+    },
+    {
+      "id": "bog-boar",
+      "display_name": "Bog Boar",
+      "role": "tank",
+      "biome": "beach",
+      "scaling": {
+        "hp_base": 33,
+        "hp_per_min": 17,
+        "contact_dmg": 20,
+        "speed_mult_vs_player": 0.60,
+        "defense_mult": 0
+      },
+      "charge": {
+        "interval_ms": 4000,
+        "burst_speed_mult": 1.50,
+        "burst_duration_ms": 1000,
+        "telegraph_ms": 400
+      },
+      "behavior_note": "sun-bleached recolor of sleepy-boar; reuse TankBehavior",
+      "drops_ref": "tank-default"
+    },
+    {
+      "id": "throw-frog",
+      "display_name": "Throw Frog",
+      "role": "ranged",
+      "biome": "beach",
+      "scaling": {
+        "hp_base": 11,
+        "hp_per_min": 7,
+        "contact_dmg": 4,
+        "ranged_dmg": 12,
+        "speed_mult_vs_player": 0.95,
+        "defense_mult": 0
+      },
+      "ranged": {
+        "kite_distance_units": 3.5,
+        "fire_window_units": [3.5, 6.5],
+        "telegraph_ms": 500,
+        "projectile_speed_units_per_sec": 3.8
+      },
+      "behavior_note": "toy-beanbag thrower; reuse RangedBehavior with marginally higher kite distance",
+      "drops_ref": "ranged-default"
+    },
+    {
+      "id": "big-hermit-crab",
+      "display_name": "Big Hermit Crab",
+      "role": "elite",
+      "biome": "beach",
+      "scaling": {
+        "hp_base": 165,
+        "hp_per_min": 44,
+        "contact_dmg": 28,
+        "speed_mult_vs_player": 0.65,
+        "defense_mult": 0.10
+      },
+      "telegraph_min_ms": 600,
+      "hitstop_on_kill_ms": 80,
+      "behavior_note": "+10% HP and small defense_mult vs big-onion to enforce the +10% biome-2 difficulty target",
+      "drops_ref": "elite-default"
+    },
+
+    {
+      "id": "bat-mini",
+      "display_name": "Bat-Mini",
+      "role": "swarmer",
+      "biome": "cavern",
+      "scaling": {
+        "hp_base": 4,
+        "hp_per_min": 4,
+        "contact_dmg": 6,
+        "speed_mult_vs_player": 1.20,
+        "defense_mult": 0
+      },
+      "behavior_note": "hovering motion (not strict-ground) — Y-position vibrates but XZ targeting per ADR-0018/0019",
+      "drops_ref": "swarmer-default"
+    },
+    {
+      "id": "glow-bug",
+      "display_name": "Glow-Bug",
+      "role": "swarmer",
+      "biome": "cavern",
+      "scaling": {
+        "hp_base": 4,
+        "hp_per_min": 4,
+        "contact_dmg": 6,
+        "speed_mult_vs_player": 1.10,
+        "defense_mult": 0
+      },
+      "behavior_note": "luminescent — telegraphs hits via self-glow (visual juice only; no extra damage)",
+      "drops_ref": "swarmer-default"
+    },
+    {
+      "id": "rock-tumble",
+      "display_name": "Rock-Tumble",
+      "role": "swarmer",
+      "biome": "cavern",
+      "scaling": {
+        "hp_base": 5,
+        "hp_per_min": 4,
+        "contact_dmg": 7,
+        "speed_mult_vs_player": 1.00,
+        "defense_mult": 0.10
+      },
+      "behavior_note": "rolling pebble-creature — Carrot Fields ladybug recolor; small defense_mult for the +40% Cavern difficulty bias",
+      "drops_ref": "swarmer-default"
+    },
+    {
+      "id": "cave-slime",
+      "display_name": "Cave-Slime",
+      "role": "swarmer",
+      "biome": "cavern",
+      "scaling": {
+        "hp_base": 4,
+        "hp_per_min": 4,
+        "contact_dmg": 6,
+        "speed_mult_vs_player": 1.05,
+        "defense_mult": 0
+      },
+      "behavior_note": "deep-blue recolor of hop-slime; ground-bound",
+      "drops_ref": "swarmer-default"
+    },
+    {
+      "id": "stone-ox",
+      "display_name": "Stone Ox",
+      "role": "tank",
+      "biome": "cavern",
+      "scaling": {
+        "hp_base": 42,
+        "hp_per_min": 21,
+        "contact_dmg": 24,
+        "speed_mult_vs_player": 0.55,
+        "defense_mult": 0.15
+      },
+      "charge": {
+        "interval_ms": 4500,
+        "burst_speed_mult": 1.55,
+        "burst_duration_ms": 1100,
+        "telegraph_ms": 450
+      },
+      "behavior_note": "heavier/slower than sleepy-boar; +40% HP and 0.15 defense_mult to hit the Cavern +40% target",
+      "drops_ref": "tank-default"
+    },
+    {
+      "id": "crystal-slinger",
+      "display_name": "Crystal Slinger",
+      "role": "ranged",
+      "biome": "cavern",
+      "scaling": {
+        "hp_base": 14,
+        "hp_per_min": 8,
+        "contact_dmg": 5,
+        "ranged_dmg": 16,
+        "speed_mult_vs_player": 0.85,
+        "defense_mult": 0
+      },
+      "ranged": {
+        "kite_distance_units": 3.5,
+        "fire_window_units": [3.5, 7.0],
+        "telegraph_ms": 550,
+        "projectile_speed_units_per_sec": 4.5
+      },
+      "behavior_note": "gem-headed mole recolor of archer-mole; faster, harder-hitting projectile to align with Cavern difficulty",
+      "drops_ref": "ranged-default"
+    },
+    {
+      "id": "stalagmite-walker",
+      "display_name": "Stalagmite Walker",
+      "role": "elite",
+      "biome": "cavern",
+      "scaling": {
+        "hp_base": 210,
+        "hp_per_min": 56,
+        "contact_dmg": 32,
+        "speed_mult_vs_player": 0.65,
+        "defense_mult": 0.20
+      },
+      "telegraph_min_ms": 600,
+      "hitstop_on_kill_ms": 80,
+      "behavior_note": "+40% HP and 0.20 defense_mult vs big-onion; legs-from-rock silhouette, reuse EliteBehavior",
+      "drops_ref": "elite-default"
     }
   ]
 }
