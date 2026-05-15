@@ -12,19 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 374ff2826d6e4e578e01f91fa981f5fc, type: 3}
   m_Name: FeelConfig
   m_EditorClassIdentifier:
-  hitstopMs: 20
+  hitstopMs: 45
   hitstopTimeScale: 0
-  flashMs: 60
+  flashMs: 80
   flashColor: {r: 1, g: 1, b: 1, a: 1}
   flashColorPropertyName: _BaseColor
-  dmgNumberLifetime: 0.6
+  dmgNumberLifetime: 0.55
   dmgNumberFloatHeight: 0.75
   dmgNumberColorNormal: {r: 1, g: 1, b: 1, a: 1}
   dmgNumberColorCrit: {r: 1, g: 0.85, b: 0.2, a: 1}
   dmgNumberColorPlayerHit: {r: 1, g: 0.25, b: 0.25, a: 1}
   dmgNumberJitter: 0.25
-  screenshakeAmpLow: 0.05
-  screenshakeAmpMed: 0.15
-  screenshakeAmpHigh: 0.35
-  screenshakeDurationSeconds: 0.18
+  screenshakeAmpLow: 0.04
+  screenshakeAmpMed: 0.1
+  screenshakeAmpHigh: 0.22
+  screenshakeDurationSeconds: 0.12
   screenshakeFrequencyHz: 35
