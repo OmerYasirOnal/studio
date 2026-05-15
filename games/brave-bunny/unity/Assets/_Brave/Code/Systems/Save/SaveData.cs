@@ -33,6 +33,11 @@ public sealed class SaveData
     [JsonProperty("dailyStreak")] public DailyStreakSection DailyStreak = new();
     [JsonProperty("settings")] public SettingsSection Settings = new();
     [JsonProperty("stats")] public StatsSection Stats = new();
+    // Wave 7C: first-run tutorial completion flag. Defaults to false; the
+    // TutorialController consults TutorialState.ShouldShow() to decide whether
+    // to mount the overlay on Run-scene start. Forward-compat per ADR-0008
+    // (missing key in v1 saves deserializes as default false).
+    [JsonProperty("tutorialSeen")] public bool TutorialSeen;
     [JsonProperty("createdAt")] public string CreatedAt = DateTime.UtcNow.ToString("o");
     [JsonProperty("lastSavedAt")] public string LastSavedAt = DateTime.UtcNow.ToString("o");
 
