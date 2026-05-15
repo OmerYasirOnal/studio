@@ -172,14 +172,22 @@ namespace Brave.Gameplay.Feel
         public FeelConfig? Config { get => _config; set => _config = value; }
         public DamageNumberPool? Pool { get => _pool; set => _pool = value; }
 
-        /// <summary>Spawn from a HitContext (preferred — has crit flag + position).</summary>
+        /// <summary>
+        /// Spawn from a HitContext (preferred — has crit flag + position). Wave 10:
+        /// when <see cref="HitContext.isCrit"/> is true the widget renders in
+        /// <see cref="FeelConfig.dmgNumberColorCrit"/> (yellow per feel.json defaults).
+        /// </summary>
         public DamageNumberWidget? Spawn(in HitContext ctx)
         {
             var kind = ctx.isCrit ? DamageNumberKind.Crit : DamageNumberKind.Normal;
             return Spawn(ctx.hitPoint, ctx.amount, kind);
         }
 
-        /// <summary>Spawn from a HitInfo (used by EnemyHealth call site).</summary>
+        /// <summary>
+        /// Spawn from a HitInfo (used by EnemyHealth call site). Wave 10: when
+        /// <see cref="HitInfo.isCrit"/> is true the widget renders in
+        /// <see cref="FeelConfig.dmgNumberColorCrit"/> (yellow per feel.json defaults).
+        /// </summary>
         public DamageNumberWidget? Spawn(in HitInfo info)
         {
             var kind = info.isCrit ? DamageNumberKind.Crit : DamageNumberKind.Normal;
@@ -189,6 +197,17 @@ namespace Brave.Gameplay.Feel
         /// <summary>Spawn for player-hurt feedback (red).</summary>
         public DamageNumberWidget? SpawnPlayerHurt(Vector3 worldPos, float amount)
             => Spawn(worldPos, amount, DamageNumberKind.PlayerHurt);
+
+        /// <summary>
+        /// Wave 10 — pure mapping of <see cref="DamageNumberKind"/> to the configured color
+        /// on a <see cref="FeelConfig"/>. Extracted for test coverage of the crit-yellow path.
+        /// </summary>
+        public static Color SelectColor(FeelConfig config, DamageNumberKind kind) => kind switch
+        {
+            DamageNumberKind.Crit       => config.dmgNumberColorCrit,
+            DamageNumberKind.PlayerHurt => config.dmgNumberColorPlayerHit,
+            _                           => config.dmgNumberColorNormal,
+        };
 
         /// <summary>Core spawn path. Returns the acquired widget, or null when pool is empty.</summary>
         public DamageNumberWidget? Spawn(Vector3 worldPos, float amount, DamageNumberKind kind)
@@ -201,12 +220,7 @@ namespace Brave.Gameplay.Feel
 
             widget.Owner = _pool;
 
-            Color color = kind switch
-            {
-                DamageNumberKind.Crit       => _config.dmgNumberColorCrit,
-                DamageNumberKind.PlayerHurt => _config.dmgNumberColorPlayerHit,
-                _                           => _config.dmgNumberColorNormal,
-            };
+            Color color = SelectColor(_config, kind);
 
             Vector3 jittered = worldPos + JitterOffset();
             widget.Configure(
