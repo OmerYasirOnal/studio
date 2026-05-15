@@ -1,8 +1,14 @@
 # ADR 0006 — Enemy HP recalibration
 
 **Date:** 2026-05-12
-**Status:** accepted
+**Status:** superseded by ADR-0022 for boss HP (other roles still apply)
 **Owner:** orchestrator (synthesizing balance-engineer wave-4 flag)
+
+> **Note (2026-05-16):** The Old Boar King row below (3000 HP total) is
+> superseded by **ADR-0022** following the Wave 7B TTK polish pass.
+> Boss HP is now **1200** (mid-boss 800). The phase-gate fractions
+> (66% / 33%) remain unchanged. Swarmer, archer-mole, and elite curves
+> in this ADR remain canonical for their respective roles.
 
 ## Context
 

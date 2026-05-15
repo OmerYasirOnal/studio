@@ -9,7 +9,7 @@ ADRs are numbered sequentially, four-digit zero-padded. Use `/decide "<topic>"` 
 | 0003 | Hitstop timings reconciliation | 2026-05-12 | accepted |
 | 0004 | No voice acting at launch | 2026-05-12 | accepted |
 | 0005 | Engine choice: Unity 6 LTS URP | 2026-05-12 | accepted |
-| 0006 | Enemy HP recalibration | 2026-05-12 | accepted |
+| 0006 | Enemy HP recalibration | 2026-05-12 | superseded by 0022 (boss HP only) |
 | 0007 | Evolution charm consumption | 2026-05-12 | accepted |
 | 0008 | Save format: Newtonsoft JSON | 2026-05-12 | accepted |
 | 0009 | Polymorphic mechanics via type-name registry | 2026-05-12 | accepted |
@@ -24,6 +24,8 @@ ADRs are numbered sequentially, four-digit zero-padded. Use `/decide "<topic>"` 
 | 0018 | Enemy + AutoAttack XZ-plane migration (closes ADR-0017 deletion gap) | 2026-05-12 | accepted |
 | 0019 | Wave 4 cleanup debt (cross-plane bug + 4 follow-ups) | 2026-05-12 | accepted |
 | 0020 | Weapon archetype-config sidecar + `EnemyRole.Boss` enum value | 2026-05-12 | accepted |
+| 0021 | Single canonical IRunRuntimeState + live HUD binding | 2026-05-13 | accepted |
+| 0022 | Boss HP recalibration (Wave 7 vertical-slice TTK) | 2026-05-16 | accepted |
 
 ## Conventions
 

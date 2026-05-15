@@ -110,20 +110,20 @@ Median L5 DPS shifts up. New median = ~6.5 (was ~5.2). Acceptable ±20% band: **
 
 | Weapon | L5 DPS (post-pass) | In band [5.2, 7.8]? |
 |---|---|---|
-| Carrot Boomerang | ~12.6 (3.0 × 1.85 × 2 proj / 0.8s × pierce) | **above** — calibration anchor, will trim if it dominates |
+| Carrot Boomerang | ~12.6 (3.0 × 1.85 × 2 proj / 0.8s × pierce) | **above** — calibration anchor, will trim if it dominates → **trimmed Wave 7C: level_mult[4] 1.85 → 1.55** |
 | Sunbeam | ~6.8 | ✓ |
 | Daisy Mine | ~7.0 | ✓ |
 | Pebble Sling | ~8.0 | borderline above ✓ |
 | Honey Aura | ~6.5 (5-enemy norm) | ✓ |
-| Acorn Cannon | ~10.0 | **above** |
+| Acorn Cannon | ~10.0 | **above** → **trimmed Wave 7C: level_mult[4] 1.95 → 1.30** |
 
 Carrot Boomerang and Acorn Cannon now sit above band ceiling. **Known issue.** Wave 7B accepts the over-tune for response-feel intent; a follow-up Wave 7C should rebalance L5 multipliers down (`level_mult[4]` from 1.85 → 1.5; Acorn `level_mult[4]` from 1.95 → 1.4) once Monte Carlo re-runs against the new enemy HP curve.
 
 ## Risks & follow-ups
 
 1. **Tank-as-friction is dead.** Tank now ≈ fat swarmer. Re-tune `hp_per_min` to 25-30 if playtest wants the chunky-roadblock identity back.
-2. **L5 DPS band broken on 2 weapons.** Carrot Boomerang & Acorn Cannon over-ceiling. Schedule Wave 7C balance pass after first playtest.
-3. **ADR-0006 supersede needed.** Boss HP now 1200 (was 3000 in ADR-0006). Draft a successor ADR with the new curve once playtest validates.
+2. ~~**L5 DPS band broken on 2 weapons.**~~ **RESOLVED (Wave 7C, 2026-05-16).** Carrot Boomerang `level_mult[4]` 1.85 → **1.55** (flat with L4), Acorn Cannon `level_mult[4]` 1.95 → **1.30** (flat with L4). Both weapons now inside 5.2-7.8 band (Carrot ≈ 5.81 DPS, Acorn ≈ 5.50 DPS by base formula). See commit referenced in `11-roadmap/current-phase.md` Wave 7C section.
+3. ~~**ADR-0006 supersede needed.**~~ **RESOLVED (Wave 7C, 2026-05-16).** **ADR-0022** drafted, superseding ADR-0006 for boss HP only. Boss HP locked at 1200 (mid-boss 800). Phase-gate fractions unchanged. See commit referenced in `11-roadmap/current-phase.md` Wave 7C section.
 4. **Honey-aura on single targets** still slow at wave 1 (1.2 s) — accept as archetype identity; aura DPS scales with crowd density.
 
 ## Files touched
