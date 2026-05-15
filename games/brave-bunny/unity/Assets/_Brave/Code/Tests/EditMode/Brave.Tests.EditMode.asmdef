@@ -4,6 +4,8 @@
     "references": [
         "Brave.Gameplay",
         "Brave.Systems",
+        "Brave.Systems.Lifecycle",
+        "Brave.Systems.Diagnostics",
         "Brave.UI",
         "Brave.Boot",
         "Brave.Boot.Editor",

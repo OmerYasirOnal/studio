@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Brave Bunny — QuitConfirmDialog modal (Wave 10 QoL).
+  User story: prevent accidental run-quit from the pause modal.
+
+  Layered above the pause modal. When the player taps "Quit to menu" on the
+  pause panel, this dialog interposes — "Quit your run?" with a Confirm /
+  Cancel pair. Cancel returns to pause; Confirm calls
+  RunController.End(Quit, "player_quit") and routes to MainMenu.
+
+  Layout: tight 1-column, two stacked full-width buttons. 44pt+ tap targets.
+  Every translatable string carries a `loc-key`. Controller:
+  Code/UI/Controllers/QuitConfirmController.cs.
+-->
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="project://database/Assets/_Brave/UI/Themes/theme.uss" />
+    <Style src="project://database/Assets/_Brave/UI/Styles/screens.uss" />
+
+    <ui:VisualElement name="quit-confirm-root" class="brave-root is-hidden">
+        <ui:VisualElement name="backdrop" class="backdrop">
+            <ui:VisualElement name="modal" class="modal quit-confirm-modal">
+
+                <!-- Title -->
+                <ui:VisualElement name="quit-header" class="quit-header">
+                    <ui:Label name="lbl-title" text="Quit your run?" class="h1"
+                              loc-key="quit_confirm.title" />
+                </ui:VisualElement>
+
+                <!-- Message body -->
+                <ui:Label name="lbl-message"
+                          text="Your run will end and progress for this run will be lost."
+                          class="body quit-confirm-message"
+                          loc-key="quit_confirm.message" />
+
+                <!-- Primary action: Confirm (destructive) -->
+                <ui:Button name="btn-confirm" text="Quit run"
+                           class="btn btn-primary-lg quit-confirm-action-primary"
+                           loc-key="quit_confirm.confirm" />
+
+                <!-- Secondary: Cancel -->
+                <ui:Button name="btn-cancel" text="Keep playing"
+                           class="btn btn-ghost quit-confirm-action"
+                           loc-key="quit_confirm.cancel" />
+
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

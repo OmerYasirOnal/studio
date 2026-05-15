@@ -159,6 +159,10 @@ public sealed class SaveData
         [JsonProperty("lowPowerMode")] public bool LowPowerMode;
         [JsonProperty("tapToMove")] public bool TapToMove;
         [JsonProperty("language")] public string Language = "en";
+        // Wave 10 QoL — gates the in-build FPS counter. Hidden behind
+        // SettingsService (no Settings UI element yet). Flip via PlayerPrefs
+        // / save-edit in build until the cheat-tap input lands.
+        [JsonProperty("devModeEnabled")] public bool DevModeEnabled;
     }
 
     [JsonObject(MemberSerialization.OptIn)]
