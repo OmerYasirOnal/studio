@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0",
+  "doc": "Weapon evolution recipes — Wave 9. Source of truth for the 8 launch recipes. Each pair (base weapon L5 + max-level charm) yields an evolved weapon. consume_charm governed by ADR-0007 (always true at launch). Mirrors the inline evolution blocks in weapons.json for cross-check; if the two disagree, weapons.json wins and this file must be re-synced.",
+  "evolutions": [
+    {
+      "id": "harvest-cyclone",
+      "base_weapon_id": "carrot-boomerang",
+      "required_charm_id": "magnet-charm",
+      "required_weapon_level": 5,
+      "required_charm_level": 5,
+      "evolved_weapon_id": "harvest-cyclone",
+      "consume_charm": true
+    },
+    {
+      "id": "solar-halo",
+      "base_weapon_id": "sunbeam",
+      "required_charm_id": "crit-charm",
+      "required_weapon_level": 5,
+      "required_charm_level": 5,
+      "evolved_weapon_id": "solar-halo",
+      "consume_charm": true
+    },
+    {
+      "id": "meadow-bloom",
+      "base_weapon_id": "daisy-mine",
+      "required_charm_id": "damage-charm",
+      "required_weapon_level": 5,
+      "required_charm_level": 5,
+      "evolved_weapon_id": "meadow-bloom",
+      "consume_charm": true
+    },
+    {
+      "id": "stone-storm",
+      "base_weapon_id": "pebble-sling",
+      "required_charm_id": "projectile-charm",
+      "required_weapon_level": 5,
+      "required_charm_level": 5,
+      "evolved_weapon_id": "stone-storm",
+      "consume_charm": true
+    },
+    {
+      "id": "honey-hug",
+      "base_weapon_id": "honey-aura",
+      "required_charm_id": "hp-charm",
+      "required_weapon_level": 5,
+      "required_charm_level": 5,
+      "evolved_weapon_id": "honey-hug",
+      "consume_charm": true
+    },
+    {
+      "id": "oak-thunderclap",
+      "base_weapon_id": "acorn-cannon",
+      "required_charm_id": "crit-charm",
+      "required_weapon_level": 5,
+      "required_charm_level": 5,
+      "evolved_weapon_id": "oak-thunderclap",
+      "consume_charm": true
+    },
+    {
+      "id": "cornfield-volley",
+      "base_weapon_id": "cob-mortar",
+      "required_charm_id": "damage-charm",
+      "required_weapon_level": 5,
+      "required_charm_level": 5,
+      "evolved_weapon_id": "cornfield-volley",
+      "consume_charm": true
+    },
+    {
+      "id": "pinwheel-storm",
+      "base_weapon_id": "whirligig",
+      "required_charm_id": "magnet-charm",
+      "required_weapon_level": 5,
+      "required_charm_level": 5,
+      "evolved_weapon_id": "pinwheel-storm",
+      "consume_charm": true
+    }
+  ]
+}
