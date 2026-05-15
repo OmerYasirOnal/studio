@@ -163,6 +163,10 @@ public sealed class SaveData
         // SettingsService (no Settings UI element yet). Flip via PlayerPrefs
         // / save-edit in build until the cheat-tap input lands.
         [JsonProperty("devModeEnabled")] public bool DevModeEnabled;
+        // Wave 11 — GDPR-friendly opt-in for the local crash reporter
+        // (see Systems/Diagnostics/CrashReporter). Default false; the
+        // CrashReportPrompt dialog is the only path that flips it true.
+        [JsonProperty("crashOptInEnabled")] public bool CrashOptInEnabled;
     }
 
     [JsonObject(MemberSerialization.OptIn)]

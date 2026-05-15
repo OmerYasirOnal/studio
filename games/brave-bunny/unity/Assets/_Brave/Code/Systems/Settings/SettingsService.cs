@@ -20,6 +20,7 @@ public interface ISettingsService : IService
     void SetHaptics(bool on);
     void SetLanguage(LanguageCode code);
     void SetDevModeEnabled(bool enabled);
+    void SetCrashOptInEnabled(bool enabled);
     void Commit();
 }
 
@@ -48,6 +49,7 @@ public sealed class SettingsService : ISettingsService
     public void SetHaptics(bool on)          { Current.HapticsEnabled = on; RaiseChanged(); }
     public void SetLanguage(LanguageCode code) { Current.Language = code; RaiseChanged(); }
     public void SetDevModeEnabled(bool enabled) { Current.DevModeEnabled = enabled; RaiseChanged(); }
+    public void SetCrashOptInEnabled(bool enabled) { Current.CrashOptInEnabled = enabled; RaiseChanged(); }
 
     /// <summary>Flush settings into the save POCO and trigger a save write. Called on modal close.</summary>
     public void Commit()
@@ -61,6 +63,7 @@ public sealed class SettingsService : ISettingsService
         s.TapToMove = Current.TapToMove;
         s.Language = Current.Language.ToIso();
         s.DevModeEnabled = Current.DevModeEnabled;
+        s.CrashOptInEnabled = Current.CrashOptInEnabled;
         _save.Save(); // 03-save-system.md trigger: "Settings changed"
     }
 
@@ -74,6 +77,7 @@ public sealed class SettingsService : ISettingsService
         TapToMove = raw.TapToMove,
         Language = LanguageCodeExtensions.FromIso(raw.Language),
         DevModeEnabled = raw.DevModeEnabled,
+        CrashOptInEnabled = raw.CrashOptInEnabled,
     };
 
     private void RaiseChanged() => OnChanged?.Invoke(Current);
