@@ -149,23 +149,154 @@ namespace Brave.UI.Theming
 
         private void ParseAndStore(LanguageCode code, string json)
         {
+            var table = new Dictionary<string, string>();
+            if (string.IsNullOrEmpty(json))
+            {
+                _tables[code] = table;
+                return;
+            }
+
+            // Strip UTF-8 BOM if present (some editors / fastlane writers prepend EF BB BF).
+            if (json.Length > 0 && json[0] == '﻿')
+            {
+                json = json.Substring(1);
+            }
+
+            // Format 1 (canonical): legacy { "_meta": {...}, "entries": [ {key,value}, ... ] }.
+            // Format 2 (new): flat JSON object { "KEY": "value", ... } — matches LocalizationService.
+            // We try the entries[] shape first via JsonUtility; if that yields nothing, we walk
+            // the flat object with a hand-rolled tokenizer (so the UI assembly keeps zero
+            // Newtonsoft dependency per its asmdef refs).
             try
             {
                 var parsed = JsonUtility.FromJson<LocTableWire>(json);
-                var table = new Dictionary<string, string>(parsed?.entries?.Length ?? 0);
-                if (parsed?.entries != null)
+                if (parsed?.entries != null && parsed.entries.Length > 0)
                 {
                     foreach (var entry in parsed.entries)
                     {
                         if (!string.IsNullOrEmpty(entry.key)) table[entry.key] = entry.value ?? string.Empty;
                     }
+                    _tables[code] = table;
+                    return;
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[LocalizationProvider] entries[] parse skipped for {code}: {ex.Message}");
+            }
+
+            // Fall through to flat-object parse.
+            try
+            {
+                ParseFlatObject(json, table);
                 _tables[code] = table;
             }
             catch (Exception ex)
             {
                 Debug.LogError($"[LocalizationProvider] Failed to parse table for {code}: {ex.Message}");
                 _tables[code] = new Dictionary<string, string>();
+            }
+        }
+
+        /// <summary>
+        /// Minimal flat JSON object parser: { "key": "value", "key2": "value2", ... }.
+        /// Only string-typed values are collected; nested objects/arrays are skipped so
+        /// `_meta_*` style scalar fields are simply ignored (they parse as strings, which
+        /// is harmless since callers look up by exact game keys).
+        /// </summary>
+        private static void ParseFlatObject(string json, Dictionary<string, string> table)
+        {
+            var i = 0;
+            var n = json.Length;
+            // Skip whitespace + opening brace.
+            while (i < n && char.IsWhiteSpace(json[i])) i++;
+            if (i >= n || json[i] != '{') return;
+            i++;
+
+            while (i < n)
+            {
+                while (i < n && (char.IsWhiteSpace(json[i]) || json[i] == ',')) i++;
+                if (i >= n || json[i] == '}') break;
+                if (json[i] != '"') { i++; continue; }
+                var key = ReadJsonString(json, ref i);
+                while (i < n && char.IsWhiteSpace(json[i])) i++;
+                if (i >= n || json[i] != ':') continue;
+                i++;
+                while (i < n && char.IsWhiteSpace(json[i])) i++;
+                if (i >= n) break;
+                if (json[i] == '"')
+                {
+                    var value = ReadJsonString(json, ref i);
+                    if (!string.IsNullOrEmpty(key)) table[key] = value;
+                }
+                else if (json[i] == '{' || json[i] == '[')
+                {
+                    // Skip nested container.
+                    SkipContainer(json, ref i);
+                }
+                else
+                {
+                    // Skip primitive (number/bool/null) until next comma or }.
+                    while (i < n && json[i] != ',' && json[i] != '}') i++;
+                }
+            }
+        }
+
+        private static string ReadJsonString(string s, ref int i)
+        {
+            // Expects s[i] == '"'.
+            i++;
+            var sb = new System.Text.StringBuilder();
+            while (i < s.Length)
+            {
+                var c = s[i];
+                if (c == '"') { i++; return sb.ToString(); }
+                if (c == '\\' && i + 1 < s.Length)
+                {
+                    var esc = s[i + 1];
+                    switch (esc)
+                    {
+                        case '"': sb.Append('"'); i += 2; break;
+                        case '\\': sb.Append('\\'); i += 2; break;
+                        case '/': sb.Append('/'); i += 2; break;
+                        case 'n': sb.Append('\n'); i += 2; break;
+                        case 't': sb.Append('\t'); i += 2; break;
+                        case 'r': sb.Append('\r'); i += 2; break;
+                        case 'b': sb.Append('\b'); i += 2; break;
+                        case 'f': sb.Append('\f'); i += 2; break;
+                        case 'u':
+                            if (i + 5 < s.Length && int.TryParse(s.Substring(i + 2, 4),
+                                System.Globalization.NumberStyles.HexNumber,
+                                System.Globalization.CultureInfo.InvariantCulture, out var code))
+                            {
+                                sb.Append((char)code);
+                            }
+                            i += 6;
+                            break;
+                        default: sb.Append(esc); i += 2; break;
+                    }
+                }
+                else
+                {
+                    sb.Append(c);
+                    i++;
+                }
+            }
+            return sb.ToString();
+        }
+
+        private static void SkipContainer(string s, ref int i)
+        {
+            var open = s[i];
+            var close = open == '{' ? '}' : ']';
+            var depth = 0;
+            while (i < s.Length)
+            {
+                var c = s[i];
+                if (c == '"') { ReadJsonString(s, ref i); continue; }
+                if (c == open) depth++;
+                else if (c == close) { depth--; i++; if (depth == 0) return; continue; }
+                i++;
             }
         }
 

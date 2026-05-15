@@ -37,7 +37,16 @@ public sealed class LocalizationService : ILocalizationService
             if (asset == null) continue;
             try
             {
-                var root = JObject.Parse(asset.text);
+                // Strip a UTF-8 BOM if present — some editors/tools (fastlane writers,
+                // Windows PowerShell `Out-File`, JetBrains Rider's "UTF-8 with BOM")
+                // prepend EF BB BF, which Newtonsoft's JObject.Parse rejects with a
+                // "Unexpected character" error at line 1, column 1.
+                var text = asset.text;
+                if (!string.IsNullOrEmpty(text) && text[0] == '﻿')
+                {
+                    text = text.Substring(1);
+                }
+                var root = JObject.Parse(text);
                 var map = new Dictionary<string, string>(capacity: 64);
                 foreach (var kv in root)
                 {
