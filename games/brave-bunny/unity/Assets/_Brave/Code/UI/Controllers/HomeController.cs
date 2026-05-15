@@ -47,6 +47,8 @@ namespace Brave.UI.Controllers
         public const string SettingsScreenName = "Settings";
         public const string CharactersScreenName = "CharacterSelect";
         public const string ShopScreenName = "Shop";
+        // Wave 10: Profile screen (lifetime stats + character roster).
+        public const string ProfileScreenName = "Profile";
 
         public static int ClampInt(long v) => v > int.MaxValue ? int.MaxValue : (int)v;
 
@@ -81,6 +83,8 @@ namespace Brave.UI.Controllers
         [SerializeField] private string _heroesScreenName = HomeMenuLogic.CharactersScreenName;
         [SerializeField] private string _settingsScreenName = HomeMenuLogic.SettingsScreenName;
         [SerializeField] private string _shopScreenName = HomeMenuLogic.ShopScreenName;
+        // Wave 10: profile-screen target (lifetime stats + roster).
+        [SerializeField] private string _profileScreenName = HomeMenuLogic.ProfileScreenName;
 
         private UIDocument _doc = null!;
         private LocalizationProvider _loc = null!;
@@ -112,6 +116,10 @@ namespace Brave.UI.Controllers
             root.Q<Button>("btn-play")!.clicked += OnPlayClicked;
             root.Q<Button>("btn-claim-daily")!.clicked += OnClaimDailyClicked;
             root.Q<Button>("btn-mailbox")!.clicked += OnMailboxClicked;
+            // Wave 10: Profile screen entry — null-safe so older Home.uxml builds
+            // (without the btn-profile element) don't NPE on enable.
+            var btnProfile = root.Q<Button>("btn-profile");
+            if (btnProfile != null) btnProfile.clicked += OnProfileClicked;
 
             // ── Tabs ──────────────────────────────────────────────────────
             root.Q<Button>("tab-home")!.clicked += () => { /* already here */ };
@@ -148,6 +156,8 @@ namespace Brave.UI.Controllers
         }
 
         private void OnMailboxClicked() => UIEvents.RaiseOpenMailbox();
+
+        private void OnProfileClicked() => PushScreen(_profileScreenName);
 
         private void PushScreen(string screenName) => UIEvents.RaisePushScreen(screenName);
     }
