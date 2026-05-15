@@ -13,5 +13,8 @@ namespace Brave.Gameplay.Definitions
         Tank    = 1,
         Ranged  = 2,
         Elite   = 3,
+        // ADR-0020: data/balance/enemies.json ships "role": "boss" for old-boar-king.
+        // Without this value the BalanceJsonImporter silently defaulted it to Swarmer.
+        Boss    = 4,
     }
 }

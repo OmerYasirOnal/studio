@@ -24,6 +24,10 @@ namespace Brave.Gameplay.Spawning
         [SerializeField] private RunTimer? runTimer;
         [SerializeField] private Transform? hero;
 
+        // ADR-0020: GDD specifies one boss per biome at a time. Capacity 1
+        // suffices and avoids over-allocating pools for a singleton encounter.
+        [SerializeField] private int bossCapacity = 1;
+
         private int _nextEventIndex;
         private readonly Dictionary<EnemyDefinition, ObjectPool<EnemyBase>> _enemyPools = new(16);
 
@@ -48,6 +52,7 @@ namespace Brave.Gameplay.Spawning
                     EnemyRole.Tank => tankCapacity,
                     EnemyRole.Ranged => rangedCapacity,
                     EnemyRole.Elite => 4,
+                    EnemyRole.Boss => bossCapacity,
                     _ => 8,
                 };
 

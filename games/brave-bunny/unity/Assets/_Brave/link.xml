@@ -50,6 +50,18 @@
         <type fullname="Brave.Gameplay.Combat.BoarSweep" preserve="all"/>
         <type fullname="Brave.Gameplay.Combat.BoarHopStomp" preserve="all"/>
 
+        <!-- ADR-0020: WeaponArchetypeConfig subclasses are resolved by MechanicRegistry
+             via [BraveRegister("weapon.archetype.*")]. Preserve every concrete
+             subclass so IL2CPP does not strip them from the iOS build. -->
+        <type fullname="Brave.Gameplay.Combat.Archetypes.WeaponArchetypeConfig" preserve="all"/>
+        <type fullname="Brave.Gameplay.Combat.Archetypes.ProjectileArchetypeConfig" preserve="all"/>
+        <type fullname="Brave.Gameplay.Combat.Archetypes.BeamArchetypeConfig" preserve="all"/>
+        <type fullname="Brave.Gameplay.Combat.Archetypes.MineArchetypeConfig" preserve="all"/>
+        <type fullname="Brave.Gameplay.Combat.Archetypes.CloudArchetypeConfig" preserve="all"/>
+        <type fullname="Brave.Gameplay.Combat.Archetypes.SplashProjectileArchetypeConfig" preserve="all"/>
+        <type fullname="Brave.Gameplay.Combat.Archetypes.AuraArchetypeConfig" preserve="all"/>
+        <type fullname="Brave.Gameplay.Combat.Archetypes.SummonArchetypeConfig" preserve="all"/>
+
         <!-- Additional mechanics + boss patterns added in Phase 5 will need
              entries here. Keep this in sync with the [BraveRegister(...)]
              declarations. See ADR-0009 for the registry contract. -->
