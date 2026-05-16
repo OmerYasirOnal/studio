@@ -1,0 +1,33 @@
+name: bb-nightly-bench
+
+on:
+  schedule:
+    - cron: '0 4 * * *'   # 04:00 UTC daily
+  workflow_dispatch:
+
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    if: ${{ hashFiles('games/brave-bunny/app/package.json') != '' }}
+    defaults:
+      run:
+        working-directory: games/brave-bunny/app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: games/brave-bunny/app/package-lock.json
+      - name: Install
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Run bench (200-enemy stress)
+        run: npm run bench -- --reporter=json --outputFile=bench-results.json
+      - name: Upload bench results
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-${{ github.sha }}
+          path: games/brave-bunny/app/bench-results.json
+          retention-days: 30
