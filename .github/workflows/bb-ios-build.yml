@@ -18,7 +18,6 @@ on:
 jobs:
   build:
     runs-on: macos-15
-    if: ${{ hashFiles('games/brave-bunny/app/package.json') != '' && hashFiles('games/brave-bunny/ios/App/App.xcworkspace/contents.xcworkspacedata') != '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
