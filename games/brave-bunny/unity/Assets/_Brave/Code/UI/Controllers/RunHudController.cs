@@ -110,7 +110,7 @@ namespace Brave.UI.Controllers
         private void OnEnable()
         {
             _elements.BindFrom(_doc.rootVisualElement);
-            _elements.PauseButton.clicked += OnPauseClicked;
+            if (_elements.PauseButton != null) _elements.PauseButton.clicked += OnPauseClicked;
 
             _runStartTime = Time.time;
             _accumulatedGoldPickup = 0;
@@ -126,7 +126,7 @@ namespace Brave.UI.Controllers
         {
             if (_levelUpChannel != null) _levelUpChannel.Unsubscribe(OnLevelUp);
             if (_pickupChannel != null) _pickupChannel.Unsubscribe(OnPickup);
-            _elements.PauseButton.clicked -= OnPauseClicked;
+            if (_elements.PauseButton != null) _elements.PauseButton.clicked -= OnPauseClicked;
 
             // Detach event subscription so we don't hold a reference after disable.
             if (State != null)
@@ -159,24 +159,24 @@ namespace Brave.UI.Controllers
             // ---- HP bar ----
             float maxHp = state.MaxHP <= 0f ? 1f : state.MaxHP;
             float hpRatio = Mathf.Clamp01(state.CurrentHP / maxHp);
-            el.HpFill.style.width = new StyleLength(new Length(hpRatio * 100f, LengthUnit.Percent));
-            el.HpNumeric.text = $"{Mathf.RoundToInt(state.CurrentHP)} / {Mathf.RoundToInt(state.MaxHP)}";
+            if (el.HpFill != null) el.HpFill.style.width = new StyleLength(new Length(hpRatio * 100f, LengthUnit.Percent));
+            if (el.HpNumeric != null) el.HpNumeric.text = $"{Mathf.RoundToInt(state.CurrentHP)} / {Mathf.RoundToInt(state.MaxHP)}";
 
             // ---- XP bar + level pill ----
             float xpMax = state.XPToNextLevel <= 0f ? 1f : state.XPToNextLevel;
             float xpRatio = Mathf.Clamp01(state.CurrentXP / xpMax);
-            el.XpFill.style.width = new StyleLength(new Length(xpRatio * 100f, LengthUnit.Percent));
-            el.LevelPill.text = $"Lv {state.Level}";
+            if (el.XpFill != null) el.XpFill.style.width = new StyleLength(new Length(xpRatio * 100f, LengthUnit.Percent));
+            if (el.LevelPill != null) el.LevelPill.text = $"Lv {state.Level}";
 
             // ---- Wave + timer ----
-            el.WaveCounter.text = $"Wave {state.WaveNumber}";
+            if (el.WaveCounter != null) el.WaveCounter.text = $"Wave {state.WaveNumber}";
             int totalSeconds = Mathf.Max(0, Mathf.FloorToInt(state.RunSecondsElapsed));
             int m = totalSeconds / 60;
             int s = totalSeconds % 60;
-            el.Timer.text = $"{m:D2}:{s:D2}";
+            if (el.Timer != null) el.Timer.text = $"{m:D2}:{s:D2}";
 
             // ---- Boss-warning banner (class toggle, no per-frame allocation) ----
-            SetHidden(el.BossWarning, !state.IsBossActive);
+            if (el.BossWarning != null) SetHidden(el.BossWarning, !state.IsBossActive);
         }
 
         private static void SetHidden(VisualElement el, bool hidden)
