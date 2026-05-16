@@ -344,9 +344,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1714413306}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 581996090}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Script: {fileID: 11500000, guid: 76e12912107b546a9ae448d6e9120e8d, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
   _mixer: {fileID: 0}
   _languageTables: []
 --- !u!4 &1714413308
