@@ -10,7 +10,7 @@ set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-cd "$ROOT"
+cd "$ROOT" || exit 1
 
 GAME=""
 while [[ $# -gt 0 ]]; do
@@ -135,9 +135,9 @@ if [[ "$WAVES_COUNT" -ge 1 ]]; then
 else
   ko "no waves.json found"
 fi
-for f in $(find "$GAME_DIR/docs/09-level-design/01-biomes" -name "waves.json" 2>/dev/null); do
-  python3 -c "import json; json.load(open('$f'))" 2>/dev/null && ok "$(echo $f | sed "s|$GAME_DIR/||") parses" || ko "$f parse fail"
-done
+while IFS= read -r -d '' f; do
+  python3 -c "import json; json.load(open('$f'))" 2>/dev/null && ok "$(echo "$f" | sed "s|$GAME_DIR/||") parses" || ko "$f parse fail"
+done < <(find "$GAME_DIR/docs/09-level-design/01-biomes" -name "waves.json" -print0 2>/dev/null)
 
 section "asset licensing"
 if [[ -f "core/tools/asset-pipeline/licenses.py" ]]; then

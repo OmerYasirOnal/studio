@@ -33,7 +33,13 @@ cd "$ROOT"
 
 if [[ ! -d "core/templates/$TEMPLATE" ]]; then
   echo "[new-game] no such template: core/templates/$TEMPLATE" >&2
-  echo "[new-game] available: $(ls core/templates | grep -v '^_common$' | tr '\n' ' ')" >&2
+  AVAILABLE=""
+  for tpl_dir in core/templates/*/; do
+    tpl_name="$(basename "$tpl_dir")"
+    [[ "$tpl_name" == "_common" ]] && continue
+    AVAILABLE+="$tpl_name "
+  done
+  echo "[new-game] available: $AVAILABLE" >&2
   exit 1
 fi
 
