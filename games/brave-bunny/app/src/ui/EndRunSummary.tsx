@@ -19,7 +19,9 @@ export default function EndRunSummary() {
   }
 
   const min = Math.floor(time / 60);
-  const sec = Math.floor(time % 60).toString().padStart(2, '0');
+  const sec = Math.floor(time % 60)
+    .toString()
+    .padStart(2, '0');
 
   const restart = () => {
     (window as unknown as { __runBanked?: boolean }).__runBanked = false;
@@ -40,16 +42,36 @@ export default function EndRunSummary() {
   return (
     <div className="overlay overlay--blocking">
       <div className="card" style={{ minWidth: 320, maxWidth: 420 }}>
-        <h2 className="title" style={{ textAlign: 'center' }}>Run Complete</h2>
+        <h2 className="title" style={{ textAlign: 'center' }}>
+          Run Complete
+        </h2>
         <div className="endrun-stats">
-          <div><div className="endrun-stat__label">Kills</div><div className="endrun-stat__value">{kills}</div></div>
-          <div><div className="endrun-stat__label">Time</div><div className="endrun-stat__value">{min}:{sec}</div></div>
-          <div><div className="endrun-stat__label">Level</div><div className="endrun-stat__value">{level}</div></div>
-          <div><div className="endrun-stat__label">Gold</div><div className="endrun-stat__value">+{gold}</div></div>
+          <div>
+            <div className="endrun-stat__label">Kills</div>
+            <div className="endrun-stat__value">{kills}</div>
+          </div>
+          <div>
+            <div className="endrun-stat__label">Time</div>
+            <div className="endrun-stat__value">
+              {min}:{sec}
+            </div>
+          </div>
+          <div>
+            <div className="endrun-stat__label">Level</div>
+            <div className="endrun-stat__value">{level}</div>
+          </div>
+          <div>
+            <div className="endrun-stat__label">Gold</div>
+            <div className="endrun-stat__value">+{gold}</div>
+          </div>
         </div>
         <div style={{ display: 'flex', gap: 8, flexDirection: 'column' }}>
-          <button className="btn btn--cta" onClick={restart}>▶ RESTART</button>
-          <button className="btn btn--ghost" onClick={lobby}>⌂ LOBBY</button>
+          <button className="btn btn--cta" onClick={restart}>
+            ▶ RESTART
+          </button>
+          <button className="btn btn--ghost" onClick={lobby}>
+            ⌂ LOBBY
+          </button>
         </div>
       </div>
     </div>

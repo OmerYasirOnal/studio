@@ -3,12 +3,27 @@ import { audio } from './AudioBus';
 
 beforeAll(() => {
   (global as unknown as { AudioContext: typeof AudioContext }).AudioContext = class {
-    createGain() { return { gain: { value: 0 }, connect: vi.fn() }; }
-    createBufferSource() { return { buffer: null, connect: vi.fn(), start: vi.fn(), stop: vi.fn(), disconnect: vi.fn(), loop: false }; }
-    decodeAudioData() { return Promise.resolve({}); }
+    createGain() {
+      return { gain: { value: 0 }, connect: vi.fn() };
+    }
+    createBufferSource() {
+      return {
+        buffer: null,
+        connect: vi.fn(),
+        start: vi.fn(),
+        stop: vi.fn(),
+        disconnect: vi.fn(),
+        loop: false,
+      };
+    }
+    decodeAudioData() {
+      return Promise.resolve({});
+    }
     destination = {};
   } as unknown as typeof AudioContext;
-  global.fetch = vi.fn(() => Promise.resolve({ arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)) })) as unknown as typeof fetch;
+  global.fetch = vi.fn(() =>
+    Promise.resolve({ arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)) }),
+  ) as unknown as typeof fetch;
 });
 
 describe('AudioBus', () => {

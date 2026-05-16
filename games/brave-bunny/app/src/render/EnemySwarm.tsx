@@ -9,7 +9,10 @@ export default function EnemySwarm() {
   useEffect(() => {
     const unsubAdd = enemyQuery.onEntityAdded.subscribe(() => force((n) => n + 1));
     const unsubRemove = enemyQuery.onEntityRemoved.subscribe(() => force((n) => n + 1));
-    return () => { unsubAdd(); unsubRemove(); };
+    return () => {
+      unsubAdd();
+      unsubRemove();
+    };
   }, []);
 
   const enemies: Entity[] = [];
@@ -17,7 +20,9 @@ export default function EnemySwarm() {
 
   return (
     <>
-      {enemies.map((e, i) => <EnemyEntity key={(e as unknown as { __id?: number }).__id ?? i} entity={e} />)}
+      {enemies.map((e, i) => (
+        <EnemyEntity key={(e as unknown as { __id?: number }).__id ?? i} entity={e} />
+      ))}
     </>
   );
 }

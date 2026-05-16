@@ -66,12 +66,27 @@
   pointer-events: auto;
   transition: transform 0.1s;
 }
-.btn:active { transform: scale(0.97); }
-.btn--cta { font-size: 24px; padding: 20px 40px; border-radius: var(--radius-lg); }
-.btn--ghost { background: transparent; border: 2px solid var(--text-mute); }
-.btn--danger { background: #c44545; }
+.btn:active {
+  transform: scale(0.97);
+}
+.btn--cta {
+  font-size: 24px;
+  padding: 20px 40px;
+  border-radius: var(--radius-lg);
+}
+.btn--ghost {
+  background: transparent;
+  border: 2px solid var(--text-mute);
+}
+.btn--danger {
+  background: #c44545;
+}
 
-.icon-row { display: flex; gap: 12px; justify-content: center; }
+.icon-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
 .icon-btn {
   width: 56px;
   height: 56px;
@@ -99,7 +114,9 @@
   transform-origin: left;
   transition: transform 0.1s;
 }
-.bar--xp .bar__fill { background: var(--bar-xp); }
+.bar--xp .bar__fill {
+  background: var(--bar-xp);
+}
 
 .hud-top {
   position: fixed;
@@ -142,14 +159,29 @@
   text-align: center;
   cursor: pointer;
   border: 2px solid transparent;
-  transition: border-color 0.15s, transform 0.1s;
+  transition:
+    border-color 0.15s,
+    transform 0.1s;
   pointer-events: auto;
 }
-.draft-card:active { transform: scale(0.98); }
-.draft-card:hover { border-color: var(--accent); }
-.draft-card__icon { font-size: 40px; margin-bottom: 8px; }
-.draft-card__name { font-weight: 700; margin-bottom: 4px; }
-.draft-card__desc { color: var(--text-mute); font-size: 14px; }
+.draft-card:active {
+  transform: scale(0.98);
+}
+.draft-card:hover {
+  border-color: var(--accent);
+}
+.draft-card__icon {
+  font-size: 40px;
+  margin-bottom: 8px;
+}
+.draft-card__name {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.draft-card__desc {
+  color: var(--text-mute);
+  font-size: 14px;
+}
 
 .endrun-stats {
   display: grid;
@@ -157,7 +189,18 @@
   gap: 12px;
   margin: 16px 0 24px 0;
 }
-.endrun-stat__label { color: var(--text-mute); font-size: 12px; }
-.endrun-stat__value { font-size: 24px; font-weight: 700; }
+.endrun-stat__label {
+  color: var(--text-mute);
+  font-size: 12px;
+}
+.endrun-stat__value {
+  font-size: 24px;
+  font-weight: 700;
+}
 
-body, html, #root { font-family: -apple-system, system-ui, sans-serif; color: var(--text); }
+body,
+html,
+#root {
+  font-family: -apple-system, system-ui, sans-serif;
+  color: var(--text);
+}

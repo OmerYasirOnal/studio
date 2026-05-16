@@ -13,7 +13,7 @@ export default function DraftModal() {
     if (offers.length === 0) rollOffers();
   }, [offers.length, rollOffers]);
 
-  const onPick = (kind: typeof offers[0]['kind']) => {
+  const onPick = (kind: (typeof offers)[0]['kind']) => {
     audio.play('draftPick');
     pick(kind);
     setPhase('run');
@@ -22,15 +22,21 @@ export default function DraftModal() {
   return (
     <div className="overlay overlay--blocking">
       <div style={{ maxWidth: 800, width: '100%' }}>
-        <h2 className="title" style={{ textAlign: 'center', marginBottom: 16 }}>Level Up!</h2>
-        <p style={{ textAlign: 'center', color: 'var(--text-mute)', marginBottom: 24 }}>Pick one upgrade</p>
+        <h2 className="title" style={{ textAlign: 'center', marginBottom: 16 }}>
+          Level Up!
+        </h2>
+        <p style={{ textAlign: 'center', color: 'var(--text-mute)', marginBottom: 24 }}>
+          Pick one upgrade
+        </p>
         <div className="draft-grid">
           {offers.map((up) => (
             <button key={up.kind} className="draft-card" onClick={() => onPick(up.kind)}>
               <div className="draft-card__icon">{up.icon}</div>
               <div className="draft-card__name">{up.name}</div>
               <div className="draft-card__desc">{up.description}</div>
-              <div style={{ marginTop: 6, fontSize: 12, color: 'var(--text-mute)' }}>{up.stacks}/{up.maxStacks}</div>
+              <div style={{ marginTop: 6, fontSize: 12, color: 'var(--text-mute)' }}>
+                {up.stacks}/{up.maxStacks}
+              </div>
             </button>
           ))}
         </div>

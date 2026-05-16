@@ -3,7 +3,7 @@ import { useRunStore } from '@/state/runStore';
 import { tickWeapons } from './weapons';
 import { tickProjectiles } from './projectiles';
 import { tickEnemyAI } from './enemyAI'; // from S7 — will exist when wired
-import { tickSpawn } from './spawn';     // from S7
+import { tickSpawn } from './spawn'; // from S7
 import { tickLifecycle } from './lifecycle'; // from S8
 
 export function useRunLoop(): null {

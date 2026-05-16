@@ -53,7 +53,14 @@ export const useMetaStore = create<MetaState>((set, get) => ({
     try {
       await Preferences.set({
         key: SAVE_KEY,
-        value: JSON.stringify({ version: 1, totalRuns, bestKills, longestRun, totalGold, totalXpEarned }),
+        value: JSON.stringify({
+          version: 1,
+          totalRuns,
+          bestKills,
+          longestRun,
+          totalGold,
+          totalXpEarned,
+        }),
       });
     } catch (e) {
       console.warn('metaStore: save failed', e);
@@ -72,6 +79,10 @@ export const useMetaStore = create<MetaState>((set, get) => ({
   },
   resetSave: async () => {
     set({ ...initial });
-    try { await Preferences.remove({ key: SAVE_KEY }); } catch { /* ignore */ }
+    try {
+      await Preferences.remove({ key: SAVE_KEY });
+    } catch {
+      /* ignore */
+    }
   },
 }));

@@ -30,7 +30,12 @@ function spawnAt(angleRad: number, dist: number): void {
   const time = useRunStore.getState().time;
   const wave = currentWave(time);
   const archetype = pickArchetype(wave.archetypeWeights);
-  const stats = (wavesData.archetypes as Record<string, { hp: number; speed: number; damage: number; xpValue: number }>)[archetype];
+  const stats = (
+    wavesData.archetypes as Record<
+      string,
+      { hp: number; speed: number; damage: number; xpValue: number }
+    >
+  )[archetype];
 
   world.add({
     archetype,

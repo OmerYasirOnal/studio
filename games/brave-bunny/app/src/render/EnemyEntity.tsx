@@ -44,7 +44,11 @@ export default function EnemyEntity({ entity }: { entity: Entity }) {
 
   // Each enemy clones the GLTF scene to allow independent positioning.
   // For <=60 enemies on MVP this is acceptable; replace with InstancedMesh + VAT in next plan.
-  return <group ref={groupRef}><primitive object={gltf.scene.clone()} /></group>;
+  return (
+    <group ref={groupRef}>
+      <primitive object={gltf.scene.clone()} />
+    </group>
+  );
 }
 
 useGLTF.preload('/assets/glb/slime.glb');

@@ -1,14 +1,14 @@
 type SFXKey = 'hit' | 'enemy-hit' | 'gem' | 'levelup' | 'death' | 'click' | 'draftPick' | 'evolve';
 
 const SFX_FILES: Record<SFXKey, string> = {
-  'hit': '/audio/hit.ogg',
+  hit: '/audio/hit.ogg',
   'enemy-hit': '/audio/enemy-hit.ogg',
-  'gem': '/audio/gem.ogg',
-  'levelup': '/audio/levelup.ogg',
-  'death': '/audio/death.ogg',
-  'click': '/audio/click.ogg',
-  'draftPick': '/audio/draftPick.ogg',
-  'evolve': '/audio/evolve.ogg',
+  gem: '/audio/gem.ogg',
+  levelup: '/audio/levelup.ogg',
+  death: '/audio/death.ogg',
+  click: '/audio/click.ogg',
+  draftPick: '/audio/draftPick.ogg',
+  evolve: '/audio/evolve.ogg',
 };
 
 class AudioBus {
@@ -22,7 +22,9 @@ class AudioBus {
 
   async init(): Promise<void> {
     if (this.initialized) return;
-    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const Ctx =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     this.ctx = new Ctx();
     this.master = this.ctx.createGain();
     this.sfxGain = this.ctx.createGain();
@@ -35,19 +37,21 @@ class AudioBus {
     this.master.connect(this.ctx.destination);
 
     const entries = [
-      ...Object.entries(SFX_FILES) as [SFXKey, string][],
+      ...(Object.entries(SFX_FILES) as [SFXKey, string][]),
       ['bgm', '/audio/bgm.ogg'] as ['bgm', string],
     ];
-    await Promise.all(entries.map(async ([key, url]) => {
-      try {
-        const resp = await fetch(url);
-        const arrayBuffer = await resp.arrayBuffer();
-        const buf = await this.ctx!.decodeAudioData(arrayBuffer);
-        this.buffers[key as SFXKey | 'bgm'] = buf;
-      } catch (e) {
-        console.warn(`AudioBus: failed to load ${key}:`, e);
-      }
-    }));
+    await Promise.all(
+      entries.map(async ([key, url]) => {
+        try {
+          const resp = await fetch(url);
+          const arrayBuffer = await resp.arrayBuffer();
+          const buf = await this.ctx!.decodeAudioData(arrayBuffer);
+          this.buffers[key as SFXKey | 'bgm'] = buf;
+        } catch (e) {
+          console.warn(`AudioBus: failed to load ${key}:`, e);
+        }
+      }),
+    );
     this.initialized = true;
   }
 

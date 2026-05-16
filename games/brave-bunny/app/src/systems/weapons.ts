@@ -9,9 +9,12 @@ const WEAPON_DEFAULTS: Record<WeaponKind, { damage: number; tickInterval: number
 };
 
 export function isInCone(
-  fromX: number, fromZ: number,
-  forwardX: number, forwardZ: number,
-  targetX: number, targetZ: number,
+  fromX: number,
+  fromZ: number,
+  forwardX: number,
+  forwardZ: number,
+  targetX: number,
+  targetZ: number,
   range: number,
   coneCosThreshold: number,
 ): boolean {
@@ -29,7 +32,11 @@ function distSq(a: { x: number; z: number }, b: { x: number; z: number }): numbe
   return dx * dx + dz * dz;
 }
 
-function spawnProjectile(from: { x: number; y: number; z: number }, target: { x: number; y: number; z: number }, damage: number): void {
+function spawnProjectile(
+  from: { x: number; y: number; z: number },
+  target: { x: number; y: number; z: number },
+  damage: number,
+): void {
   const dx = target.x - from.x;
   const dz = target.z - from.z;
   const dist = Math.hypot(dx, dz);
@@ -37,7 +44,11 @@ function spawnProjectile(from: { x: number; y: number; z: number }, target: { x:
   world.add({
     archetype: 'projectile',
     position: { x: from.x, y: from.y + 0.5, z: from.z },
-    velocity: { x: dist === 0 ? 0 : (dx / dist) * speed, y: 0, z: dist === 0 ? 0 : (dz / dist) * speed },
+    velocity: {
+      x: dist === 0 ? 0 : (dx / dist) * speed,
+      y: 0,
+      z: dist === 0 ? 0 : (dz / dist) * speed,
+    },
     damage,
     team: 'hero',
     ttl: 2,
@@ -71,12 +82,19 @@ export function tickWeapons(delta: number): void {
 
       for (const e of enemyQuery) {
         if (!e.position || e.hp == null) continue;
-        if (!isInCone(
-          hero.position.x, hero.position.z,
-          forwardX, forwardZ,
-          e.position.x, e.position.z,
-          range, coneCosThreshold,
-        )) continue;
+        if (
+          !isInCone(
+            hero.position.x,
+            hero.position.z,
+            forwardX,
+            forwardZ,
+            e.position.x,
+            e.position.z,
+            range,
+            coneCosThreshold,
+          )
+        )
+          continue;
         e.hp -= weapon.damage;
         e.hitFlashTime = 0.15;
         audio.play('hit');
