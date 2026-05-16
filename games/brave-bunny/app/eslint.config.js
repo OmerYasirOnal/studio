@@ -41,6 +41,6 @@ export default [
     settings: { react: { version: 'detect' } },
   },
   {
-    ignores: ['dist/**', 'node_modules/**', 'playwright-report/**', 'test-results/**', 'coverage/**'],
+    ignores: ['dist/**', 'node_modules/**', 'playwright-report/**', 'test-results/**', 'coverage/**', '.tsbuildinfo-node/**', '**/*.tsbuildinfo'],
   },
 ];
