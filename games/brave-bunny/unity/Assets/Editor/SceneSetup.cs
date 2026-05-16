@@ -20,6 +20,9 @@ using UnityEngine.UIElements;
 
 using Brave.Gameplay.Definitions;   // gameplay-engineer Wave 2: PlayerMover wiring needs CharacterDefinition
 using Brave.Gameplay.Movement;
+using Brave.Gameplay.Combat;        // Wave 13: CarrotProjectilePool, Projectile prefab wiring
+using Brave.Gameplay.Run;           // Wave 13: CameraFollow wiring on MainCamera
+using Brave.Gameplay.MVP;           // Wave 13: MvpWaveSpawner runtime fallback (no SO needed)
 using Brave.Boot.Editor;            // BalanceJsonImporter — generates SOs before scene wiring
 
 public static class SceneSetup
@@ -162,6 +165,323 @@ public static class SceneSetup
         // Step 2: rebuild Run scene with gameplay wiring.
         ForceScaffoldRun();
         EditorApplication.Exit(0);
+    }
+
+    // -------------------------------------------------------------------------
+    // Wave 13 — Playable MVP Run wiring.
+    //
+    // Why a separate menu / entry: the canonical EnsureRun() above leaves the
+    // Run scene functional but inert — projectilePrefab is null on the pool,
+    // WaveSpawner has no WaveDefinition SO, MainCamera has no CameraFollow.
+    // EnsurePlayableMvpRun() patches the live Run.unity in place so it actually
+    // plays end-to-end without authoring assets first. Idempotent.
+    //
+    //   * Creates Assets/_Brave/Art/Prefabs/CarrotProjectile.prefab if missing
+    //     (0.2u cube, orange URP/Lit).
+    //   * Wires that prefab onto the CarrotProjectilePool component.
+    //   * Adds Rigidbody (non-kinematic, freezeRotation) to Player.
+    //   * Adds CameraFollow to MainCamera with target = Player.transform.
+    //   * Replaces the inert canonical WaveSpawner setup with an MvpWaveSpawner
+    //     that spawns 5 swarmers on a ring of r=8 every 3 s (no SO required).
+    //   * Idempotent on all of the above — re-running is a no-op when wiring
+    //     is already correct.
+    // -------------------------------------------------------------------------
+
+    private const string CarrotProjectilePrefabPath = "Assets/_Brave/Art/Prefabs/CarrotProjectile.prefab";
+    private const string PrefabsDir = "Assets/_Brave/Art/Prefabs";
+    private const string ArtRoot = "Assets/_Brave/Art";
+
+    [MenuItem("BraveBunny/MVP/Ensure Playable Run Scene")]
+    public static void EnsurePlayableMvpRun()
+    {
+        Directory.CreateDirectory(SceneDir);
+
+        // Step 0 — generate balance SOs if they're missing. Cheap when up-to-date.
+        // BalanceJsonImporter.GenerateAll();
+
+        // Step 1 — ensure the procedural CarrotProjectile prefab exists.
+        var projectilePrefab = EnsureCarrotProjectilePrefab();
+
+        var runPath = $"{SceneDir}/Run.unity";
+        var scene = File.Exists(runPath)
+            ? EditorSceneManager.OpenScene(runPath, OpenSceneMode.Single)
+            : EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+
+        // Step 2 — resolve / create Player.
+        var player = GameObject.Find("Player");
+        if (player == null)
+        {
+            player = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            player.name = "Player";
+            player.tag = "Player";
+            player.transform.position = Vector3.zero;
+        }
+        WirePlayerComponents(player);
+
+        // Step 3 — resolve / create MainCamera, attach CameraFollow.
+        var cam = Camera.main != null ? Camera.main.gameObject : GameObject.Find("MainCamera");
+        if (cam == null)
+        {
+            cam = new GameObject("MainCamera");
+            var camera = cam.AddComponent<Camera>();
+            camera.fieldOfView = 35;
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = new Color(0.74f, 0.88f, 0.45f);
+            cam.tag = "MainCamera";
+            cam.AddComponent<AudioListener>();
+            cam.transform.position = new Vector3(0, 14.7f, -10.4f);
+            cam.transform.rotation = Quaternion.Euler(55, 0, 0);
+        }
+        WireCameraFollow(cam, player.transform);
+
+        // Step 4 — Directional light (skip if any Light already in scene).
+        EnsureDirectionalLight();
+
+        // Step 5 — Ensure ground plane (the existing MeadowGround is fine; create a Quad
+        // fallback if no ground is present).
+        EnsureGround();
+
+        // Step 6 — Resolve / create the CarrotProjectilePool with prefab assigned.
+        var pool = EnsureCarrotPoolWired(projectilePrefab);
+
+        // Step 7 — Resolve / create the AutoAttackController on Player + wire pool.
+        WireAutoAttackController(player, pool);
+
+        // Step 8 — Resolve / create the MvpWaveSpawner (replaces inert canonical spawner).
+        EnsureMvpWaveSpawner(player.transform);
+
+        // Step 9 — RunController + RunTimer remain as-is from EnsureRun(); confirm they exist.
+        EnsureRunControllerIfMissing();
+
+        // Step 10 — HUD remains as-is. UXML element names verified against RunHudController
+        // queries (HpFill/XpFill/etc.) — all present in Assets/_Brave/UI/Documents/RunHud.uxml.
+
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene, runPath);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        Debug.Log("[SceneSetup] EnsurePlayableMvpRun OK — Run scene patched for MVP playability.");
+    }
+
+    /// <summary>CLI entry: -executeMethod SceneSetup.EnsurePlayableMvpRunHeadless.</summary>
+    public static void EnsurePlayableMvpRunHeadless()
+    {
+        try
+        {
+            EnsurePlayableMvpRun();
+            EditorApplication.Exit(0);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[SceneSetup] EnsurePlayableMvpRunHeadless failed: {ex}");
+            EditorApplication.Exit(1);
+        }
+    }
+
+    private static GameObject EnsureCarrotProjectilePrefab()
+    {
+        var existing = AssetDatabase.LoadAssetAtPath<GameObject>(CarrotProjectilePrefabPath);
+        if (existing != null) return existing;
+
+        if (!Directory.Exists(ArtRoot)) Directory.CreateDirectory(ArtRoot);
+        if (!Directory.Exists(PrefabsDir)) Directory.CreateDirectory(PrefabsDir);
+
+        // Build a tiny 0.2u cube tinted carrot-orange. URP/Lit shader; fall back to Standard.
+        var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        go.name = "CarrotProjectile";
+        go.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+
+        var renderer = go.GetComponent<MeshRenderer>();
+        if (renderer != null)
+        {
+            var shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
+            var mat = new Material(shader) { color = new Color(1f, 0.55f, 0.15f) };
+            renderer.sharedMaterial = mat;
+        }
+
+        // The runtime collider isn't strictly required (Projectile uses EnemyRegistry,
+        // not Unity colliders), but having one helps if a future hit-detector wants it.
+        // The default BoxCollider added by CreatePrimitive is fine.
+
+        // Add the Projectile component so spawned instances are actually projectiles.
+        go.AddComponent<Projectile>();
+
+        var prefab = PrefabUtility.SaveAsPrefabAsset(go, CarrotProjectilePrefabPath);
+        GameObject.DestroyImmediate(go);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        Debug.Log($"[SceneSetup] Created procedural carrot projectile prefab at {CarrotProjectilePrefabPath}.");
+        return prefab!;
+    }
+
+    private static void WirePlayerComponents(GameObject player)
+    {
+        // PlayerMover is wired via EnsureRunPlayerWiring (canonical path); call it for safety.
+        EnsureRunPlayerWiring(player);
+
+        // MeshRenderer + URP material (replace any missing).
+        if (player.GetComponent<MeshFilter>() == null)
+            player.AddComponent<MeshFilter>().sharedMesh = Resources.GetBuiltinResource<Mesh>("Cube.fbx");
+        var pr = player.GetComponent<MeshRenderer>();
+        if (pr == null) pr = player.AddComponent<MeshRenderer>();
+        if (pr.sharedMaterial == null || pr.sharedMaterial.shader == null)
+        {
+            var shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
+            pr.sharedMaterial = new Material(shader) { color = new Color(0.83f, 0.64f, 0.45f) }; // bunny-brown #d4a373
+        }
+
+        // Replace BoxCollider with CapsuleCollider for cleaner rolling on the ground.
+        var box = player.GetComponent<BoxCollider>();
+        if (box != null) GameObject.DestroyImmediate(box);
+        var cap = player.GetComponent<CapsuleCollider>();
+        if (cap == null) cap = player.AddComponent<CapsuleCollider>();
+        cap.radius = 0.4f;
+        cap.height = 1.0f;
+        cap.direction = 1; // Y axis
+
+        // Rigidbody — non-kinematic, freeze rotation, gravity off so the bunny stays on
+        // the ground without needing a NavMesh or kinematic-character-controller pass.
+        var rb = player.GetComponent<Rigidbody>();
+        if (rb == null) rb = player.AddComponent<Rigidbody>();
+        rb.useGravity = false;
+        rb.isKinematic = false;
+        rb.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionY;
+        rb.linearDamping = 4f;
+    }
+
+    private static void WireCameraFollow(GameObject cam, Transform target)
+    {
+        var follow = cam.GetComponent<CameraFollow>();
+        if (follow == null) follow = cam.AddComponent<CameraFollow>();
+        var so = new SerializedObject(follow);
+        var targetProp = so.FindProperty("target");
+        if (targetProp != null) targetProp.objectReferenceValue = target;
+        var offsetProp = so.FindProperty("offset");
+        if (offsetProp != null) offsetProp.vector3Value = new Vector3(10f, 12f, -8f);
+        var lookProp = so.FindProperty("lookAtTarget");
+        if (lookProp != null) lookProp.boolValue = true;
+        so.ApplyModifiedPropertiesWithoutUndo();
+        // Pre-position the camera at the resolved offset so the first frame doesn't drift.
+        cam.transform.position = target.position + new Vector3(10f, 12f, -8f);
+        cam.transform.LookAt(target.position);
+    }
+
+    private static void EnsureDirectionalLight()
+    {
+        var existing = UnityEngine.Object.FindFirstObjectByType<Light>();
+        if (existing != null && existing.type == LightType.Directional) return;
+        var go = new GameObject("DirectionalLight");
+        var l = go.AddComponent<Light>();
+        l.type = LightType.Directional;
+        l.intensity = 1.2f;
+        l.color = new Color(1f, 0.96f, 0.85f);
+        go.transform.rotation = Quaternion.Euler(50, -30, 0);
+    }
+
+    private static void EnsureGround()
+    {
+        // Re-use the existing MeadowGround Plane if present.
+        if (GameObject.Find("MeadowGround") != null) return;
+        if (GameObject.Find("Ground") != null) return;
+
+        var ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        ground.name = "MeadowGround";
+        ground.transform.localScale = new Vector3(8, 1, 8);
+        ground.transform.position = new Vector3(0, -0.5f, 0);
+        var gr = ground.GetComponent<Renderer>();
+        if (gr != null)
+        {
+            var shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
+            gr.sharedMaterial = new Material(shader) { color = new Color(0.65f, 0.84f, 0.37f) };
+        }
+    }
+
+    private static CarrotProjectilePool EnsureCarrotPoolWired(GameObject prefabAsset)
+    {
+        var go = GameObject.Find("[CarrotProjectilePool]");
+        if (go == null) go = new GameObject("[CarrotProjectilePool]");
+        var pool = go.GetComponent<CarrotProjectilePool>();
+        if (pool == null) pool = go.AddComponent<CarrotProjectilePool>();
+
+        var so = new SerializedObject(pool);
+        var prefabProp = so.FindProperty("projectilePrefab");
+        if (prefabProp != null && prefabAsset != null)
+        {
+            // The serialized field is typed as Projectile (component). Look up the
+            // Projectile MonoBehaviour on the prefab asset and assign that.
+            var proj = prefabAsset.GetComponent<Projectile>();
+            if (proj != null)
+                prefabProp.objectReferenceValue = proj;
+        }
+        so.ApplyModifiedPropertiesWithoutUndo();
+        return pool;
+    }
+
+    private static void WireAutoAttackController(GameObject player, CarrotProjectilePool pool)
+    {
+        var aa = player.GetComponent<AutoAttackController>();
+        if (aa == null) aa = player.AddComponent<AutoAttackController>();
+        var so = new SerializedObject(aa);
+
+        var mover = player.GetComponent<PlayerMover>();
+        var playerProp = so.FindProperty("player");
+        if (playerProp != null && mover != null && playerProp.objectReferenceValue == null)
+            playerProp.objectReferenceValue = mover;
+
+        var poolProp = so.FindProperty("projectilePool");
+        if (poolProp != null) poolProp.objectReferenceValue = pool;
+
+        var weaponProp = so.FindProperty("weapon");
+        if (weaponProp != null && weaponProp.objectReferenceValue == null)
+        {
+            var weaponDef = AssetDatabase.LoadAssetAtPath<WeaponDefinition>(WeaponCarrotAssetPath)
+                ?? AssetDatabase.LoadAssetAtPath<WeaponDefinition>(WeaponPebbleAssetPath);
+            if (weaponDef != null) weaponProp.objectReferenceValue = weaponDef;
+        }
+        so.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    private static void EnsureMvpWaveSpawner(Transform hero)
+    {
+        var go = GameObject.Find("[MvpWaveSpawner]");
+        if (go == null) go = new GameObject("[MvpWaveSpawner]");
+        var spawner = go.GetComponent<MvpWaveSpawner>();
+        if (spawner == null) spawner = go.AddComponent<MvpWaveSpawner>();
+        // Configure via SerializedObject so the values persist on the scene asset.
+        var so = new SerializedObject(spawner);
+        SetFloat(so, "spawnIntervalSeconds", 3f);
+        SetInt(so, "swarmersPerWave", 5);
+        SetFloat(so, "ringRadius", 8f);
+        SetInt(so, "activeCap", 50);
+        SetFloat(so, "swarmerMoveSpeed", 2.5f);
+        SetFloat(so, "swarmerHp", 10f);
+
+        var heroProp = so.FindProperty("hero");
+        if (heroProp != null) heroProp.objectReferenceValue = hero;
+        so.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    private static void EnsureRunControllerIfMissing()
+    {
+        var existing = GameObject.Find("[Run]");
+        if (existing != null) return;
+        var timerGo = GameObject.Find("[RunTimer]") ?? new GameObject("[RunTimer]");
+        var timerType = FindType("Brave.Gameplay.Run.RunTimer");
+        if (timerType != null && timerGo.GetComponent(timerType) == null)
+            timerGo.AddComponent(timerType);
+        EnsureRunController(timerGo);
+    }
+
+    private static void SetFloat(SerializedObject so, string field, float value)
+    {
+        var p = so.FindProperty(field);
+        if (p != null) p.floatValue = value;
+    }
+
+    private static void SetInt(SerializedObject so, string field, int value)
+    {
+        var p = so.FindProperty(field);
+        if (p != null) p.intValue = value;
     }
 
     private static void EnsureBoot()
