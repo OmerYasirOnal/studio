@@ -29,7 +29,7 @@ const INITIAL: Omit<RunState, 'setPhase' | 'setInput' | 'incKills' | 'addXp' | '
   kills: 0,
   level: 1,
   xp: 0,
-  xpForNext: 10,
+  xpForNext: 23,
   input: { x: 0, y: 0, active: false },
 };
 
@@ -46,7 +46,7 @@ export const useRunStore = create<RunState>((set) => ({
       while (xp >= xpForNext) {
         xp -= xpForNext;
         level += 1;
-        xpForNext = 10 + level * 5;
+        xpForNext = 15 + level * 8;
       }
       return { xp, level, xpForNext };
     }),

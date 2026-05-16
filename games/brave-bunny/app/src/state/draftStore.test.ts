@@ -5,14 +5,20 @@ import { useDraftStore } from './draftStore';
 describe('XP curve', () => {
   beforeEach(() => useRunStore.getState().reset());
 
-  it('level 1 → level 2 at 10 XP', () => {
-    useRunStore.getState().addXp(10);
+  it('level 1 → level 2 at 23 XP', () => {
+    useRunStore.getState().addXp(23);
     expect(useRunStore.getState().level).toBe(2);
   });
 
-  it('xpForNext grows with level', () => {
-    useRunStore.getState().addXp(10); // L1→L2 (xpForNext = 10 + 2*5 = 20)
-    expect(useRunStore.getState().xpForNext).toBe(20);
+  it('level 2 → level 3 at 31 more XP', () => {
+    useRunStore.getState().addXp(23); // L1→L2
+    useRunStore.getState().addXp(31); // L2→L3
+    expect(useRunStore.getState().level).toBe(3);
+  });
+
+  it('xpForNext at level 2 is 31', () => {
+    useRunStore.getState().addXp(23); // L1→L2 (xpForNext = 15 + 2*8 = 31)
+    expect(useRunStore.getState().xpForNext).toBe(31);
   });
 });
 
@@ -25,7 +31,6 @@ describe('Draft offers', () => {
   });
 
   it('rollOffers respects maxStacks', () => {
-    // Max out HP (5 stacks)
     for (let i = 0; i < 5; i++) {
       useDraftStore.setState((s) => ({ taken: { ...s.taken, hp: i + 1 } }));
     }
