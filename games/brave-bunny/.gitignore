@@ -25,3 +25,8 @@ unity/.vs/
 # Asset working files we don't commit raw
 assets-raw/**/*.psd
 assets-raw/**/*.psb
+
+# Override root .gitignore: poly.pizza Quaternius .glb sources are small CC0
+# raw inputs that licenses.py validates row-by-row. Keep them tracked so the
+# asset-licenses CI gate passes. Compressed outputs live in app/public/models/.
+!assets-raw/quaternius/*.glb
