@@ -1,7 +1,8 @@
 import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { useRef } from 'react';
-import type { Group, Mesh, MeshStandardMaterial } from 'three';
+import { useEffect, useMemo, useRef } from 'react';
+import { AnimationMixer, type Group, type Mesh, type MeshStandardMaterial } from 'three';
+import { SkeletonUtils } from 'three-stdlib';
 import type { Entity } from '@/ecs/components';
 
 const MODEL_MAP: Record<string, string> = {
@@ -10,43 +11,66 @@ const MODEL_MAP: Record<string, string> = {
   mushroom: '/assets/glb/mushroom.glb',
 };
 
-const FLASH_COLOR = '#ffffff';
+const SCALE_MAP: Record<string, number> = {
+  slime: 0.6,
+  wolf: 0.7,
+  mushroom: 0.5,
+};
 
 export default function EnemyEntity({ entity }: { entity: Entity }) {
   const groupRef = useRef<Group>(null);
   const modelKey = entity.archetype as keyof typeof MODEL_MAP;
   const gltf = useGLTF(MODEL_MAP[modelKey] ?? MODEL_MAP.slime);
+  const scale = SCALE_MAP[modelKey] ?? 0.5;
+
+  // Per-instance scene clone + mixer (SkeletonUtils.clone preserves skeleton).
+  const clonedScene = useMemo(() => SkeletonUtils.clone(gltf.scene), [gltf.scene]);
+  const mixer = useMemo(() => new AnimationMixer(clonedScene), [clonedScene]);
+
+  // Pick walk/idle animation by suffix and play it on a loop.
+  useEffect(() => {
+    const clip =
+      gltf.animations.find((a) => a.name.endsWith('Walk')) ??
+      gltf.animations.find((a) => a.name.endsWith('Idle')) ??
+      gltf.animations[0];
+    if (!clip) return;
+    const action = mixer.clipAction(clip);
+    action.reset().fadeIn(0.1).play();
+    return () => {
+      action.fadeOut(0.1);
+      mixer.stopAllAction();
+    };
+  }, [mixer, gltf.animations]);
 
   useFrame((_, delta) => {
+    mixer.update(delta);
     if (!groupRef.current || !entity.position) return;
     groupRef.current.position.set(entity.position.x, entity.position.y, entity.position.z);
     if (entity.rotationY != null) groupRef.current.rotation.y = entity.rotationY;
 
     if (entity.hitFlashTime != null && entity.hitFlashTime > 0) {
       entity.hitFlashTime -= delta;
-      groupRef.current.traverse((o) => {
+      clonedScene.traverse((o) => {
         const mesh = o as Mesh;
         if (mesh.isMesh && mesh.material) {
           const mat = mesh.material as MeshStandardMaterial;
-          mat.emissive?.set(FLASH_COLOR);
+          if (mat.emissive) mat.emissive.setHex(0xffffff);
         }
       });
     } else {
-      groupRef.current.traverse((o) => {
+      clonedScene.traverse((o) => {
         const mesh = o as Mesh;
         if (mesh.isMesh && mesh.material) {
           const mat = mesh.material as MeshStandardMaterial;
-          mat.emissive?.set('#000000');
+          if (mat.emissive) mat.emissive.setHex(0x000000);
         }
       });
     }
   });
 
-  // Each enemy clones the GLTF scene to allow independent positioning.
-  // For <=60 enemies on MVP this is acceptable; replace with InstancedMesh + VAT in next plan.
   return (
-    <group ref={groupRef}>
-      <primitive object={gltf.scene.clone()} />
+    <group ref={groupRef} scale={scale}>
+      <primitive object={clonedScene} />
     </group>
   );
 }
