@@ -19,7 +19,15 @@
 #
 # Paths in this file are RELATIVE TO THIS FILE (fastlane sets CWD to its own dir).
 # games/brave-bunny/tools/ci/fastlane/Fastfile
-#   ../../../unity/Build/iOS = games/brave-bunny/unity/Build/iOS
+#   ../../../unity/Build/iOS = games/brave-bunny/unity/Build/iOS (legacy Unity path, retained
+#   for the simulator/preview/release lanes that still archive the Unity Xcode project)
+#
+# Sprint A engine pivot (Plan 2, Stream 3 — 2026-05-16): the `beta` lane now archives the
+# Capacitor 7 workspace at games/brave-bunny/ios/App/App.xcworkspace instead of the Unity-
+# generated Unity-iPhone.xcworkspace. The legacy Unity lanes are kept until the Unity tree
+# is retired (planned: Sprint C cleanup).
+
+require "shellwords"  # used by `String#shellescape` in the Capacitor pre-build sh calls
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -30,6 +38,14 @@ IOS_BUILD_DIR          = File.join(UNITY_PROJECT_PATH, "Build", "iOS")
 IOS_XCODEPROJ          = File.join(IOS_BUILD_DIR, "Unity-iPhone.xcodeproj")
 IOS_XCWORKSPACE        = File.join(IOS_BUILD_DIR, "Unity-iPhone.xcworkspace")
 BUILD_OUTPUT_ROOT      = File.expand_path("../../../Builds", __dir__)
+
+# Capacitor (post-pivot) paths — relative to this Fastfile's directory.
+CAP_APP_DIR            = File.expand_path("../../../app", __dir__)
+CAP_IOS_DIR            = File.expand_path("../../../ios", __dir__)
+CAP_XCODEPROJ          = File.join(CAP_IOS_DIR, "App", "App.xcodeproj")
+CAP_XCWORKSPACE        = File.join(CAP_IOS_DIR, "App", "App.xcworkspace")
+CAP_BUILD_OUTPUT_DIR   = File.expand_path("../../../build/ios", __dir__)
+
 APP_IDENTIFIER         = "com.omeryasir.bravebunny"
 APP_NAME               = "Brave Bunny: Survivors"  # ASC display name; see ADR-0016 for the trademark-driven split from in-game brand "Brave Bunny"
 APP_PRIMARY_LANGUAGE   = "en-US"
@@ -317,12 +333,83 @@ platform :ios do
   end
 
   # -------------------------------------------------------------------------
-  # Lane: beta
-  # TestFlight upload. Triggered by GitHub Actions (workflow_dispatch).
-  # Requires full Apple credentials in env.
+  # Lane: beta (Capacitor 7 — post-pivot, Sprint A onwards)
+  # TestFlight upload of the R3F/Vite app wrapped by Capacitor. Replaces the
+  # Unity-iOS `beta` lane preserved below as `beta_unity` for emergency use.
+  #
+  # Pre-build chain runs from this Fastfile's directory:
+  #   1. `app/`  : npm ci → npm run build (Vite) → npx cap sync ios
+  #   2. `ios/App/` : pod install (CocoaPods deps for Capacitor plugins)
+  #
+  # Build numbers: the .pbxproj's CURRENT_PROJECT_VERSION is the source of
+  # truth. We do NOT mutate it from this lane (would dirty the working tree
+  # mid-build); the human bumps it in a commit before invoking the lane.
   # -------------------------------------------------------------------------
-  desc "Build and upload to TestFlight"
+  desc "Build and upload Capacitor iOS shell to TestFlight"
   lane :beta do
+    require_env(vars: ["MATCH_PASSWORD"])
+    api_key = asc_api_key             # supersedes FASTLANE_USER + 2FA
+
+    UI.user_error!("[beta] Capacitor workspace missing at #{CAP_XCWORKSPACE}") unless File.exist?(CAP_XCWORKSPACE)
+
+    # Pre-build: regenerate the Vite bundle and sync it into the iOS shell,
+    # then refresh CocoaPods so Capacitor plugins are present.
+    sh("bash", "-lc", "cd #{CAP_APP_DIR.shellescape} && npm ci && npm run build && npx cap sync ios")
+    sh("bash", "-lc", "cd #{File.join(CAP_IOS_DIR, 'App').shellescape} && pod install")
+
+    match(
+      type: "appstore",
+      readonly: !ENV["CI"].nil?,      # CI: read-only; local: allow refresh
+      app_identifier: APP_IDENTIFIER,
+      api_key: api_key
+    )
+
+    # Pin the Capacitor-generated Xcode project to Manual signing with the
+    # exact match-issued provisioning profile. Mirrors the legacy Unity
+    # treatment to avoid xcodebuild auto-picking a stale profile.
+    update_code_signing_settings(
+      path: CAP_XCODEPROJ,
+      use_automatic_signing: false,
+      team_id: "9X8FDSW5D8",
+      bundle_identifier: APP_IDENTIFIER,
+      code_sign_identity: "Apple Distribution",
+      profile_name: "match AppStore #{APP_IDENTIFIER}",
+      profile_uuid: ENV["sigh_#{APP_IDENTIFIER}_appstore"],
+      targets: ["App"]
+    )
+
+    build_app(
+      workspace: CAP_XCWORKSPACE,
+      scheme: "App",
+      configuration: "Release",
+      export_method: "app-store",
+      include_bitcode: false,
+      output_directory: CAP_BUILD_OUTPUT_DIR,
+      output_name: "BraveBunny.ipa",
+      clean: true,
+      clear_derived_data: true
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      app_identifier: APP_IDENTIFIER,
+      ipa: File.join(CAP_BUILD_OUTPUT_DIR, "BraveBunny.ipa"),
+      skip_waiting_for_build_processing: true,
+      changelog: "Sprint A engine bootstrap — first Capacitor + R3F build (empty scene, rotating cube placeholder).",
+      distribute_external: false,     # internal testers only until v0.2
+      reject_build_waiting_for_review: false
+    )
+
+    UI.success("[beta] TestFlight upload submitted from Capacitor workspace")
+  end
+
+  # -------------------------------------------------------------------------
+  # Lane: beta_unity (LEGACY — pre-pivot Unity flow)
+  # Kept until the Unity tree is removed (planned: Sprint C). Do not invoke
+  # unless rolling back the engine pivot.
+  # -------------------------------------------------------------------------
+  desc "[LEGACY Unity flow] Build and upload Unity-generated Xcode project to TestFlight"
+  lane :beta_unity do
     require_env(vars: ["MATCH_PASSWORD"])
     api_key = asc_api_key             # supersedes FASTLANE_USER + 2FA
 
@@ -335,9 +422,6 @@ platform :ios do
       api_key: api_key
     )
 
-    # Mirror the preview-lane signing fix: switch Unity-generated Xcode project
-    # to Manual signing and pin the exact match profile UUID. Without this,
-    # xcodebuild can pick a stale profile and fail with provisioning errors.
     update_code_signing_settings(
       path: IOS_XCODEPROJ,
       use_automatic_signing: false,
@@ -375,7 +459,7 @@ platform :ios do
       reject_build_waiting_for_review: false
     )
 
-    UI.success("[beta] TestFlight upload submitted (build ##{build_number})")
+    UI.success("[beta_unity] TestFlight upload submitted (build ##{build_number})")
   end
 
   # -------------------------------------------------------------------------
