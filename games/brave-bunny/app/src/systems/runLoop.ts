@@ -1,5 +1,6 @@
 import { useFrame } from '@react-three/fiber';
 import { useRunStore } from '@/state/runStore';
+import { useVfxStore } from '@/state/vfxStore';
 import { tickWeapons } from './weapons';
 import { tickProjectiles } from './projectiles';
 import { tickEnemyAI } from './enemyAI'; // from S7 — will exist when wired
@@ -18,6 +19,7 @@ export function useRunLoop(): null {
     tickWeapons(dt);
     tickProjectiles(dt);
     tickLifecycle(dt);
+    useVfxStore.getState().tick(dt);
 
     useRunStore.setState((s) => ({ time: s.time + dt }));
   });

@@ -1,6 +1,7 @@
 import { world } from '@/ecs/world';
 import { projectileQuery, enemyQuery } from '@/ecs/queries';
 import { audio } from '@/audio/AudioBus';
+import { useVfxStore } from '@/state/vfxStore';
 
 export function tickProjectiles(delta: number): void {
   for (const p of projectileQuery) {
@@ -23,6 +24,12 @@ export function tickProjectiles(delta: number): void {
         e.hp -= p.damage ?? 0;
         e.hitFlashTime = 0.15;
         audio.play('hit');
+        if (e.position) {
+          useVfxStore
+            .getState()
+            .emitDamage(e.position.x, e.position.y, e.position.z, p.damage ?? 0);
+          useVfxStore.getState().emitSpark(e.position.x, e.position.y, e.position.z);
+        }
         world.remove(p);
         break;
       }

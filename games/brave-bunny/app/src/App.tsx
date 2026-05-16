@@ -6,6 +6,7 @@ import HUD from './ui/HUD';
 import DraftModal from './ui/DraftModal';
 import EndRunSummary from './ui/EndRunSummary';
 import Joystick from './ui/Joystick';
+import DamageNumbers from './render/DamageNumbers';
 import { useRunStore } from './state/runStore';
 import { useMetaStore } from './state/metaStore';
 import { audio } from './audio/AudioBus';
@@ -23,6 +24,7 @@ export default function App() {
   return (
     <>
       <Game />
+      <DamageNumbers />
       {phase === 'run' && <HUD />}
       {phase === 'run' && <Joystick />}
       {phase === 'boot' && <Boot />}

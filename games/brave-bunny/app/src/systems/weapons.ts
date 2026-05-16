@@ -1,6 +1,7 @@
 import { world } from '@/ecs/world';
 import { enemyQuery, heroQuery } from '@/ecs/queries';
 import { audio } from '@/audio/AudioBus';
+import { useVfxStore } from '@/state/vfxStore';
 import type { Entity, WeaponKind } from '@/ecs/components';
 
 const WEAPON_DEFAULTS: Record<WeaponKind, { damage: number; tickInterval: number }> = {
@@ -98,6 +99,12 @@ export function tickWeapons(delta: number): void {
         e.hp -= weapon.damage;
         e.hitFlashTime = 0.15;
         audio.play('hit');
+        if (e.position) {
+          useVfxStore
+            .getState()
+            .emitDamage(e.position.x, e.position.y, e.position.z, weapon.damage);
+          useVfxStore.getState().emitSpark(e.position.x, e.position.y, e.position.z);
+        }
       }
     } else if (weapon.kind === 'sling') {
       // Find nearest enemy, spawn projectile
