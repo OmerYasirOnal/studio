@@ -13,6 +13,10 @@ The framework's job is to let one developer ship a mobile game in 8 weeks using 
 
 The currently active game is recorded in `.active-game` at the repository root. All agent-spawn helpers and slash commands read this file to know which `games/<name>/` directory to write to. Update it via `/active-game <name>` or `./core/scripts/new-game.sh <name>` — do not edit by hand during a session.
 
+## Active engine
+
+The active engine is **Three.js + React Three Fiber + Capacitor 7** (web-tech 3D wrapped for iOS). All code is TypeScript/JSON/Markdown; there is no GUI editor in the authoring loop. The historical Unity pivot is documented in [`docs/superpowers/specs/2026-05-16-engine-pivot-design.md`](docs/superpowers/specs/2026-05-16-engine-pivot-design.md).
+
 ## Nine guiding principles
 
 1. **Spec-first, code-last.** No engine code before the GDD, art bible, and tech spec are written and committed.
@@ -58,10 +62,10 @@ If you think a paid API is needed, the answer is: find a CC0 alternative or writ
 | `games/<active>/docs/decisions/` | any agent — ADRs are universal |
 | `games/<active>/assets-raw/` | asset-curator, blender-tech |
 | `games/<active>/data/balance/` | balance-engineer |
-| `games/<active>/unity/Assets/Scripts/Gameplay/` | gameplay-engineer |
-| `games/<active>/unity/Assets/Scripts/Systems/` | systems-engineer |
-| `games/<active>/unity/Assets/Scripts/UI/` | ui-engineer |
-| `games/<active>/unity/Assets/Tests/` | qa-engineer |
+| `games/<active>/app/src/systems/`, `games/<active>/app/src/render/` | gameplay-engineer |
+| `games/<active>/app/src/ecs/`, `games/<active>/app/src/state/`, `games/<active>/app/src/platform/`, `games/<active>/app/src/audio/` | systems-engineer |
+| `games/<active>/app/src/ui/` | ui-engineer |
+| `games/<active>/app/src/**/*.test.ts`, `games/<active>/app/e2e/`, `games/<active>/app/bench/` | qa-engineer |
 | `games/<active>/tools/ci/` | build-engineer |
 
 ## Forbidden patterns

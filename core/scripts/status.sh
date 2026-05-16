@@ -5,7 +5,7 @@ set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-cd "$ROOT"
+cd "$ROOT" || exit 1
 
 ACTIVE="$(cat .active-game 2>/dev/null || echo "")"
 

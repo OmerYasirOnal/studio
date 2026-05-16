@@ -1,18 +1,18 @@
-name: bb-lint
+name: bb-web-test
 
 on:
   push:
     branches: [main]
     paths:
       - 'games/brave-bunny/app/**'
-      - '.github/workflows/bb-lint.yml'
+      - '.github/workflows/bb-web-test.yml'
   pull_request:
     paths:
       - 'games/brave-bunny/app/**'
-      - '.github/workflows/bb-lint.yml'
+      - '.github/workflows/bb-web-test.yml'
 
 jobs:
-  lint:
+  test:
     runs-on: ubuntu-latest
     if: ${{ hashFiles('games/brave-bunny/app/package.json') != '' }}
     defaults:
@@ -27,7 +27,7 @@ jobs:
           cache-dependency-path: games/brave-bunny/app/package-lock.json
       - name: Install
         run: npm ci
-      - name: ESLint
-        run: npm run lint
-      - name: Prettier check
-        run: npm run format:check
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm test -- --reporter=verbose

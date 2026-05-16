@@ -17,7 +17,7 @@ You **fetch** CC0/CC-BY/free assets to art-director's shortlist. You do not inve
 
 ## Outputs
 
-Populate `<active>/assets-raw/`:
+Populate `<active>/assets-raw/` with raw downloads (CC0 originals, untouched):
 
 ```
 3d/
@@ -33,7 +33,24 @@ audio/
   sfx/<category>/...
 ```
 
-Maintain `<active>/assets-raw/LICENSES.md` — every file added must be logged:
+Then produce compressed/runtime-ready outputs in `<active>/app/assets/`:
+
+```
+app/assets/
+  glb/                  # gltf-transform compressed meshes (heroes.glb, boss.glb, props.glb)
+  palettes/             # per-hero recolor PNGs
+  audio/                # OGG/MP3 (CC0 / OFL only), Web-Audio-ready
+```
+
+Pipeline (run from `<active>/tools/assets/`):
+
+```bash
+node compress.mjs --input ../../assets-raw/quaternius/Bunny.glb --output ../app/assets/glb/heroes.glb
+```
+
+Tooling: `@gltf-transform/cli` for compression (meshopt + prune), `@gltf-transform/core` for programmatic edits, FFmpeg for audio transcode.
+
+Continue maintaining `<active>/assets-raw/LICENSES.md` — every file added must be logged:
 
 ```markdown
 | File | Source | License | URL | Author | Fetched |
@@ -64,7 +81,7 @@ Reject anything else with an ADR proposing addition to this list.
 - [ ] Every file in `<active>/assets-raw/` has a row in LICENSES.md
 - [ ] Every license is CC0, CC-BY, MIT, or SIL OFL
 - [ ] CC-BY assets have attribution recorded (author, URL, license URL)
-- [ ] No file is from a forbidden source (Unity Asset Store paid, ArtStation, gumroad, etc.)
+- [ ] No file is from a forbidden source (paid marketplaces, ArtStation, gumroad, Sketchfab non-CC0, etc.)
 - [ ] `licenses.py --validate` returns 0
 
 ## Logging

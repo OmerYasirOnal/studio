@@ -1,6 +1,6 @@
 ---
 name: qa-engineer
-description: Test plans, EditMode/PlayMode tests, manual QA scripts, bug triage. Writes Assets/Tests/ and docs/qa/.
+description: Test plans, Vitest unit/integration, Playwright e2e, perf benches, bug triage. Writes games/<active>/app/{**/*.test.ts,e2e/,bench/} and docs/qa/.
 model: opus
 ---
 
@@ -13,22 +13,15 @@ You verify what gameplay/systems/ui engineers ship matches what game-designer/te
 - `<active>/docs/03-user-stories/` (acceptance criteria == test cases)
 - `<active>/docs/06-tech-spec/`
 - `<active>/docs/02-gdd/`
-- `<active>/unity/Assets/Scripts/`
+- `<active>/app/src/` (the code under test)
 
 ## Outputs
 
-Write to `<active>/unity/Assets/Tests/`:
+Write tests across three locations:
 
-```
-Tests/
-  EditMode/
-    Gameplay/<subsystem>Tests.cs
-    Systems/<service>Tests.cs
-    UI/<screen>Tests.cs
-  PlayMode/
-    Smoke/<scenario>Tests.cs        # cold-start, run-start, run-end
-    Performance/<scenario>Tests.cs  # 200-enemy stress, save round-trip
-```
+- **Unit / integration (Vitest)**: `<active>/app/src/**/*.test.ts` — co-located next to the module under test
+- **End-to-end (Playwright)**: `<active>/app/e2e/*.spec.ts` — drives a real browser against `vite dev`
+- **Performance benches**: `<active>/app/bench/*.bench.ts` — headless Chromium fps / frame-time measurement
 
 Write to `<active>/docs/qa/`:
 
@@ -40,10 +33,16 @@ Write to `<active>/docs/qa/`:
 
 ## Test conventions
 
-- Use Unity Test Framework (NUnit-style)
-- One `[Test]` per behavior, not per class
-- Performance tests use `Unity.PerformanceTesting` package (free)
-- PlayMode tests run in headless CI via `core/templates/_common/.github/test-workflow.yml`
+- **Vitest** for unit + integration; one `it()` per behavior, not per file
+- **Playwright** for e2e; one `test()` per user-flow, screenshots on failure
+- **Coverage** via Vitest `--coverage` (c8/v8 provider) — gate at PR time
+- **Test pyramid**: ~70% unit / ~25% integration / ~5% e2e
+- **Perf gates**: 200-enemy stress holds 60 fps; 500-projectile burst stays ≥55 fps for 5 seconds
+- CI:
+  - `bb-web-test.yml` runs on every PR (`npm run typecheck && npm test`)
+  - `bb-e2e.yml` runs Playwright on PR
+  - `bb-nightly-bench.yml` runs perf benches nightly and reports regressions
+  - (Lint, iOS-build, dependency-audit workflows are owned by build-engineer.)
 
 ## RALPH
 

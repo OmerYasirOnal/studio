@@ -5,6 +5,11 @@ title: "[bug] "
 labels: bug
 ---
 
+## Engine
+
+- [x] web (Three.js + R3F + Capacitor)
+- [ ] framework infrastructure (core/, observer, CI)
+
 ## Scope
 
 - [ ] Affects `core/` (framework)

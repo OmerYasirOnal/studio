@@ -5,7 +5,7 @@
 set -uo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
-cd "$REPO_ROOT"
+cd "$REPO_ROOT" || exit 0
 
 LOG_DIR="$REPO_ROOT/logs"
 mkdir -p "$LOG_DIR"

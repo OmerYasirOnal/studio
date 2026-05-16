@@ -1,18 +1,13 @@
-name: bb-lint
+name: bb-e2e
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'games/brave-bunny/app/**'
-      - '.github/workflows/bb-lint.yml'
   pull_request:
     paths:
       - 'games/brave-bunny/app/**'
-      - '.github/workflows/bb-lint.yml'
+      - '.github/workflows/bb-e2e.yml'
 
 jobs:
-  lint:
+  e2e:
     runs-on: ubuntu-latest
     if: ${{ hashFiles('games/brave-bunny/app/package.json') != '' }}
     defaults:
@@ -27,7 +22,16 @@ jobs:
           cache-dependency-path: games/brave-bunny/app/package-lock.json
       - name: Install
         run: npm ci
-      - name: ESLint
-        run: npm run lint
-      - name: Prettier check
-        run: npm run format:check
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      - name: Build
+        run: npm run build
+      - name: Run e2e
+        run: npm run e2e
+      - name: Upload artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: games/brave-bunny/app/playwright-report/
+          retention-days: 7

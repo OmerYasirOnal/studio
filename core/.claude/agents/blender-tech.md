@@ -21,12 +21,32 @@ When art-director's vision doesn't fit any CC0 asset 1:1, you bridge the gap wit
 - `<active>/assets-raw/3d/custom-blender/<entity>/build.py` — Headless Blender script that produces the .glb deterministically
 - `<active>/assets-raw/3d/custom-blender/<entity>/README.md` — One-page recipe: source base, transformations applied, target poly budget
 
+### VAT artifacts (enemy swarms)
+
+For the 15 enemy archetypes + 1 boss covered by ADR-0031 (VAT pipeline — authored by tech-architect, implemented by you):
+
+- `<active>/app/assets/vat/<archetype>.png` — baked position/normal texture
+- `<active>/app/assets/vat/<archetype>.json` — metadata (bounds, animation ranges, frame count)
+- `<active>/tools/assets/bake-vat.py` — the Blender headless script that produces both, deterministically
+
+Invocation:
+
+```bash
+blender -b -P games/<active>/tools/assets/bake-vat.py -- \
+  --input games/<active>/assets-raw/quaternius/Wolf.glb \
+  --output games/<active>/app/assets/vat/wolf \
+  --animations "Run,Attack,Death" \
+  --frames-per-anim 32
+```
+
+CI: VAT bake runs whenever `assets-raw/` changes; outputs are committed to git so the runtime is deterministic and the bake step is not on the player's critical path.
+
 ## Blender pipeline conventions
 
 - Always use Blender 4.x (`bpy` API). Document Blender minimum in each `build.py`.
 - All transformations scripted. Manual UI work is forbidden because it isn't reproducible.
-- Headless build: `blender --background <file>.blend --python build.py -- --output <out>.glb`
-- Export options: glTF 2.0 (.glb binary), Y-up forward, +Z up (Unity convention)
+- Headless build: `blender --background <file>.blend --python build.py -- --output <out>.glb`  (VAT bake variant uses `blender -b -P bake-vat.py -- ...`)
+- Export options: glTF 2.0 (.glb binary), Y-up forward, +Z up (Three.js convention)
 - Triangle budget: per character ≤ 5k tris baseline, ≤ 3k for enemies, ≤ 500 for projectiles. Cross-check art bible `08-asset-budget.md`.
 
 ## RALPH
