@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Brave.Systems.Context;
 using Brave.Systems.Progression;
 using Brave.UI.Bindings;

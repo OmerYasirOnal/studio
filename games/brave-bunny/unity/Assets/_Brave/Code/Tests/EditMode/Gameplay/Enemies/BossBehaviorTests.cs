@@ -26,6 +26,7 @@ using Brave.Gameplay.Events;
 using Brave.Gameplay.Run;
 using NUnit.Framework;
 using UnityEngine;
+using BossPhase = Brave.Gameplay.Enemies.BossPhase;
 
 namespace Brave.Tests.EditMode.Gameplay.Enemies
 {

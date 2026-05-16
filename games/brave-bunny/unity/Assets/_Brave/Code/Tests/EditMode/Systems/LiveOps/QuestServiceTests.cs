@@ -244,8 +244,8 @@ namespace Brave.Tests.EditMode.Systems.LiveOps
             // Force load from the InMemoryFileSystem on a brand-new SaveService.
             var save2 = new SaveService(RootDir, _fs);
             save2.Load();
-            Assert.That(save2.Data.QuestState.Entries.Count, Is.GreaterThan(0));
-            var matching = save2.Data.QuestState.Entries.Find(e => e.Id == lvl.Id);
+            Assert.That(save2.Data.Quests.Entries.Count, Is.GreaterThan(0));
+            var matching = save2.Data.Quests.Entries.Find(e => e.Id == lvl.Id);
             Assert.That(matching, Is.Not.Null);
             Assert.That(matching!.Progress, Is.EqualTo(3));
         }
@@ -267,10 +267,10 @@ namespace Brave.Tests.EditMode.Systems.LiveOps
             var day2Quests = svc.GetTodaysQuests();
 
             Assert.That(day2Quests, Has.Length.EqualTo(3));
-            Assert.That(_save.Data.QuestState.RolledForDate, Is.EqualTo("2026-05-17"));
+            Assert.That(_save.Data.Quests.RolledForDate, Is.EqualTo("2026-05-17"));
 
             // Day-1 progress should be wiped from the persisted entries.
-            foreach (var entry in _save.Data.QuestState.Entries)
+            foreach (var entry in _save.Data.Quests.Entries)
             {
                 Assert.That(entry.Progress, Is.EqualTo(0),
                     $"Entry {entry.Id} must reset across UTC rollover.");

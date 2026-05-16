@@ -39,7 +39,7 @@ public sealed class SaveData
     // Wave 9: 7-day rotating login-reward calendar (DailyRewardService).
     [JsonProperty("dailyRewardState")] public DailyRewardState DailyRewardState = new();
     // Wave 9 LiveOps — daily quest/mission system (rotates at UTC midnight).
-    [JsonProperty("questState")] public QuestState QuestState = new();
+    [JsonProperty("questState")] public QuestState Quests = new();
     [JsonProperty("settings")] public SettingsSection Settings = new();
     [JsonProperty("stats")] public StatsSection Stats = new();
     // Wave 7C: first-run tutorial completion flag. Defaults to false; the

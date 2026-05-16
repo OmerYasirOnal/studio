@@ -17,6 +17,7 @@ using Brave.Systems.Achievements;
 using Brave.Systems.Context;
 using Brave.Systems.Localization;
 using Brave.UI.Bindings;
+using Brave.UI.Theming;
 using UnityEngine;
 using UnityEngine.UIElements;
 

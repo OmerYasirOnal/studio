@@ -80,7 +80,7 @@ namespace Brave.Systems.LiveOps
                 q.OnEvent(evt);
                 if (q.CurrentCount != before)
                 {
-                    PersistInto(_save.Data.QuestState, q);
+                    PersistInto(_save.Data.Quests, q);
                     QuestUpdated?.Invoke(q);
                     any = true;
                 }
@@ -101,7 +101,7 @@ namespace Brave.Systems.LiveOps
                 if (q == null || !string.Equals(q.Id, questId, StringComparison.Ordinal)) continue;
                 if (!q.TryMarkClaimed()) return default;
                 GrantReward(q.Reward);
-                PersistInto(_save.Data.QuestState, q);
+                PersistInto(_save.Data.Quests, q);
                 _save.Save();
                 QuestUpdated?.Invoke(q);
                 return q.Reward;
@@ -120,7 +120,7 @@ namespace Brave.Systems.LiveOps
 
         private void RollFor(string today)
         {
-            var state = _save.Data.QuestState;
+            var state = _save.Data.Quests;
             var persistedDate = state.RolledForDate ?? string.Empty;
             var sameDay = string.Equals(persistedDate, today, StringComparison.Ordinal);
 

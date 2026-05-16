@@ -118,7 +118,7 @@ namespace Brave.Tests.EditMode.Gameplay.Combat
             {
                 Random.InitState(12345);
                 var pick = TargetSelector.Select(Vector3.zero, list, TargetStrategy.Random);
-                Assert.That(pick, Is.AnyOf(a, b, c),
+                Assert.That(pick, Is.EqualTo(a).Or.EqualTo(b).Or.EqualTo(c),
                     "Random must return one of the supplied in-range candidates.");
             }
             finally { Random.state = prev; }

@@ -19,6 +19,7 @@ using Brave.Systems.Progression;
 using Brave.Systems.Save;
 using NUnit.Framework;
 using UnityEngine;
+using AchievementService = Brave.Systems.Achievements.AchievementService;
 
 namespace Brave.Tests.EditMode.Systems.Achievements
 {
