@@ -2,13 +2,13 @@ import { describe, it, expect, beforeAll, vi } from 'vitest';
 import { audio } from './AudioBus';
 
 beforeAll(() => {
-  (global as any).AudioContext = class {
+  (global as unknown as { AudioContext: typeof AudioContext }).AudioContext = class {
     createGain() { return { gain: { value: 0 }, connect: vi.fn() }; }
     createBufferSource() { return { buffer: null, connect: vi.fn(), start: vi.fn(), stop: vi.fn(), disconnect: vi.fn(), loop: false }; }
     decodeAudioData() { return Promise.resolve({}); }
     destination = {};
-  };
-  global.fetch = vi.fn(() => Promise.resolve({ arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)) })) as any;
+  } as unknown as typeof AudioContext;
+  global.fetch = vi.fn(() => Promise.resolve({ arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)) })) as unknown as typeof fetch;
 });
 
 describe('AudioBus', () => {

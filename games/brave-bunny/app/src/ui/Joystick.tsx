@@ -1,4 +1,3 @@
-/* global HTMLDivElement, PointerEvent */
 import { useRef, useEffect } from 'react';
 import { useRunStore } from '@/state/runStore';
 import './joystick.css';

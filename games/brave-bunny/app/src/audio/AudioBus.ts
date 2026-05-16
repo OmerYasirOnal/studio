@@ -22,7 +22,8 @@ class AudioBus {
 
   async init(): Promise<void> {
     if (this.initialized) return;
-    this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    this.ctx = new Ctx();
     this.master = this.ctx.createGain();
     this.sfxGain = this.ctx.createGain();
     this.bgmGain = this.ctx.createGain();
