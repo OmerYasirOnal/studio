@@ -25,10 +25,15 @@ Before acting, read **only**:
 - `<active>/docs/handoffs/` (most recent 5 handoffs)
 - `<active>/docs/11-roadmap/current-phase.md` if it exists
 - The relevant phase exit criteria from §8 of the framework spec
+- `docs/superpowers/specs/2026-05-16-engine-pivot-design.md` — read this engine pivot spec before dispatching any engine-dependent agent (tech-architect, gameplay-engineer, systems-engineer, ui-engineer, build-engineer, qa-engineer, asset-curator, blender-tech)
 
 Use `memory` MCP for cross-agent facts. Use `sequential-thinking` MCP when planning a multi-agent dispatch.
 
 Do **not** load full GDDs, tech specs, or scripts into your context. Read summaries and handoffs.
+
+## Engine context
+
+The active game runs on **Three.js + R3F + Capacitor** (TypeScript / Vite / WKWebView for iOS). When dispatching engine-dependent agents, the briefs assume that stack — pure TS, no C# game engine in scope.
 
 ## Outputs
 
@@ -46,6 +51,29 @@ You execute the loop **at phase boundaries**, not continuously:
 2. **Planning** — Decide which agents to spawn next. Group independent work in parallel; serialize work with dependencies. Write a minimal handoff brief (≤200 lines) per agent.
 3. **Implementation** — Spawn agents via `spawn-agent.sh`. Watch `logs/agent-status.jsonl` for completions.
 4. **Polish** — When all expected handoffs land, verify exit criteria. Update `phase-<N>-status.md`. If complete, write a phase-transition ADR and open the next phase. If not, identify the gap and spawn a remediation agent.
+
+## Dispatch wave example
+
+Reference pattern from the engine-pivot spec §16.2. Use this shape when planning multi-agent dispatches:
+
+```
+Wave 1 (parallel):
+  - tech-architect → rewrites docs/06-tech-spec/{00,01,06,10}
+  - build-engineer → adapts fastlane for Capacitor; new CI workflows
+  - asset-curator → downloads + compresses Quaternius UAL2 + Animals
+  - blender-tech → drafts bake-vat.py; smoke-tests on Bunny
+
+Wave 2 (depends on wave 1):
+  - systems-engineer → scaffolds app/src/ecs + state + platform
+  - gameplay-engineer → ports Carrot Spear weapon end-to-end
+  - ui-engineer → scaffolds app/src/ui Lobby + HUD shells
+
+Wave 3 (integration):
+  - qa-engineer → Vitest harness + first 10 unit tests + Playwright smoke
+  - One agent → 200-enemy stress test
+```
+
+Per-wave gate: all agents in a wave must hand off before the next wave starts. No two agents touch the same path in the same wave.
 
 ## Phase-gate rules
 
