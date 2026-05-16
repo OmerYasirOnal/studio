@@ -93,6 +93,17 @@ The "Best-effort fetches attempted" section above supersedes the original planni
 - 6 custom-Blender weapons (owner: blender-tech, not asset-curator)
 - ~24 custom MIT UI icons (owner: ui-engineer, not asset-curator)
 
+## MVP Stream S2 fetches (2026-05-16) — Quaternius via poly.pizza
+
+| File (relative to assets-raw/) | Source | License | URL | Author | Fetched |
+|---|---|---|---|---|---|
+| quaternius/bunny.glb | poly.pizza (Quaternius) | CC0 1.0 | https://poly.pizza/m/irZjWFARyl (CDN: https://static.poly.pizza/084b5ebe-c3eb-4e64-9b17-06e2d1e3da5d.glb) | Quaternius | 2026-05-16 |
+| quaternius/wolf.glb | poly.pizza (Quaternius) | CC0 1.0 | https://poly.pizza/m/P1gU3Qkr9r (CDN: https://static.poly.pizza/f1d12388-e39b-4157-b32a-646a1d089fc4.glb) | Quaternius | 2026-05-16 |
+| quaternius/slime.glb | poly.pizza (Quaternius) | CC0 1.0 | https://poly.pizza/m/eSLKTsbl7F (CDN: https://static.poly.pizza/93e6c3e3-75f8-441f-86d0-b223f7829005.glb) | Quaternius | 2026-05-16 |
+| quaternius/mushroom.glb | poly.pizza (Quaternius) | CC0 1.0 | https://poly.pizza/m/LWKmS30Xxl (CDN: https://static.poly.pizza/55c64684-49a4-4fcc-b393-113126add89b.glb) | Quaternius | 2026-05-16 |
+
+Note: `mushroom.glb` uses the "Mushnub" model (a stylized mushroom creature) by Quaternius — fits the tank-archetype enemy slot. The Quaternius "Slime Enemy" model is used for the slime archetype. Raw .glb files are NOT git-tracked (see root `.gitignore`); compressed outputs land in `app/assets/glb/` via `tools/assets/compress.mjs`.
+
 ## Allowed licenses
 
 - CC0 1.0 Universal
