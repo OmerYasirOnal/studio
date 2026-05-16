@@ -219,6 +219,22 @@ public sealed class GameContextBootstrap : MonoBehaviour
 
         // ADR-0009: scan [BraveRegister] mechanics + raise GameContextReady.
         Bootstrapper.Complete(ctx);
+
+        // ----------------------------------------------------------------------
+        // MVP fast-path (Wave 13): bypass MainMenu/Loadout and drop the player
+        // straight into the Run scene on first launch. The Boot scene's
+        // [SceneFlow] component already targets "Run" (nextScene = "Run") and
+        // its GameContextReady handler fires LoadSceneAsync above, so this is
+        // a belt-and-braces synchronous load that also documents the intent
+        // and gives us a single grep-able call site for v0.2's settings-driven
+        // wiring (SettingsService.SkipMenus toggle).
+        // ----------------------------------------------------------------------
+        const bool MVP_FAST_RUN = true;  // TODO(v0.2): gate behind ISettingsService.SkipMenus
+        if (MVP_FAST_RUN)
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene("Run");
+            return;
+        }
     }
 
     // ---- Wave 7A helpers ----
