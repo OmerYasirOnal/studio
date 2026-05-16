@@ -1,0 +1,24 @@
+.joystick {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  touch-action: none;
+  z-index: 100;
+}
+.joystick__knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  margin: -25px;
+  border-radius: 50%;
+  background: rgba(255, 111, 60, 0.8);
+  border: 2px solid #ff6f3c;
+  pointer-events: none;
+}
