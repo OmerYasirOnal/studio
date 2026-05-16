@@ -19,7 +19,7 @@ export default function Lobby() {
   return (
     <div className="overlay overlay--blocking">
       <div className="card card--lobby">
-        <h1 className="title">Brave Bunny</h1>
+        <h1 className="title lobby-title">Brave Bunny</h1>
         <button className="btn btn--cta" onClick={startRun}>
           ▶ PLAY
         </button>

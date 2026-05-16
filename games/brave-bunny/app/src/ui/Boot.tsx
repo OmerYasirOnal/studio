@@ -11,8 +11,9 @@ export default function Boot() {
   return (
     <div className="overlay overlay--blocking">
       <div className="card card--lobby">
-        <h1 className="title">Brave Bunny</h1>
-        <p style={{ color: 'var(--text-mute)' }}>Loading…</p>
+        <div style={{ fontSize: 64, marginBottom: 16 }}>🐰</div>
+        <h1 className="title lobby-title">Brave Bunny</h1>
+        <p style={{ color: 'var(--text-mute)', margin: 0 }}>Loading…</p>
       </div>
     </div>
   );
