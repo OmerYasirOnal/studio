@@ -211,7 +211,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!115 &581996090
+--- !u!115 &794893699
 MonoScript:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -328,6 +328,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1714413308}
   - component: {fileID: 1714413307}
+  - component: {fileID: 1714413309}
   m_Layer: 0
   m_Name: '[Bootstrap]'
   m_TagString: Untagged
@@ -345,8 +346,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 76e12912107b546a9ae448d6e9120e8d, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   _mixer: {fileID: 0}
   _languageTables: []
 --- !u!4 &1714413308
@@ -364,6 +365,30 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1714413309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1714413306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 794893699}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mixer: {fileID: 0}
+  _languageTables: []
+  _feelConfig: {fileID: 0}
+  _feelDefinition: {fileID: 0}
+  _damageNumberWidgetPrefab: {fileID: 0}
+  _damageNumberPoolCapacity: 32
+  _characterCatalogue: []
+  _questPool: {fileID: 0}
+  _questEnemyKilled: {fileID: 0}
+  _questLevelUp: {fileID: 0}
+  _questBossDefeated: {fileID: 0}
+  _questPickup: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
