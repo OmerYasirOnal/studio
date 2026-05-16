@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const RAW_DIR = join(__dirname, '../../assets-raw/quaternius');
-const OUT_DIR = join(__dirname, '../../app/assets/glb');
+const OUT_DIR = join(__dirname, '../../app/public/assets/glb');
 
 await mkdir(OUT_DIR, { recursive: true });
 await MeshoptDecoder.ready;
