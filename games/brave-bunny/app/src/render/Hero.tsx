@@ -4,27 +4,41 @@ import { useEffect, useRef } from 'react';
 import type { Group } from 'three';
 import { world } from '@/ecs/world';
 import { useRunStore } from '@/state/runStore';
+import { setMagnetRadius } from '@/systems/lifecycle';
 
 export default function Hero() {
   const groupRef = useRef<Group>(null);
   const gltf = useGLTF('/assets/glb/bunny.glb');
   const input = useRunStore((s) => s.input);
+  const phase = useRunStore((s) => s.phase);
 
   useEffect(() => {
-    const entity = world.add({
-      archetype: 'hero',
-      position: { x: 0, y: 0, z: 0 },
-      velocity: { x: 0, y: 0, z: 0 },
-      rotationY: 0,
-      hp: 100,
-      maxHp: 100,
-      team: 'hero',
-      speed: 4,
-    });
-    return () => {
-      world.remove(entity);
-    };
-  }, []);
+    // Mount once on lobby→run, remove on endrun→lobby
+    if (phase === 'run') {
+      // Check if hero already exists
+      const existing = world.with('archetype').where((e) => e.archetype === 'hero').first;
+      if (existing) return; // already mounted
+
+      world.add({
+        archetype: 'hero',
+        position: { x: 0, y: 0, z: 0 },
+        velocity: { x: 0, y: 0, z: 0 },
+        rotationY: 0,
+        hp: 100,
+        maxHp: 100,
+        team: 'hero',
+        speed: 4,
+        weapons: [
+          { kind: 'spear', damage: 15, tickInterval: 0.6, cooldown: 0, level: 1 },
+          { kind: 'sling', damage: 10, tickInterval: 0.4, cooldown: 0, level: 1 },
+        ],
+      });
+    } else if (phase === 'lobby') {
+      // Clean up all entities
+      for (const e of world.entities) world.remove(e);
+      setMagnetRadius(2);
+    }
+  }, [phase]);
 
   useFrame((_, delta) => {
     const hero = world.with('archetype').where((e) => e.archetype === 'hero').first;

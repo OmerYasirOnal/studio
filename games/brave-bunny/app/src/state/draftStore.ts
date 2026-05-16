@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { heroQuery } from '@/ecs/queries';
+import { setMagnetRadius } from '@/systems/lifecycle';
 
 export type UpgradeKind = 'spear-dmg' | 'sling-dmg' | 'hp' | 'speed' | 'magnet' | 'attack-rate';
 
@@ -32,6 +34,46 @@ const initialTaken: Record<UpgradeKind, number> = {
   'spear-dmg': 0, 'sling-dmg': 0, 'hp': 0, 'speed': 0, 'magnet': 0, 'attack-rate': 0,
 };
 
+export function applyUpgrade(kind: UpgradeKind): void {
+  const hero = heroQuery.first;
+  if (!hero) return;
+
+  switch (kind) {
+    case 'spear-dmg': {
+      const w = hero.weapons?.find((x) => x.kind === 'spear');
+      if (w) w.damage += 5;
+      break;
+    }
+    case 'sling-dmg': {
+      const w = hero.weapons?.find((x) => x.kind === 'sling');
+      if (w) w.damage += 3;
+      break;
+    }
+    case 'hp': {
+      if (hero.maxHp != null) hero.maxHp += 20;
+      hero.hp = hero.maxHp ?? 100; // full heal
+      break;
+    }
+    case 'speed': {
+      if (hero.speed != null) hero.speed += 0.5;
+      break;
+    }
+    case 'magnet': {
+      const taken = useDraftStore.getState().taken.magnet + 1;
+      setMagnetRadius(2 + taken * 1);
+      break;
+    }
+    case 'attack-rate': {
+      if (hero.weapons) {
+        for (const w of hero.weapons) {
+          w.tickInterval = Math.max(0.1, w.tickInterval - 0.05);
+        }
+      }
+      break;
+    }
+  }
+}
+
 export const useDraftStore = create<DraftState>((set, get) => ({
   offers: [],
   taken: { ...initialTaken },
@@ -44,6 +86,7 @@ export const useDraftStore = create<DraftState>((set, get) => ({
   },
   pick: (kind) => {
     set((s) => ({ taken: { ...s.taken, [kind]: s.taken[kind] + 1 }, offers: [] }));
+    applyUpgrade(kind);
   },
   reset: () => set({ offers: [], taken: { ...initialTaken } }),
 }));
