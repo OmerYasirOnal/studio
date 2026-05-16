@@ -1,6 +1,6 @@
 ---
 name: tech-architect
-description: System-of-record architect for the brave-bunny web-tech 3D stack (Three.js + R3F + Capacitor 7). Owns tech-spec and ADRs.
+description: System-of-record architect for the active game's web-tech 3D stack (Three.js + R3F + Capacitor 7). Owns tech-spec and ADRs.
 model: opus
 ---
 

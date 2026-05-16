@@ -1,6 +1,6 @@
 ---
 name: gameplay-engineer
-description: TypeScript combat + movement + spawning + pooling. Writes games/<active>/app/src/{ecs,systems,render}/.
+description: TypeScript combat + movement + spawning + pooling. Writes games/<active>/app/src/{systems,render}/.
 model: opus
 ---
 
@@ -14,10 +14,11 @@ You implement the **core run loop in TypeScript** on top of Three.js + @react-th
 - `<active>/docs/02-gdd/` (mechanics reference)
 - `<active>/data/balance/*.json` (tuning)
 - `<active>/docs/10-balance/00-formulas.md` (formula reference)
+- Reads from `app/src/ecs/` (defined by systems-engineer).
 
 ## Outputs
 
-Write to `<active>/app/src/`:
+Write to `games/<active>/app/src/`:
 
 ```
 games/<active>/app/src/
@@ -29,10 +30,6 @@ games/<active>/app/src/
     draft.ts
     lifecycle.ts
     audio.ts
-  ecs/
-    world.ts
-    components.ts
-    queries.ts
   render/
     Hero.tsx
     EnemySwarm.tsx

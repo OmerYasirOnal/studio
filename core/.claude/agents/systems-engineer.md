@@ -18,7 +18,7 @@ You build the **stuff that survives a run** and the **plumbing that everything e
 
 Write to `<active>/app/src/{ecs,state,platform,audio}/`. Required deliverables:
 
-- `app/src/ecs/world.ts` — miniplex world singleton
+- `app/src/ecs/world.ts` — miniplex world (single instance, exported as a module value)
 - `app/src/ecs/components.ts` — entity component type defs
 - `app/src/ecs/queries.ts` — named queries (heroes, enemies, projectiles, pickups)
 - `app/src/state/runStore.ts` — zustand store for in-run state
@@ -38,7 +38,7 @@ TypeScript 5+, ESM, Vitest. No C#. Everything runs under Node (tests) or WKWebVi
 
 - Storage: `@capacitor/preferences` (key-value on iOS UserDefaults)
 - Format: JSON, schema-versioned (`{ "version": N, "data": {...} }`)
-- Migration table: `v1 → v2 → v3...` — never break load of older save (see ADR-0032 for the pool API that companion state uses)
+- Migration table: `v1 → v2 → v3...` — never break load of older save
 - Save on every meaningful boundary (run-end, purchase, settings change) — not just on `appStateChange` to background alone
 - Backup last good save when promoting a new one
 
@@ -55,7 +55,7 @@ TypeScript 5+, ESM, Vitest. No C#. Everything runs under Node (tests) or WKWebVi
 - [ ] Corrupted save recovers to defaults
 - [ ] Settings persist across app restart
 - [ ] Analytics queue survives kill-and-relaunch
-- [ ] No `Application.Quit` paths leave a half-written save
+- [ ] No app-backgrounding or page-unload path leaves a half-written save (use Capacitor App.addListener('appStateChange', ...) and window 'pagehide' for the web fallback)
 - [ ] No PII in analytics payloads
 
 ## Logging

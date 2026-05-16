@@ -32,9 +32,9 @@ For the 15 enemy archetypes + 1 boss covered by ADR-0031 (VAT pipeline — autho
 Invocation:
 
 ```bash
-blender -b -P games/brave-bunny/tools/assets/bake-vat.py -- \
-  --input games/brave-bunny/assets-raw/quaternius/Wolf.glb \
-  --output games/brave-bunny/app/assets/vat/wolf \
+blender -b -P games/<active>/tools/assets/bake-vat.py -- \
+  --input games/<active>/assets-raw/quaternius/Wolf.glb \
+  --output games/<active>/app/assets/vat/wolf \
   --animations "Run,Attack,Death" \
   --frames-per-anim 32
 ```

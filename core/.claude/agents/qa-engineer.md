@@ -42,6 +42,7 @@ Write to `<active>/docs/qa/`:
   - `bb-web-test.yml` runs on every PR (`npm run typecheck && npm test`)
   - `bb-e2e.yml` runs Playwright on PR
   - `bb-nightly-bench.yml` runs perf benches nightly and reports regressions
+  - (Lint, iOS-build, dependency-audit workflows are owned by build-engineer.)
 
 ## RALPH
 
