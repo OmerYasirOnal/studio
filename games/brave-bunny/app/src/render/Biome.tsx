@@ -68,23 +68,12 @@ function InstancedDecor({
   });
 
   return (
-    <instancedMesh
-      ref={meshRef}
-      args={[undefined, undefined, count]}
-      castShadow
-      receiveShadow
-    >
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]} castShadow receiveShadow>
       {geom === 'tree-trunk' && <cylinderGeometry args={[0.15, 0.2, 1.0, 6]} />}
       {geom === 'tree-leaves' && <coneGeometry args={[0.7, 1.6, 6]} />}
       {geom === 'rock' && <dodecahedronGeometry args={[0.4]} />}
       <meshStandardMaterial
-        color={
-          geom === 'tree-leaves'
-            ? '#3e8a3a'
-            : geom === 'tree-trunk'
-              ? '#6b3a1f'
-              : '#888a8c'
-        }
+        color={geom === 'tree-leaves' ? '#3e8a3a' : geom === 'tree-trunk' ? '#6b3a1f' : '#888a8c'}
         flatShading
       />
     </instancedMesh>
