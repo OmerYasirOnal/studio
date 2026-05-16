@@ -22,6 +22,8 @@ What should change?
 - [ ] Observer improvement
 - [ ] Documentation
 - [ ] Other (describe)
+- [ ] New runtime code under `games/<active>/app/src/`
+- [ ] New asset pipeline tooling under `games/<active>/tools/assets/`
 
 ## Reusability check
 
