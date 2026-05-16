@@ -1,0 +1,29 @@
+# Cocoapods
+App/Pods/
+Pods/
+Podfile.lock.bak
+
+# Xcode user / build artifacts
+*.xcuserstate
+*.xcuserdatad/
+xcuserdata/
+DerivedData/
+App/build/
+App/output/
+build/
+*.dSYM/
+*.ipa
+*.xcarchive/
+
+# Capacitor-generated web bundle (copied from app/dist/)
+App/App/public/
+
+# Cordova plugins for Capacitor
+capacitor-cordova-ios-plugins/
+
+# Generated Config files (Capacitor-synced; not source-of-truth)
+App/App/capacitor.config.json
+App/App/config.xml
+
+# Misc
+.DS_Store
