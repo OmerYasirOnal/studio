@@ -20,7 +20,7 @@ There are two common ways people use AI to make games today, and both are frustr
 | **Manual chat** — ask ChatGPT/Claude piecewise and glue answers by hand | Slow, lossy, no shared memory between conversations |
 | **Generic orchestrators** — CrewAI, AutoGen, AgentBuilder | Built for office workflows; no game-dev opinion, no game-engine opinion, no asset pipeline |
 
-Studio sits in the middle: **an opinionated game-dev pipeline** with 16 specialist Claude Code agents that talk to each other through the filesystem, coordinated by a local FastAPI dashboard. The opinions are deliberate — Unity 6 LTS, GDD-first, CC0 assets only, mobile-first, single repo per studio with multiple games inside.
+Studio sits in the middle: **an opinionated game-dev pipeline** with 16 specialist Claude Code agents that talk to each other through the filesystem, coordinated by a local FastAPI dashboard. The opinions are deliberate — Three.js + R3F + Capacitor, GDD-first, CC0 assets only, mobile-first, single repo per studio with multiple games inside.
 
 No paid third-party APIs. No cloud lock-in. `git init` and go.
 
@@ -103,7 +103,7 @@ Every agent runs in its own clean Claude Code conversation. They never read each
 | 9 | blender-tech | Blender Python recolor / retex / props |
 | 10 | level-designer | Biomes, wave patterns, boss arenas |
 | 11 | balance-engineer | Damage formulas, XP curves, drop tables |
-| 12 | gameplay-engineer | Unity C# combat + core loop |
+| 12 | gameplay-engineer | TypeScript combat + R3F render loop |
 | 13 | systems-engineer | Save/load, progression, persistence |
 | 14 | ui-engineer | HUD, menus, UI Toolkit |
 | 15 | qa-engineer | Test plans, EditMode + PlayMode tests |
@@ -113,13 +113,13 @@ Every agent runs in its own clean Claude Code conversation. They never read each
 
 | Game | Genre | Status | Folder |
 |---|---|---|---|
-| **Brave Bunny** | Action roguelite (Survivor.io-like) | Phase 3 complete (Tech Architecture) — Phase 5 (Prototype) gated on tmux + Unity install | [`games/brave-bunny/`](games/brave-bunny/) |
+| **Brave Bunny** | Action roguelite (Survivor.io-like) | Phase 3 complete (Tech Architecture) — Phase 5 (Prototype) gated on Capacitor + iOS toolchain | [`games/brave-bunny/`](games/brave-bunny/) |
 
 ## Roadmap
 
 - **v0.1** — Brave Bunny ships to TestFlight (this repo state)
 - **v0.2** — Second game in a different genre; framework hardened from Brave Bunny's pain points
-- **v0.3** — Godot 4 support alongside Unity 6
+- **v0.3** — Godot 4 / Bevy support alongside the default web-tech stack
 - **v0.4** — Steam desktop build template
 
 ## License
