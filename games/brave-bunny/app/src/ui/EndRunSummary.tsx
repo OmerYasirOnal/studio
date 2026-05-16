@@ -41,7 +41,7 @@ export default function EndRunSummary() {
 
   return (
     <div className="overlay overlay--blocking">
-      <div className="card" style={{ minWidth: 320, maxWidth: 420 }}>
+      <div className="card endrun-card" style={{ minWidth: 320, maxWidth: 420 }}>
         <h2 className="title" style={{ textAlign: 'center' }}>
           Run Complete
         </h2>
