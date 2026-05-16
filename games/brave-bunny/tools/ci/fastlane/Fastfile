@@ -79,11 +79,16 @@ end
 # Invoke headless Unity build via the dedicated shell script.
 # Keeping this as a sh-out (not Ruby) means local devs can run the same script
 # without a fastlane install.
+#
+# target: "iOS"           — device SDK (default, used by preview/beta/release)
+# target: "iOS_Simulator" — simulator SDK (used by :simulator lane, Wave 12)
 private_lane :unity_build do |options|
   target = options[:target] || "iOS"
-  UI.user_error!("unity_build: only iOS target wired in v0.1 (got #{target})") unless target == "iOS"
-  UI.message("[unity_build] invoking #{UNITY_BUILD_SCRIPT}")
-  sh("bash", UNITY_BUILD_SCRIPT)
+  unless %w[iOS iOS_Simulator].include?(target)
+    UI.user_error!("unity_build: unsupported target '#{target}' (expected iOS or iOS_Simulator)")
+  end
+  UI.message("[unity_build] invoking #{UNITY_BUILD_SCRIPT} --target #{target}")
+  sh("bash", UNITY_BUILD_SCRIPT, "--target", target)
   UI.user_error!("unity_build: expected #{IOS_XCODEPROJ}") unless File.exist?(IOS_XCODEPROJ)
 end
 
@@ -576,6 +581,46 @@ platform :ios do
     )
 
     UI.success("[release] binary uploaded — open App Store Connect to submit for review")
+  end
+
+  # -------------------------------------------------------------------------
+  # Lane: simulator (Wave 12)
+  # Pre-TestFlight smoke test — Unity build for the iPhone Simulator SDK,
+  # xcodebuild for iphonesimulator, install + launch on a booted simulator,
+  # screenshot, and pink-pixel regression check.
+  #
+  # Cost: ~3-4 min total (vs. 15+ min TestFlight loop). Catches the pink-
+  # screen / shader-bundle regression class BEFORE we burn a TestFlight
+  # build number.
+  #
+  # No signing — simulator apps run unsigned. No match. No ASC traffic.
+  # Safe to run on any macOS machine with Xcode + Unity 6 LTS.
+  # -------------------------------------------------------------------------
+  desc "Build for iOS Simulator, launch, screenshot, pink-pixel regression check"
+  lane :simulator do |options|
+    device = options[:device] || ENV["BB_DEVICE"] || "iPhone 17"
+    skip_unity = options[:skip_unity] || ENV["BB_SKIP_UNITY"] == "1"
+
+    UI.message("[simulator] device: #{device}, skip_unity: #{skip_unity}")
+
+    # Step 1+2: Unity → xcodebuild → BraveBunny-sim.app
+    build_script = File.expand_path("../scripts/build-for-simulator.sh", __dir__)
+    env = skip_unity ? { "BB_SKIP_UNITY" => "1" } : {}
+    sh(env, "bash", build_script)
+
+    app_path = File.join(BUILD_OUTPUT_ROOT, "BraveBunny-sim.app")
+    UI.user_error!("[simulator] expected app at #{app_path}") unless File.exist?(app_path)
+    UI.success("[simulator] built sim app: #{app_path}")
+
+    # Step 3: install, launch, screenshot, pink-check
+    test_script = File.expand_path("../scripts/test-in-simulator.sh", __dir__)
+    test_env = {
+      "BB_APP_PATH" => app_path,
+      "BB_DEVICE"   => device
+    }
+    sh(test_env, "bash", test_script)
+
+    UI.success("[simulator] PASS — playable build verified before TestFlight")
   end
 
 end

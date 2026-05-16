@@ -34,10 +34,12 @@ namespace Brave.Boot
             try
             {
                 string outputPath = ParseArg("-output") ?? "Build/iOS";
+                bool simulator = HasFlag("-simulator");
                 Debug.Log($"[IOSBuilder] output path: {outputPath}");
+                Debug.Log($"[IOSBuilder] simulator mode: {simulator}");
 
                 // Force iOS player settings per tech-spec 00 (IL2CPP, .NET Std 2.1, ARM64).
-                ConfigureIOSPlayerSettings();
+                ConfigureIOSPlayerSettings(simulator);
 
                 // Pull enabled scenes from EditorBuildSettings.
                 string[] scenes = EditorBuildSettings.scenes
@@ -93,13 +95,21 @@ namespace Brave.Boot
         /// <summary>
         /// Apply tech-spec 00 player settings: IL2CPP, .NET Standard 2.1, ARM64,
         /// bundle id, build number from GITHUB_RUN_NUMBER if present.
+        /// When <paramref name="simulator"/> is true, switch sdkVersion to the
+        /// iPhone Simulator SDK (Wave 12 — pre-TestFlight smoke-test pipeline).
         /// </summary>
-        private static void ConfigureIOSPlayerSettings()
+        private static void ConfigureIOSPlayerSettings(bool simulator = false)
         {
             PlayerSettings.applicationIdentifier = "com.omeryasir.bravebunny";
             PlayerSettings.SetScriptingBackend(BuildTargetGroup.iOS, ScriptingImplementation.IL2CPP);
             PlayerSettings.SetApiCompatibilityLevel(BuildTargetGroup.iOS, ApiCompatibilityLevel.NET_Standard);
             PlayerSettings.SetArchitecture(BuildTargetGroup.iOS, 1); // 1 = ARM64
+
+            // SDK selection — Device by default, Simulator for the Wave 12 sim smoke pipeline.
+            PlayerSettings.iOS.sdkVersion = simulator
+                ? iOSSdkVersion.SimulatorSDK
+                : iOSSdkVersion.DeviceSDK;
+            Debug.Log($"[IOSBuilder] PlayerSettings.iOS.sdkVersion = {PlayerSettings.iOS.sdkVersion}");
 
             // iOS deployment target — tech-spec 00 declares iOS 14 minimum.
             PlayerSettings.iOS.targetOSVersionString = "14.0";
@@ -129,6 +139,14 @@ namespace Brave.Boot
                 if (args[i] == name) return args[i + 1];
             }
             return null;
+        }
+
+        /// <summary>
+        /// Boolean flag check (no value follows). Used for `-simulator`.
+        /// </summary>
+        private static bool HasFlag(string name)
+        {
+            return Environment.GetCommandLineArgs().Any(a => a == name);
         }
     }
 }
