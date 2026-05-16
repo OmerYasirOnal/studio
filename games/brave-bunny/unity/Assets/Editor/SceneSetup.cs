@@ -424,18 +424,32 @@ public static class SceneSetup
                 timerProp.objectReferenceValue = timerComp;
         }
 
-        // wave — no WaveDefinition asset exists until level-designer generates them.
+        // wave — Wave-13 MVP: prefer the default Wave_Mvp_Test.asset so the run scene
+        // actually spawns enemies. If missing, build it on the fly via WaveDefBuilder
+        // (which will in turn lazily build the default enemy prefab + EnemyDefinition).
+        var wave = AssetDatabase.LoadAssetAtPath<WaveDefinition>(WaveDefBuilder.WaveAssetPath);
+        if (wave == null)
+        {
+            Debug.Log("[SceneSetup] Wave_Mvp_Test.asset missing — invoking WaveDefBuilder.Build().");
+            WaveDefBuilder.Build();
+            wave = AssetDatabase.LoadAssetAtPath<WaveDefinition>(WaveDefBuilder.WaveAssetPath);
+        }
         var waveProp = so.FindProperty("wave");
         if (waveProp != null)
-            waveProp.objectReferenceValue = null;   // graceful null — logged below
+            waveProp.objectReferenceValue = wave;
 
-        Debug.LogWarning(
-            "[SceneSetup] WaveSpawner.wave is null — no WaveDefinition SO found. "
-            + "Generate Assets/_Brave/Data/Balance/Wave_meadow.asset from "
-            + "docs/09-level-design/01-biomes/meadow/waves.json to enable spawning.");
+        if (wave == null)
+        {
+            Debug.LogWarning(
+                "[SceneSetup] WaveSpawner.wave is null — WaveDefBuilder failed to produce "
+                + WaveDefBuilder.WaveAssetPath + ". Run BraveBunny > MVP > Build Default WaveDefinition manually.");
+        }
 
         so.ApplyModifiedPropertiesWithoutUndo();
-        Debug.Log("[SceneSetup] [WaveSpawner] wired (wave=null, hero+runTimer set).");
+        Debug.Log(
+            wave != null
+                ? $"[SceneSetup] [WaveSpawner] wired (wave={wave.name}, hero+runTimer set)."
+                : "[SceneSetup] [WaveSpawner] wired (wave=null, hero+runTimer set).");
     }
 
     /// <summary>
