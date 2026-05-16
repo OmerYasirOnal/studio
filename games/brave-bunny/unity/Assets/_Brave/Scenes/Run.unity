@@ -421,7 +421,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   initialPoolSize: 64
-  projectilePrefab: {fileID: 0}
+  projectilePrefab: {fileID: 6364634749583916626, guid: a04a35730e5f9418d8f0c65b30b3681a, type: 3}
 --- !u!4 &612046525
 Transform:
   m_ObjectHideFlags: 0
@@ -469,6 +469,7 @@ MonoBehaviour:
   wave: {fileID: 0}
   runTimer: {fileID: 1818436391}
   hero: {fileID: 1084411930}
+  bossCapacity: 1
 --- !u!4 &857979567
 Transform:
   m_ObjectHideFlags: 0
@@ -722,6 +723,58 @@ Material:
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
+--- !u!1 &1070030923
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1070030925}
+  - component: {fileID: 1070030924}
+  m_Layer: 0
+  m_Name: '[MvpWaveSpawner]'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1070030924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1070030923}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b83c68887dcd8453892cb13652684b43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnIntervalSeconds: 3
+  swarmersPerWave: 5
+  ringRadius: 8
+  activeCap: 50
+  hero: {fileID: 1084411930}
+  swarmerPrefab: {fileID: 0}
+  swarmerMoveSpeed: 2.5
+  swarmerHp: 10
+--- !u!4 &1070030925
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1070030923}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1084411929
 GameObject:
   m_ObjectHideFlags: 0
@@ -732,10 +785,11 @@ GameObject:
   m_Component:
   - component: {fileID: 1084411930}
   - component: {fileID: 1084411935}
-  - component: {fileID: 1084411934}
   - component: {fileID: 1084411933}
   - component: {fileID: 1084411932}
   - component: {fileID: 1084411931}
+  - component: {fileID: 1084411937}
+  - component: {fileID: 1084411936}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -832,8 +886,43 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &1084411934
-BoxCollider:
+--- !u!33 &1084411935
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1084411929}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!54 &1084411936
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1084411929}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 4
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 116
+  m_CollisionDetection: 0
+--- !u!136 &1084411937
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -850,17 +939,11 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  serializedVersion: 2
+  m_Radius: 0.4
+  m_Height: 1
+  m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!33 &1084411935
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1084411929}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1402933670
 GameObject:
   m_ObjectHideFlags: 0
@@ -872,6 +955,7 @@ GameObject:
   - component: {fileID: 1402933673}
   - component: {fileID: 1402933672}
   - component: {fileID: 1402933671}
+  - component: {fileID: 1402933674}
   m_Layer: 0
   m_Name: MainCamera
   m_TagString: MainCamera
@@ -946,13 +1030,30 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1402933670}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.46174863, y: 0, z: 0, w: 0.8870109}
-  m_LocalPosition: {x: 0, y: 14.7, z: -10.4}
+  m_LocalRotation: {x: 0.33134156, y: -0.4028543, z: 0.159251, w: 0.8381887}
+  m_LocalPosition: {x: 10, y: 12, z: -8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1402933674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1402933670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf7594ea5c0e432fad6720300caf5a6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 1084411930}
+  offset: {x: 10, y: 12, z: -8}
+  smoothTime: 0.12
+  maxSpeed: Infinity
+  lookAtTarget: 1
 --- !u!115 &1470956423
 MonoScript:
   m_ObjectHideFlags: 0
@@ -1044,6 +1145,10 @@ MonoBehaviour:
   _activeCharacter: {fileID: 11400000, guid: 03f69ff68d3e3467c869c7809c1d3860, type: 2}
   _activeBiome: {fileID: 0}
   _deathChannel: {fileID: 0}
+  _runEndedChannel: {fileID: 0}
+  _enemyKilledChannel: {fileID: 0}
+  _levelUpChannel: {fileID: 0}
+  _pickupChannel: {fileID: 0}
 --- !u!4 &1968681195
 Transform:
   m_ObjectHideFlags: 0
@@ -1072,3 +1177,4 @@ SceneRoots:
   - {fileID: 857979567}
   - {fileID: 1968681195}
   - {fileID: 475560178}
+  - {fileID: 1070030925}
