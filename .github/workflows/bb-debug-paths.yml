@@ -1,0 +1,13 @@
+name: bb-debug-paths
+
+on:
+  push:
+    branches: [debug/bb-workflows]
+    paths:
+      - '.github/workflows/bb-debug-paths.yml'
+
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "paths filter works"
