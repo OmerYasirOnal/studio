@@ -81,7 +81,7 @@ export function tickWeapons(delta: number): void {
       const coneCosThreshold = Math.cos(Math.PI / 6); // 30° half-angle = 60° cone
 
       for (const e of enemyQuery) {
-        if (!e.position || e.hp == null) continue;
+        if (!e.position || e.hp == null || e.dying) continue;
         if (
           !isInCone(
             hero.position.x,
@@ -104,7 +104,7 @@ export function tickWeapons(delta: number): void {
       let nearest: Entity | null = null;
       let nearestDistSq = 64; // 8u range squared
       for (const e of enemyQuery) {
-        if (!e.position || e.hp == null) continue;
+        if (!e.position || e.hp == null || e.dying) continue;
         const d = distSq(e.position, hero.position);
         if (d < nearestDistSq) {
           nearest = e;

@@ -11,10 +11,15 @@ export function setMagnetRadius(r: number): void {
   magnetRadiusSq = r * r;
 }
 
+const ENEMY_DEATH_ANIM_DURATION = 0.6;
+
 export function tickLifecycle(delta: number): void {
-  // Enemy death → spawn pickup, increment kills
+  // Enemy death → mark as dying, spawn pickup, increment kills
+  // (actual world.remove deferred until deathTimer expires so death anim plays)
   for (const e of enemyQuery) {
-    if (e.hp != null && e.hp <= 0) {
+    if (e.hp != null && e.hp <= 0 && !e.dying) {
+      e.dying = true;
+      e.deathTimer = ENEMY_DEATH_ANIM_DURATION;
       if (e.position && e.xpValue != null) {
         world.add({
           archetype: 'pickup',
@@ -26,7 +31,16 @@ export function tickLifecycle(delta: number): void {
         });
       }
       useRunStore.getState().incKills();
-      world.remove(e);
+    }
+  }
+
+  // Tick dying timers + remove when done
+  for (const e of enemyQuery) {
+    if (e.dying && e.deathTimer != null) {
+      e.deathTimer -= delta;
+      if (e.deathTimer <= 0) {
+        world.remove(e);
+      }
     }
   }
 
