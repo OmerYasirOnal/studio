@@ -8,18 +8,31 @@ on:
 jobs:
   audit:
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('games/brave-bunny/app/package.json') != '' }}
     defaults:
       run:
         working-directory: games/brave-bunny/app
     steps:
       - uses: actions/checkout@v4
+      - name: Guard — skip if app/ not yet present
+        id: guard
+        shell: bash
+        run: |
+          if [ ! -f games/brave-bunny/app/package.json ]; then
+            echo "app/package.json missing — skipping audit"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+        working-directory: ${{ github.workspace }}
       - uses: actions/setup-node@v4
+        if: steps.guard.outputs.skip != 'true'
         with:
           node-version: '22'
           cache: 'npm'
           cache-dependency-path: games/brave-bunny/app/package-lock.json
       - name: npm audit (high+ only)
+        if: steps.guard.outputs.skip != 'true'
         run: npm audit --audit-level=high
       - name: Check for outdated majors
+        if: steps.guard.outputs.skip != 'true'
         run: npm outdated || true

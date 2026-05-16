@@ -24,7 +24,7 @@ export default [
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
-      'react': reactPlugin,
+      react: reactPlugin,
       'react-hooks': reactHooksPlugin,
     },
     rules: {
@@ -41,6 +41,14 @@ export default [
     settings: { react: { version: 'detect' } },
   },
   {
-    ignores: ['dist/**', 'node_modules/**', 'playwright-report/**', 'test-results/**', 'coverage/**', '.tsbuildinfo-node/**', '**/*.tsbuildinfo'],
+    ignores: [
+      'dist/**',
+      'node_modules/**',
+      'playwright-report/**',
+      'test-results/**',
+      'coverage/**',
+      '.tsbuildinfo-node/**',
+      '**/*.tsbuildinfo',
+    ],
   },
 ];
