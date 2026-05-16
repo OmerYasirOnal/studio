@@ -61,7 +61,23 @@ Local archive without uploading (smoke test the pipeline)
 [bundle exec] fastlane ios beta
 ```
 
-Build and upload to TestFlight
+Build and upload Capacitor iOS shell to TestFlight
+
+### ios beta_no_match
+
+```sh
+[bundle exec] fastlane ios beta_no_match
+```
+
+Build and upload Capacitor iOS shell to TestFlight WITHOUT match (uses local cert+profile)
+
+### ios beta_unity
+
+```sh
+[bundle exec] fastlane ios beta_unity
+```
+
+[LEGACY Unity flow] Build and upload Unity-generated Xcode project to TestFlight
 
 ### ios beta_local
 
