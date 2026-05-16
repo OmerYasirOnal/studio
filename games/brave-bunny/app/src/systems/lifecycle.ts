@@ -2,6 +2,7 @@ import { world } from '@/ecs/world';
 import { enemyQuery, heroQuery, pickupQuery } from '@/ecs/queries';
 import { useRunStore } from '@/state/runStore';
 import { audio } from '@/audio/AudioBus';
+import { useVfxStore } from '@/state/vfxStore';
 
 const MAGNET_RADIUS_SQ = 9; // default 3u magnet
 const PICKUP_HIT_RADIUS_SQ = 1.0; // 1.0u
@@ -20,6 +21,9 @@ export function tickLifecycle(delta: number): void {
     if (e.hp != null && e.hp <= 0 && !e.dying) {
       e.dying = true;
       e.deathTimer = ENEMY_DEATH_ANIM_DURATION;
+      if (e.position) {
+        useVfxStore.getState().emitPoof(e.position.x, e.position.y, e.position.z);
+      }
       if (e.position && e.xpValue != null) {
         world.add({
           archetype: 'pickup',
@@ -71,6 +75,9 @@ export function tickLifecycle(delta: number): void {
         if (newLevel > prevLevel) {
           audio.play('levelup');
           useRunStore.getState().setPhase('draft');
+          if (hero.position) {
+            useVfxStore.getState().emitBurst(hero.position.x, hero.position.y, hero.position.z);
+          }
         } else {
           audio.play('gem');
         }

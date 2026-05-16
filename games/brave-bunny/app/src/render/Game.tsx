@@ -6,6 +6,10 @@ import Biome from './Biome';
 import ProjectileSwarm from './ProjectileSwarm';
 import EnemySwarm from './EnemySwarm'; // S7
 import PickupSwarm from './PickupSwarm'; // S7/S8
+import HitSparks from './HitSparks';
+import LevelUpBurst from './LevelUpBurst';
+import DeathPoofs from './DeathPoofs';
+import { DamageNumbersProjector } from './DamageNumbers';
 import { RunLoop } from '@/systems/runLoop';
 
 export default function Game() {
@@ -42,6 +46,10 @@ export default function Game() {
         <PickupSwarm />
       </Suspense>
       <ProjectileSwarm />
+      <HitSparks />
+      <LevelUpBurst />
+      <DeathPoofs />
+      <DamageNumbersProjector />
       <CameraRig />
       <RunLoop />
     </Canvas>
