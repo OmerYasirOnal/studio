@@ -388,7 +388,12 @@ platform :ios do
   lane :beta_local do
     api_key = asc_api_key
 
-    unity_build(target: "iOS")
+    if ENV["BB_SKIP_UNITY"] == "1"
+      UI.message("[beta_local] BB_SKIP_UNITY=1 — skipping unity_build (using existing Xcode project)")
+      UI.user_error!("BB_SKIP_UNITY=1 but #{IOS_XCODEPROJ} missing") unless File.exist?(IOS_XCODEPROJ)
+    else
+      unity_build(target: "iOS")
+    end
 
     # Fetch / create the AppStore provisioning profile via ASC API (no match).
     sigh(

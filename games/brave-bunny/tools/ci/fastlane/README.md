@@ -63,6 +63,14 @@ Local archive without uploading (smoke test the pipeline)
 
 Build and upload to TestFlight
 
+### ios beta_local
+
+```sh
+[bundle exec] fastlane ios beta_local
+```
+
+Build and upload to TestFlight without match (sigh-based)
+
 ### ios upload_existing
 
 ```sh
@@ -86,6 +94,14 @@ Re-archive the existing Xcode project + upload to TestFlight (skips Unity rebuil
 ```
 
 App Store submission (manual gate — binary upload only, no auto-submit)
+
+### ios simulator
+
+```sh
+[bundle exec] fastlane ios simulator
+```
+
+Build for iOS Simulator, launch, screenshot, pink-pixel regression check
 
 ----
 
