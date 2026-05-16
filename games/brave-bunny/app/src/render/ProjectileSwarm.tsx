@@ -28,8 +28,8 @@ export default function ProjectileSwarm() {
 
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, MAX_PROJECTILES]}>
-      <sphereGeometry args={[0.15, 8, 8]} />
-      <meshStandardMaterial color="#ffba00" emissive="#ff6f3c" emissiveIntensity={0.5} />
+      <sphereGeometry args={[0.25, 12, 12]} />
+      <meshStandardMaterial color="#ffba00" emissive="#ff6f3c" emissiveIntensity={1.2} />
     </instancedMesh>
   );
 }

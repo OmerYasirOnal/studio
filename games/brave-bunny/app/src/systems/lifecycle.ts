@@ -3,8 +3,8 @@ import { enemyQuery, heroQuery, pickupQuery } from '@/ecs/queries';
 import { useRunStore } from '@/state/runStore';
 import { audio } from '@/audio/AudioBus';
 
-const MAGNET_RADIUS_SQ = 4; // default 2u magnet
-const PICKUP_HIT_RADIUS_SQ = 0.36; // 0.6u
+const MAGNET_RADIUS_SQ = 9; // default 3u magnet
+const PICKUP_HIT_RADIUS_SQ = 1.0; // 1.0u
 let magnetRadiusSq = MAGNET_RADIUS_SQ;
 
 export function setMagnetRadius(r: number): void {

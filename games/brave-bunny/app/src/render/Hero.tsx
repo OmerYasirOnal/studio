@@ -1,4 +1,4 @@
-import { useGLTF } from '@react-three/drei';
+import { useGLTF, useAnimations } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import type { Group } from 'three';
@@ -9,6 +9,7 @@ import { setMagnetRadius } from '@/systems/lifecycle';
 export default function Hero() {
   const groupRef = useRef<Group>(null);
   const gltf = useGLTF('/assets/glb/bunny.glb');
+  const { actions, names } = useAnimations(gltf.animations, groupRef);
   const input = useRunStore((s) => s.input);
   const phase = useRunStore((s) => s.phase);
 
@@ -40,7 +41,41 @@ export default function Hero() {
     }
   }, [phase]);
 
+  // Resolve animation names by suffix (Quaternius prefixes vary:
+  // CharacterArmature|, AnimalArmature|, MonsterArmature|).
+  const findAnim = (suffix: string): string | undefined =>
+    names.find((n) => n.endsWith(suffix)) ?? names[0];
+  const IDLE = findAnim('Idle');
+  const RUN = findAnim('Run') ?? IDLE;
+
+  // Play idle by default on mount
+  useEffect(() => {
+    if (!actions || !IDLE) return;
+    const action = actions[IDLE];
+    action?.reset().fadeIn(0.2).play();
+    return () => {
+      action?.fadeOut(0.2);
+    };
+  }, [actions, IDLE]);
+
+  // Crossfade between idle and run based on input.active
+  const currentAnimRef = useRef<string | undefined>(IDLE);
+
   useFrame((_, delta) => {
+    const target =
+      input.active && (Math.abs(input.x) > 0.1 || Math.abs(input.y) > 0.1) ? RUN : IDLE;
+    if (
+      target &&
+      currentAnimRef.current &&
+      currentAnimRef.current !== target &&
+      actions[target] &&
+      actions[currentAnimRef.current]
+    ) {
+      actions[currentAnimRef.current]?.fadeOut(0.15);
+      actions[target]?.reset().fadeIn(0.15).play();
+      currentAnimRef.current = target;
+    }
+
     const hero = world.with('archetype').where((e) => e.archetype === 'hero').first;
     if (!hero || !hero.position) return;
 
@@ -61,7 +96,7 @@ export default function Hero() {
 
   return (
     <group ref={groupRef}>
-      <primitive object={gltf.scene} scale={1} />
+      <primitive object={gltf.scene} scale={0.5} />
     </group>
   );
 }

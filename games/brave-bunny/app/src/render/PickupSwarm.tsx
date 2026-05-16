@@ -17,7 +17,7 @@ export default function PickupSwarm() {
     let i = 0;
     for (const p of pickupQuery) {
       if (!p.position) continue;
-      pos.set(p.position.x, p.position.y + 0.4 + Math.sin(t.current * 4 + i) * 0.1, p.position.z);
+      pos.set(p.position.x, p.position.y + 0.6 + Math.sin(t.current * 4 + i) * 0.15, p.position.z);
       matrix.setPosition(pos);
       meshRef.current.setMatrixAt(i, matrix);
       i++;
@@ -29,8 +29,8 @@ export default function PickupSwarm() {
 
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, MAX_PICKUPS]}>
-      <octahedronGeometry args={[0.2]} />
-      <meshStandardMaterial color="#5acff6" emissive="#5acff6" emissiveIntensity={0.6} />
+      <octahedronGeometry args={[0.3]} />
+      <meshStandardMaterial color="#5acff6" emissive="#5acff6" emissiveIntensity={1.5} />
     </instancedMesh>
   );
 }

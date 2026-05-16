@@ -43,7 +43,7 @@ function spawnProjectile(
   const speed = 12;
   world.add({
     archetype: 'projectile',
-    position: { x: from.x, y: from.y + 0.5, z: from.z },
+    position: { x: from.x, y: from.y + 0.3, z: from.z },
     velocity: {
       x: dist === 0 ? 0 : (dx / dist) * speed,
       y: 0,
