@@ -1,7 +1,16 @@
 import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
-import { AnimationMixer, type Group, type Mesh, type MeshStandardMaterial } from 'three';
+import {
+  AnimationMixer,
+  LoopOnce,
+  LoopRepeat,
+  type AnimationAction,
+  type AnimationClip,
+  type Group,
+  type Mesh,
+  type MeshStandardMaterial,
+} from 'three';
 import { SkeletonUtils } from 'three-stdlib';
 import type { Entity } from '@/ecs/components';
 
@@ -17,6 +26,8 @@ const SCALE_MAP: Record<string, number> = {
   mushroom: 0.5,
 };
 
+type EnemyAnimState = 'walk' | 'death';
+
 export default function EnemyEntity({ entity }: { entity: Entity }) {
   const groupRef = useRef<Group>(null);
   const modelKey = entity.archetype as keyof typeof MODEL_MAP;
@@ -27,20 +38,37 @@ export default function EnemyEntity({ entity }: { entity: Entity }) {
   const clonedScene = useMemo(() => SkeletonUtils.clone(gltf.scene), [gltf.scene]);
   const mixer = useMemo(() => new AnimationMixer(clonedScene), [clonedScene]);
 
-  // Pick walk/idle animation by suffix and play it on a loop.
+  // Resolve animations by suffix (handles AnimalArmature|, MonsterArmature|,
+  // CharacterArmature| prefixes uniformly).
+  const findClip = (suffix: string): AnimationClip | undefined =>
+    gltf.animations.find((a) => a.name.endsWith(suffix));
+  const WALK = useMemo(
+    () => findClip('Walk') ?? findClip('Idle') ?? gltf.animations[0],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [gltf.animations],
+  );
+  const DEATH = useMemo(
+    () => findClip('Death'),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [gltf.animations],
+  );
+
+  const stateRef = useRef<EnemyAnimState>('walk');
+  const currentActionRef = useRef<AnimationAction | null>(null);
+
+  // Play walk loop on mount
   useEffect(() => {
-    const clip =
-      gltf.animations.find((a) => a.name.endsWith('Walk')) ??
-      gltf.animations.find((a) => a.name.endsWith('Idle')) ??
-      gltf.animations[0];
-    if (!clip) return;
-    const action = mixer.clipAction(clip);
+    if (!WALK) return;
+    const action = mixer.clipAction(WALK);
+    action.setLoop(LoopRepeat, Infinity);
     action.reset().fadeIn(0.1).play();
+    currentActionRef.current = action;
+    stateRef.current = 'walk';
     return () => {
       action.fadeOut(0.1);
       mixer.stopAllAction();
     };
-  }, [mixer, gltf.animations]);
+  }, [mixer, WALK]);
 
   useFrame((_, delta) => {
     mixer.update(delta);
@@ -48,6 +76,18 @@ export default function EnemyEntity({ entity }: { entity: Entity }) {
     groupRef.current.position.set(entity.position.x, entity.position.y, entity.position.z);
     if (entity.rotationY != null) groupRef.current.rotation.y = entity.rotationY;
 
+    // Switch to death anim once when the entity enters the dying state
+    if (entity.dying && stateRef.current !== 'death' && DEATH) {
+      currentActionRef.current?.fadeOut(0.1);
+      const deathAction = mixer.clipAction(DEATH);
+      deathAction.setLoop(LoopOnce, 1);
+      deathAction.clampWhenFinished = true;
+      deathAction.reset().fadeIn(0.05).play();
+      currentActionRef.current = deathAction;
+      stateRef.current = 'death';
+    }
+
+    // Hit flash via emissive (existing behaviour, supplements the death anim)
     if (entity.hitFlashTime != null && entity.hitFlashTime > 0) {
       entity.hitFlashTime -= delta;
       clonedScene.traverse((o) => {

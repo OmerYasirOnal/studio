@@ -14,6 +14,7 @@ export function tickEnemyAI(delta: number): void {
 
   for (const e of enemyQuery) {
     if (!e.position || !e.velocity || e.hp == null) continue;
+    if (e.dying) continue; // dying enemies freeze (death anim plays)
 
     // Despawn if too far
     const dxh = e.position.x - hero.position.x;

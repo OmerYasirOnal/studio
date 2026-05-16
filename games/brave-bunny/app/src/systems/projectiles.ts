@@ -16,7 +16,7 @@ export function tickProjectiles(delta: number): void {
 
     // Collision with enemies (AABB-ish: 0.3u projectile, 0.5u enemy)
     for (const e of enemyQuery) {
-      if (!e.position || e.hp == null) continue;
+      if (!e.position || e.hp == null || e.dying) continue;
       const dx = e.position.x - p.position.x;
       const dz = e.position.z - p.position.z;
       if (dx * dx + dz * dz < 0.64) {

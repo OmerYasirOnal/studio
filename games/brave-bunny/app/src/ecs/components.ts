@@ -31,4 +31,6 @@ export interface Entity {
   weapons?: WeaponInstance[];
   xpValue?: number;
   hitFlashTime?: number;
+  dying?: boolean;
+  deathTimer?: number;
 }
