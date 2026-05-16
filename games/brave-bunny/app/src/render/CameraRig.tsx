@@ -2,7 +2,7 @@ import { useThree, useFrame } from '@react-three/fiber';
 import { Vector3 } from 'three';
 import { world } from '@/ecs/world';
 
-const OFFSET = new Vector3(0, 14, 9);
+const OFFSET = new Vector3(0, 16, 10);
 const TARGET = new Vector3();
 const DESIRED = new Vector3();
 
