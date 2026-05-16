@@ -1,5 +1,23 @@
-// Stub — replaced by Stream S7 (Task 35: per-archetype enemy rendering).
-// Kept minimal so S6's Game.tsx typechecks + renders before S7 lands.
+import { useState, useEffect } from 'react';
+import { enemyQuery } from '@/ecs/queries';
+import EnemyEntity from './EnemyEntity';
+import type { Entity } from '@/ecs/components';
+
 export default function EnemySwarm() {
-  return null;
+  const [, force] = useState(0);
+
+  useEffect(() => {
+    const unsubAdd = enemyQuery.onEntityAdded.subscribe(() => force((n) => n + 1));
+    const unsubRemove = enemyQuery.onEntityRemoved.subscribe(() => force((n) => n + 1));
+    return () => { unsubAdd(); unsubRemove(); };
+  }, []);
+
+  const enemies: Entity[] = [];
+  for (const e of enemyQuery) enemies.push(e);
+
+  return (
+    <>
+      {enemies.map((e, i) => <EnemyEntity key={(e as unknown as { __id?: number }).__id ?? i} entity={e} />)}
+    </>
+  );
 }

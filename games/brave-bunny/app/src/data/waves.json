@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "waves": [
+    { "timeStart": 0,   "timeEnd": 30,  "spawnInterval": 1.5, "archetypeWeights": { "slime": 0.8, "wolf": 0.15, "mushroom": 0.05 } },
+    { "timeStart": 30,  "timeEnd": 90,  "spawnInterval": 1.0, "archetypeWeights": { "slime": 0.6, "wolf": 0.3,  "mushroom": 0.1  } },
+    { "timeStart": 90,  "timeEnd": 180, "spawnInterval": 0.7, "archetypeWeights": { "slime": 0.4, "wolf": 0.4,  "mushroom": 0.2  } },
+    { "timeStart": 180, "timeEnd": 300, "spawnInterval": 0.5, "archetypeWeights": { "slime": 0.3, "wolf": 0.4,  "mushroom": 0.3  } }
+  ],
+  "archetypes": {
+    "slime":    { "hp": 10, "speed": 2, "damage": 5,  "xpValue": 2 },
+    "wolf":     { "hp": 25, "speed": 4, "damage": 10, "xpValue": 5 },
+    "mushroom": { "hp": 60, "speed": 1, "damage": 15, "xpValue": 12 }
+  }
+}
