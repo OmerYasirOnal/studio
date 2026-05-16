@@ -3,6 +3,10 @@ import { Suspense } from 'react';
 import Hero from './Hero';
 import CameraRig from './CameraRig';
 import Biome from './Biome';
+import ProjectileSwarm from './ProjectileSwarm';
+import EnemySwarm from './EnemySwarm'; // S7
+import PickupSwarm from './PickupSwarm'; // S7/S8
+import { RunLoop } from '@/systems/runLoop';
 
 export default function Game() {
   return (
@@ -18,8 +22,12 @@ export default function Game() {
       <Suspense fallback={null}>
         <Biome />
         <Hero />
+        <EnemySwarm />
+        <PickupSwarm />
       </Suspense>
+      <ProjectileSwarm />
       <CameraRig />
+      <RunLoop />
     </Canvas>
   );
 }
